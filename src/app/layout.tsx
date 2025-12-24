@@ -33,6 +33,8 @@ export const metadata: Metadata = {
   description: "The drinking game where your secrets aren't safe. Sandy knows your friends, Sandy makes the rules, and you do what Sandy says.",
 };
 
+import { AuthProvider } from "@/ui/providers/AuthContext";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -43,7 +45,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${serifFont.variable} ${sansFont.variable} ${scriptFont.variable} antialiased`}
       >
-        {children}
+        <AuthProvider>
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );

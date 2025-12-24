@@ -1,7 +1,22 @@
+"use client";
+
 import Image from "next/image";
 import { Button } from "@/ui/components/ui/Button";
+import { useAuth } from "@/ui/providers/AuthContext";
+import { useRouter } from "next/navigation";
 
 export const Hero = () => {
+  const { user } = useAuth();
+  const router = useRouter();
+
+  const handleCTA = () => {
+    if (user) {
+      router.push("/decks");
+    } else {
+      router.push("/login");
+    }
+  };
+
   return (
     <section className="relative pt-32 pb-24 px-6 lg:pt-48 lg:pb-40 container mx-auto">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
@@ -21,7 +36,7 @@ export const Hero = () => {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-6 justify-center lg:justify-start">
-            <Button variant="primary" size="xl" className="shadow-xl">
+            <Button variant="primary" size="xl" className="shadow-xl" onClick={handleCTA}>
               Do What Sandy Says
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14m-7-7 7 7-7 7"/></svg>
             </Button>

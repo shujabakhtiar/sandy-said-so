@@ -3,9 +3,14 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/ui/components/ui/Button";
 import { cn } from "@/ui/lib/utils";
+import { useAuth } from "@/ui/providers/AuthContext";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
+  const { user, logout } = useAuth();
+  const router = useRouter();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -19,7 +24,16 @@ export const Navbar = () => {
     { label: "How it Works", href: "#how-it-works" },
     { label: "The Deck", href: "#the-deck" },
     { label: "Game Modes", href: "#modes" },
+    ...(user ? [{ label: "Your Decks", href: "/decks" }] : []),
   ];
+
+  const handleCTA = () => {
+    if (user) {
+      router.push("/decks");
+    } else {
+      router.push("/login");
+    }
+  };
 
   return (
     <nav 
@@ -31,19 +45,45 @@ export const Navbar = () => {
       )}
     >
       <div className="container mx-auto flex items-center justify-between">
-        <div className="font-serif text-2xl tracking-tight font-bold text-brand-brown">
+        <Link href="/" className="font-serif text-2xl tracking-tight font-bold text-brand-brown">
           Sandy <span className="font-script text-3xl font-normal ml-1">said so.</span>
-        </div>
-        <div className="hidden md:flex gap-10 text-sm font-semibold uppercase tracking-widest text-brand-text-muted">
+        </Link>
+        <div className="hidden md:flex gap-10 text-sm font-semibold uppercase tracking-widest text-brand-text-muted items-center">
           {navLinks.map((link) => (
-            <a key={link.href} href={link.href} className="hover:text-brand-brown transition-colors">
-              {link.label}
-            </a>
+            link.href.startsWith("#") ? (
+              <a key={link.href} href={link.href} className="hover:text-brand-brown transition-colors">
+                {link.label}
+              </a>
+            ) : (
+              <Link key={link.href} href={link.href} className="hover:text-brand-brown transition-colors">
+                {link.label}
+              </Link>
+            )
           ))}
+          {user && (
+            <button 
+              onClick={logout}
+              className="hover:text-brand-red transition-colors"
+            >
+              Logout
+            </button>
+          )}
         </div>
-        <Button variant="primary" size="md">
-          Build Now
-        </Button>
+        {!user && (
+          <Button variant="primary" size="md" onClick={handleCTA}>
+            Build Now
+          </Button>
+        )}
+        {user && (
+          <div className="flex items-center gap-4">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-brand-text-muted hidden sm:block">
+              Hey, {user.name || "Culprit"}
+            </span>
+            <Button variant="outline" size="md" onClick={() => router.push("/decks")}>
+              Dashboard
+            </Button>
+          </div>
+        )}
       </div>
     </nav>
   );

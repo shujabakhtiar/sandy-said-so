@@ -1,6 +1,21 @@
+"use client";
+
 import { Button } from "@/ui/components/ui/Button";
+import { useAuth } from "@/ui/providers/AuthContext";
+import { useRouter } from "next/navigation";
 
 export const CTA = () => {
+  const { user } = useAuth();
+  const router = useRouter();
+
+  const handleCTA = () => {
+    if (user) {
+      router.push("/decks");
+    } else {
+      router.push("/login");
+    }
+  };
+
   return (
     <section className="py-40 px-6 text-center">
       <div className="container mx-auto max-w-4xl relative">
@@ -11,7 +26,7 @@ export const CTA = () => {
           Ready to listen?
         </h2>
         <div className="flex flex-col sm:flex-row gap-6 justify-center">
-          <Button variant="primary" size="xl" className="shadow-xl">
+          <Button variant="primary" size="xl" className="shadow-xl" onClick={handleCTA}>
             Give Sandy Your Photos
           </Button>
           <Button variant="outline" size="xl">
@@ -19,7 +34,7 @@ export const CTA = () => {
           </Button>
         </div>
         <p className="mt-14 text-brand-text-muted text-xs font-bold uppercase tracking-[0.5em]">
-          No login required to start building.
+          {user ? "Your secrets are safe with Sandy." : "Secure your secrets with an account."}
         </p>
       </div>
     </section>
