@@ -6,54 +6,115 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
 }
 
-model Deck {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
   name      String?
-  gameMode  String   // DRINKING, TRUTH_DARE, COUPLES
-  status    String   @default("DRAFT") // DRAFT, GENERATING, READY, ORDERED
-  
-  persons   Person[]
-  cards     Card[]
-  orders    Order[]
-}
+  createdAt DateTime @default(now()) @map("created_at")
 
-model Person {
-  id      String  @id @default(cuid())
-  name    String
-  deckId  String
-  deck    Deck    @relation(fields: [deckId], references: [id], onDelete: Cascade)
-  photos  Photo[]
-  cards   Card[]  // Cards that specifically refer to this person
+  photos    Photo[]
+  people    Person[]
+  gameDecks GameDeck[]
+
+  @@map("users")
 }
 
 model Photo {
-  id        String   @id @default(cuid())
-  url       String
-  personId  String
-  person    Person   @relation(fields: [personId], references: [id], onDelete: Cascade)
+  id         Int      @id @default(autoincrement())
+  userId     Int      @map("user_id")
+  user       User     @relation(fields: [userId], references: [id])
+  imageUrl   String   @map("image_url")
+  uploadedAt DateTime @default(now()) @map("uploaded_at")
+
+  faces     Face[]
+  gameCards GameCard[]
+
+  @@map("photos")
 }
 
-model Card {
-  id        String   @id @default(cuid())
-  text      String
-  type      String   // RULE, DARE, CHALLENGE
-  deckId    String
-  deck      Deck     @relation(fields: [deckId], references: [id], onDelete: Cascade)
-  personId  String?
-  person    Person?  @relation(fields: [personId], references: [id])
+model Face {
+  id            Int      @id @default(autoincrement())
+  photoId       Int      @map("photo_id")
+  photo         Photo    @relation(fields: [photoId], references: [id])
+  boundingBox   Json     @map("bounding_box")
+  faceEmbedding String?  @map("face_embedding") // Representing vector as string for balance
+
+  personMaps FacePersonMap[]
+
+  @@map("faces")
 }
 
-model Order {
-  id            String   @id @default(cuid())
-  createdAt     DateTime @default(now())
-  status        String   @default("PENDING") // PENDING, PAID, SHIPPED, DELIVERED
-  deckId        String
-  deck          Deck     @relation(fields: [deckId], references: [id])
-  customerEmail String
-  address       String
+model Person {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  user      User     @relation(fields: [userId], references: [id])
+  name      String
+  note      String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  faceMaps FacePersonMap[]
+
+  @@map("people")
 }
+
+model FacePersonMap {
+  id       Int    @id @default(autoincrement())
+  faceId   Int    @map("face_id")
+  face     Face   @relation(fields: [faceId], references: [id])
+  personId Int    @map("person_id")
+  person   Person @relation(fields: [personId], references: [id])
+
+  @@map("face_person_map")
+}
+
+model GameMode {
+  id   Int    @id @default(autoincrement())
+  name String
+
+  gameDecks GameDeck[]
+
+  @@map("game_modes")
+}
+
+model GameDeck {
+  id         Int      @id @default(autoincrement())
+  userId     Int      @map("user_id")
+  user       User     @relation(fields: [userId], references: [id])
+  gameModeId Int      @map("game_mode_id")
+  gameMode   GameMode @relation(fields: [gameModeId], references: [id])
+  title      String?
+  isSaved    Boolean  @map("is_saved")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  gameCards     GameCard[]
+  aiGenerations AIGeneration[]
+
+  @@map("game_decks")
+}
+
+model GameCard {
+  id        Int    @id @default(autoincrement())
+  deckId    Int    @map("deck_id")
+  deck      GameDeck @relation(fields: [deckId], references: [id])
+  photoId   Int?   @map("photo_id")
+  photo     Photo? @relation(fields: [photoId], references: [id])
+  ruleText  String @map("rule_text")
+  orderIndex Int   @map("order_index")
+
+  @@map("game_cards")
+}
+
+model AIGeneration {
+  id        Int      @id @default(autoincrement())
+  deckId    Int      @map("deck_id")
+  deck      GameDeck @relation(fields: [deckId], references: [id])
+  prompt    String
+  model     String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("ai_generations")
+}
+
