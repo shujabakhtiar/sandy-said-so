@@ -63,16 +63,26 @@ export class AICardsGeneratorService {
 
     if (!deck) throw new Error("Deck not found");
 
-    // 2. Generate 3 different themed decks
-    const themes = [
-      { name: "Spicy & Bold", vibe: "Make these cards bold, daring, and spicy. Push boundaries and create memorable moments." },
-      { name: "Chill & Conversational", vibe: "Keep it light, fun, and conversational. Focus on getting to know each other better." },
-      { name: "Chaotic & Wild", vibe: "Maximum chaos! Create unpredictable, wild, and hilarious situations." }
+    // 2. Generate 3 different variations based on game mode
+    // These variations stay within the game mode but offer different styles
+    const variations = [
+      { 
+        name: "Deck 1", 
+        instruction: "Create cards that are bold and push boundaries. Make them memorable and daring within the game mode." 
+      },
+      { 
+        name: "Deck 2", 
+        instruction: "Create cards that are lighter and more conversational. Keep the energy fun and inclusive within the game mode." 
+      },
+      { 
+        name: "Deck 3", 
+        instruction: "Create cards that maximize chaos and unpredictability. Make them wild and hilarious within the game mode." 
+      }
     ];
 
     const deckSuggestions = await Promise.all(
-      themes.map(async (theme) => {
-        const prompt = this.constructThemePrompt(deck, theme);
+      variations.map(async (variation, index) => {
+        const prompt = this.constructVariationPrompt(deck, variation, index + 1);
         
         const response = await this.genAI.models.generateContent({
           model: "gemini-2.5-flash",
@@ -83,7 +93,7 @@ export class AICardsGeneratorService {
         const cards = this.parseGeneratedCards(text);
 
         return {
-          theme: theme.name,
+          theme: variation.name,
           cards: cards
         };
       })
@@ -122,17 +132,21 @@ Example: ["Sandy says: Drink if you've ever lied about your age.", "The person t
     return basePrompt;
   }
 
-  private static constructThemePrompt(deck: any, theme: { name: string; vibe: string }) {
+  private static constructVariationPrompt(deck: any, variation: { name: string; instruction: string }, deckNumber: number) {
     const modeName = deck.gameMode.name;
     const { goal, secrets, extra, chaosLevel } = deck;
 
     let basePrompt = `You are "Sandy", a mischievous and witty game master for a drinking game called "Sandy Said So". 
-Your goal is to generate exactly 20 creative, engaging cards for a game deck with a specific theme.
+Your goal is to generate exactly 20 creative, engaging cards for a game deck.
 
+IMPORTANT CONTEXT:
 Game Mode: ${modeName}
+- If this is "Sandy's Confession" (Truth or Dare mode): Focus on revealing secrets, uncomfortable truths, and social challenges.
+- If this is "Pure Provocation" (Kings Cup/Drinking Rituals): Focus on drinking rules, group challenges, and circle-based gameplay.
+- If this is "The Verdict" (Naughty & Spicy/Sex Games): Focus on adult content, intimate dares, and spicy challenges.
+
 Chaos Level (1-5): ${chaosLevel}
-Theme: ${theme.name}
-Theme Vibe: ${theme.vibe}
+Deck Variation #${deckNumber}: ${variation.instruction}
 
 User-provided Context:
 - Goal: ${goal || "Not specified"}
@@ -140,12 +154,13 @@ User-provided Context:
 - Extra Rules/Vibe: ${extra || "None"}
 
 Instructions for each card:
-1. Each card should be a "command" or "situation" from Sandy.
-2. The tone should be consistent with the game mode AND the theme vibe.
-3. IMPORTANT: Align all cards with the "${theme.name}" theme - ${theme.vibe}
-4. If secrets or inside jokes are provided, try to weave them into 2-3 of the cards.
+1. Each card MUST align with the "${modeName}" game mode. Stay true to the mode's theme.
+2. Apply the variation style: ${variation.instruction}
+3. The tone should match both the game mode AND the variation style.
+4. If secrets or inside jokes are provided, weave them into 2-3 cards naturally.
 5. Use "Sandy says..." or similar phrasing for some cards to maintain the persona.
-6. Make each card unique and interesting.
+6. Make each card unique, engaging, and appropriate for the game mode.
+7. Consider the chaos level - higher levels mean more intense/frequent consequences.
 
 OUTPUT FORMAT:
 Return ONLY a valid JSON array of exactly 20 strings, where each string is the text for one card. No other text or markdown formatting outside the JSON.

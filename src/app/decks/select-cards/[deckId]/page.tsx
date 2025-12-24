@@ -137,7 +137,7 @@ export default function SelectCardsPage() {
         <div className="mb-12">
           <h1 className="text-5xl font-serif font-bold text-brand-brown mb-4">Pick your poison.</h1>
           <p className="text-xl text-brand-text-muted italic font-medium mb-6">
-            Sandy has prepared three different vibes. Select individual cards or entire decks.
+            Sandy has prepared three variations of your chosen game mode. Select individual cards or entire decks.
           </p>
           <div className="flex items-center gap-4 bg-white rounded-3xl p-6 shadow-sm">
             <div className="flex-1">
@@ -173,14 +173,26 @@ export default function SelectCardsPage() {
             const allSelected = deckCards.every(card => selectedCards.has(card));
             const someSelected = deckCards.some(card => selectedCards.has(card));
             
+            // Better labels for the variations
+            const variationLabels = [
+              { name: "Bold & Daring", description: "Push boundaries and create memorable moments" },
+              { name: "Light & Fun", description: "Keep the energy inclusive and conversational" },
+              { name: "Wild & Chaotic", description: "Maximum unpredictability and hilarious chaos" }
+            ];
+            
+            const variation = variationLabels[deckIndex] || { name: suggestion.theme, description: "" };
+            
             return (
               <div key={deckIndex} className="bg-white rounded-[48px] p-10 shadow-lg">
                 <div className="flex items-center justify-between mb-8">
                   <div>
                     <h2 className="text-3xl font-serif font-bold text-brand-brown mb-2">
-                      {suggestion.theme}
+                      {variation.name}
                     </h2>
-                    <p className="text-sm text-brand-text-muted uppercase tracking-widest font-bold">
+                    <p className="text-sm text-brand-text-muted italic mb-1">
+                      {variation.description}
+                    </p>
+                    <p className="text-xs text-brand-text-muted uppercase tracking-widest font-bold">
                       {deckCards.filter(card => selectedCards.has(card)).length} of {deckCards.length} selected
                     </p>
                   </div>
