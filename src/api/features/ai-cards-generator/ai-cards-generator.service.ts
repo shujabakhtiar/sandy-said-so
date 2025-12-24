@@ -1,8 +1,10 @@
 import { prisma } from "../../../lib/prisma";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenAI } from "@google/genai";
 
 export class AICardsGeneratorService {
-  private static genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY || "");
+  private static genAI = new GoogleGenAI({
+    apiKey: process.env.GOOGLE_AI_API_KEY,
+  });
 
   static async generateCards(deckId: number) {
     // 1. Fetch deck details
@@ -14,14 +16,15 @@ export class AICardsGeneratorService {
     if (!deck) throw new Error("Deck not found");
 
     // 2. Prepare the prompt based on deck info
-    const model = this.genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-    
     const prompt = this.constructPrompt(deck);
 
-    // 3. Generate content
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
+    // 3. Generate content using new API
+    const response = await this.genAI.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: prompt,
+    });
+
+    const text = response.text || "";
 
     // 4. Parse the generated cards
     const cards = this.parseGeneratedCards(text);
@@ -44,7 +47,7 @@ export class AICardsGeneratorService {
       data: {
         deckId: deck.id,
         prompt: prompt,
-        model: "gemini-1.5-flash",
+        model: "gemini-2.5-flash",
       },
     });
 
