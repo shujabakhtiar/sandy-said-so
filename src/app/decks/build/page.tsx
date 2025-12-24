@@ -41,7 +41,7 @@ export default function BuildDeckPage() {
 
     setLoading(true);
     try {
-      // 1. Create the Deck
+      // Create the Deck
       const response = await fetch("/api/game-decks", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -60,20 +60,8 @@ export default function BuildDeckPage() {
       if (response.ok) {
         const deck = await response.json();
         
-        // 2. Generate AI Cards
-        const aiResponse = await fetch("/api/ai-cards-generator", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ deckId: deck.id }),
-        });
-
-        if (aiResponse.ok) {
-          router.push(`/decks/${deck.id}`);
-        } else {
-          console.error("Failed to generate AI cards");
-          // Still redirect but maybe show an error or empty state later
-          router.push(`/decks/${deck.id}`);
-        }
+        // Redirect to card selection page
+        router.push(`/decks/select-cards/${deck.id}`);
       } else {
         console.error("Failed to create deck");
         setLoading(false);
@@ -97,9 +85,9 @@ export default function BuildDeckPage() {
             <span className="font-script text-4xl text-brand-red">S</span>
           </div>
         </div>
-        <h1 className="text-5xl font-serif font-bold text-brand-brown mb-4 animate-pulse">Sandy&apos;s cooking...</h1>
+        <h1 className="text-5xl font-serif font-bold text-brand-brown mb-4 animate-pulse">Sandy&apos;s preparing...</h1>
         <p className="text-xl text-brand-text-muted italic max-w-sm mx-auto">
-          Sandy is analyzing your choices and plotting some truly terrible decisions for you and your friends.
+          Setting up your deck. You&apos;ll get to choose from Sandy&apos;s suggestions in just a moment.
         </p>
       </div>
     );

@@ -33,4 +33,21 @@ export class GameCardsController {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
   }
+
+  static async bulkCreate(req: NextRequest) {
+    try {
+      const { deckId, cards } = await req.json();
+      if (!deckId || !cards || !Array.isArray(cards)) {
+        return NextResponse.json({ error: "deckId and cards array are required" }, { status: 400 });
+      }
+      
+      const result = await GameCardsService.bulkAddCards(Number(deckId), cards);
+      return NextResponse.json({ 
+        success: true, 
+        message: `${result.count} cards created successfully` 
+      }, { status: 201 });
+    } catch (error: any) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+  }
 }

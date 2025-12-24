@@ -21,4 +21,21 @@ export class GameCardsService {
       },
     });
   }
+
+  static async bulkAddCards(deckId: number, cards: { ruleText: string; orderIndex: number; photoId?: number }[]) {
+    // First, delete any existing cards for this deck
+    await prisma.gameCard.deleteMany({
+      where: { deckId },
+    });
+
+    // Then create all the new cards
+    return await prisma.gameCard.createMany({
+      data: cards.map(card => ({
+        deckId,
+        ruleText: card.ruleText,
+        orderIndex: card.orderIndex,
+        photoId: card.photoId,
+      })),
+    });
+  }
 }
