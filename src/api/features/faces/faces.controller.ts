@@ -1,34 +1,35 @@
-import { Request, Response } from "express";
+import { NextRequest, NextResponse } from "next/server";
 import { FacesService } from "./faces.service";
 
 export class FacesController {
-  static async create(req: Request, res: Response) {
+  static async create(req: NextRequest) {
     try {
-      const { photoId, boundingBox, faceEmbedding } = req.body;
+      const { photoId, boundingBox, faceEmbedding } = await req.json();
       if (!photoId || !boundingBox) {
-        return res.status(400).json({ error: "photoId and boundingBox are required" });
+        return NextResponse.json({ error: "photoId and boundingBox are required" }, { status: 400 });
       }
       const face = await FacesService.createFace({ 
         photoId: Number(photoId), 
         boundingBox, 
         faceEmbedding 
       });
-      res.status(201).json(face);
+      return NextResponse.json(face, { status: 201 });
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      return NextResponse.json({ error: error.message }, { status: 500 });
     }
   }
 
-  static async list(req: Request, res: Response) {
+  static async list(req: NextRequest) {
     try {
-      const photoId = req.query.photoId;
+      const { searchParams } = new URL(req.url);
+      const photoId = searchParams.get("photoId");
       if (!photoId) {
-        return res.status(400).json({ error: "photoId is required" });
+        return NextResponse.json({ error: "photoId is required" }, { status: 400 });
       }
       const faces = await FacesService.listFaces(Number(photoId));
-      res.json(faces);
+      return NextResponse.json(faces);
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      return NextResponse.json({ error: error.message }, { status: 500 });
     }
   }
 }

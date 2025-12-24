@@ -1,21 +1,25 @@
-import { Request, Response } from "express";
+import { NextRequest, NextResponse } from "next/server";
 import { AIGenerationsService } from "./ai-generations.service";
 
 export class AIGenerationsController {
-  static async create(req: Request, res: Response) {
+  static async create(req: NextRequest) {
     try {
-      const { deckId, prompt, model } = req.body;
+      const body = await req.json();
+      const { deckId, prompt, model } = body;
+      
       if (!deckId || !prompt) {
-        return res.status(400).json({ error: "deckId and prompt are required" });
+        return NextResponse.json({ error: "deckId and prompt are required" }, { status: 400 });
       }
+      
       const generation = await AIGenerationsService.saveGeneration({ 
         deckId: Number(deckId), 
         prompt, 
         model 
       });
-      res.status(201).json(generation);
+      
+      return NextResponse.json(generation, { status: 201 });
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      return NextResponse.json({ error: error.message }, { status: 500 });
     }
   }
 }

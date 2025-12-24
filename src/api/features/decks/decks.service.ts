@@ -1,85 +1,61 @@
-import { db } from "@/lib/db";
+import { prisma } from "@/lib/prisma";
 
 export class DeckService {
   /**
-   * Creates a new game deck with associated persons and their photos.
+   * Creates a new game deck.
    */
   static async createDeck(data: {
-    name?: string;
-    gameMode: string;
-    persons: { name: string; photos: string[] }[];
+    title?: string;
+    gameModeId: number;
+    userId: number;
   }) {
-    return await db.deck.create({
+    return await prisma.gameDeck.create({
       data: {
-        name: data.name,
-        gameMode: data.gameMode,
-        status: "READY",
-        persons: {
-          create: data.persons.map((p) => ({
-            name: p.name,
-            photos: {
-              create: p.photos.map((url) => ({ url })),
-            },
-          })),
-        },
-      },
-      include: {
-        persons: {
-          include: {
-            photos: true,
-          },
-        },
+        title: data.title,
+        gameModeId: data.gameModeId,
+        userId: data.userId,
+        isSaved: false,
       },
     });
   }
 
   /**
-   * Fetches a deck by ID with all associations.
+   * Fetches a deck by ID.
    */
   static async getDeck(id: string) {
-    return await db.deck.findUnique({
-      where: { id },
+    return await prisma.gameDeck.findUnique({
+      where: { id: Number(id) },
       include: {
-        persons: {
-          include: {
-            photos: true,
-          },
-        },
-        cards: true,
+        gameMode: true,
+        gameCards: true,
       },
     });
   }
 
   /**
-   * Generates rules (cards) for a deck based on the game mode and persons.
-   * This is where the 'Logic Engine' would reside.
+   * Generates rules (cards) for a deck.
    */
-  static async generateCards(deckId: string) {
-    const deck = await db.deck.findUnique({
+  static async generateCards(deckId: number) {
+    const deck = await prisma.gameDeck.findUnique({
       where: { id: deckId },
-      include: { persons: true },
     });
 
     if (!deck) throw new Error("Deck not found");
 
-    // Example logic for rule generation
+    // Placeholder for rule generation logic
     const ruleTemplates = [
-      "Drink if you are {name}.",
-      "{name} must do a truth or dare.",
-      "Waterfall starts with {name}.",
+      "Drink if you are the dealer.",
+      "Everyone takes a shot.",
+      "The person to your left drinks.",
     ];
 
-    const cards = deck.persons.map((person: { id: string; name: string }) => {
-      const template = ruleTemplates[Math.floor(Math.random() * ruleTemplates.length)];
-      return {
-        text: template.replace("{name}", person.name),
-        type: "RULE",
-        deckId: deck.id,
-        personId: person.id,
-      };
-    });
+    const cards = ruleTemplates.map((template, index) => ({
+      ruleText: template,
+      deckId: deck.id,
+      orderIndex: index,
+    }));
 
-    return await db.card.createMany({
+    return await prisma.gameCard.createMany({
       data: cards,
     });
   }

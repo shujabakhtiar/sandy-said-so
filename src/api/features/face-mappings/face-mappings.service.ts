@@ -1,8 +1,8 @@
-import { db } from "@/lib/db";
+import { prisma } from "../../../lib/prisma";
 
 export class FaceMappingsService {
   static async mapFaceToPerson(data: { faceId: number; personId: number }) {
-    return await db.facePersonMap.create({
+    return await prisma.facePersonMap.create({
       data: {
         faceId: data.faceId,
         personId: data.personId,
@@ -11,7 +11,7 @@ export class FaceMappingsService {
   }
 
   static async removeMapping(id: number) {
-    return await db.facePersonMap.delete({
+    return await prisma.facePersonMap.delete({
       where: { id },
     });
   }

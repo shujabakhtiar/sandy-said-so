@@ -9,9 +9,11 @@ datasource db {
   provider = "postgresql"
 }
 
+
 model User {
   id        Int      @id @default(autoincrement())
   email     String   @unique
+  password  String
   name      String?
   createdAt DateTime @default(now()) @map("created_at")
 
@@ -19,7 +21,7 @@ model User {
   people    Person[]
   gameDecks GameDeck[]
 
-  @@map("users")
+  @@index([email])
 }
 
 model Photo {
@@ -32,19 +34,19 @@ model Photo {
   faces     Face[]
   gameCards GameCard[]
 
-  @@map("photos")
+  @@index([userId])
 }
 
 model Face {
-  id            Int      @id @default(autoincrement())
-  photoId       Int      @map("photo_id")
-  photo         Photo    @relation(fields: [photoId], references: [id])
-  boundingBox   Json     @map("bounding_box")
-  faceEmbedding String?  @map("face_embedding") // Representing vector as string for balance
+  id            Int     @id @default(autoincrement())
+  photoId       Int     @map("photo_id")
+  photo         Photo   @relation(fields: [photoId], references: [id], onDelete: Cascade)
+  boundingBox   Json    @map("bounding_box")
+  faceEmbedding String? @map("face_embedding")
 
-  personMaps FacePersonMap[]
+  facePersonMaps FacePersonMap[]
 
-  @@map("faces")
+  @@index([photoId])
 }
 
 model Person {
@@ -55,28 +57,27 @@ model Person {
   note      String?
   createdAt DateTime @default(now()) @map("created_at")
 
-  faceMaps FacePersonMap[]
+  facePersonMaps FacePersonMap[]
 
-  @@map("people")
+  @@index([userId])
 }
 
 model FacePersonMap {
   id       Int    @id @default(autoincrement())
   faceId   Int    @map("face_id")
-  face     Face   @relation(fields: [faceId], references: [id])
+  face     Face   @relation(fields: [faceId], references: [id], onDelete: Cascade)
   personId Int    @map("person_id")
-  person   Person @relation(fields: [personId], references: [id])
+  person   Person @relation(fields: [personId], references: [id], onDelete: Cascade)
 
-  @@map("face_person_map")
+  @@index([faceId])
+  @@index([personId])
 }
 
 model GameMode {
   id   Int    @id @default(autoincrement())
-  name String
+  name String @unique
 
   gameDecks GameDeck[]
-
-  @@map("game_modes")
 }
 
 model GameDeck {
@@ -86,35 +87,49 @@ model GameDeck {
   gameModeId Int      @map("game_mode_id")
   gameMode   GameMode @relation(fields: [gameModeId], references: [id])
   title      String?
-  isSaved    Boolean  @map("is_saved")
+  isSaved    Boolean  @default(false) @map("is_saved")
   createdAt  DateTime @default(now()) @map("created_at")
 
   gameCards     GameCard[]
-  aiGenerations AIGeneration[]
+  aiGenerations AiGeneration[]
+  orders        Order[]
 
-  @@map("game_decks")
+  @@index([userId])
+  @@index([gameModeId])
 }
 
 model GameCard {
-  id        Int    @id @default(autoincrement())
-  deckId    Int    @map("deck_id")
-  deck      GameDeck @relation(fields: [deckId], references: [id])
-  photoId   Int?   @map("photo_id")
-  photo     Photo? @relation(fields: [photoId], references: [id])
-  ruleText  String @map("rule_text")
-  orderIndex Int   @map("order_index")
+  id         Int    @id @default(autoincrement())
+  deckId     Int    @map("deck_id")
+  deck       GameDeck @relation(fields: [deckId], references: [id], onDelete: Cascade)
+  photoId    Int?   @map("photo_id")
+  photo      Photo? @relation(fields: [photoId], references: [id])
+  ruleText   String @map("rule_text")
+  orderIndex Int    @map("order_index")
 
-  @@map("game_cards")
+  @@index([deckId])
 }
 
-model AIGeneration {
+model AiGeneration {
   id        Int      @id @default(autoincrement())
   deckId    Int      @map("deck_id")
-  deck      GameDeck @relation(fields: [deckId], references: [id])
+  deck      GameDeck @relation(fields: [deckId], references: [id], onDelete: Cascade)
   prompt    String
   model     String?
   createdAt DateTime @default(now()) @map("created_at")
 
-  @@map("ai_generations")
+  @@index([deckId])
 }
 
+model Order {
+  id            Int      @id @default(autoincrement())
+  deckId        Int      @map("deck_id")
+  deck          GameDeck @relation(fields: [deckId], references: [id])
+  customerEmail String   @map("customer_email")
+  address       String
+  status        String   @default("PENDING")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  @@index([deckId])
+  @@index([customerEmail])
+}

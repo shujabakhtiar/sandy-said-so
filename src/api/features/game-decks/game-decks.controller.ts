@@ -1,44 +1,43 @@
-import { Request, Response } from "express";
+import { NextRequest, NextResponse } from "next/server";
 import { GameDecksService } from "./game-decks.service";
+import { requireAuth } from "@/api/utils/auth";
 
 export class GameDecksController {
-  static async create(req: Request, res: Response) {
+  static async create(req: NextRequest) {
     try {
-      const { userId, gameModeId, title } = req.body;
-      if (!userId || !gameModeId) {
-        return res.status(400).json({ error: "userId and gameModeId are required" });
+      const userId = await requireAuth();
+      const { gameModeId, title } = await req.json();
+      if (!gameModeId) {
+        return NextResponse.json({ error: "gameModeId is required" }, { status: 400 });
       }
       const deck = await GameDecksService.createDeck({ 
-        userId: Number(userId), 
+        userId: userId, 
         gameModeId: Number(gameModeId), 
         title 
       });
-      res.status(201).json(deck);
+      return NextResponse.json(deck, { status: 201 });
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      return NextResponse.json({ error: error.message }, { status: 500 });
     }
   }
 
-  static async list(req: Request, res: Response) {
+  static async list(req: NextRequest) {
     try {
-      const userId = req.query.userId;
-      if (!userId) {
-        return res.status(400).json({ error: "userId is required" });
-      }
-      const decks = await GameDecksService.listDecks(Number(userId));
-      res.json(decks);
+      const userId = await requireAuth();
+      const decks = await GameDecksService.listDecks(userId);
+      return NextResponse.json(decks);
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      return NextResponse.json({ error: error.message }, { status: 500 });
     }
   }
 
-  static async save(req: Request, res: Response) {
+  static async save(req: NextRequest, { params }: { params: { id: string } }) {
     try {
-      const { id } = req.params;
+      const { id } = params;
       const deck = await GameDecksService.markDeckAsSaved(Number(id));
-      res.json(deck);
+      return NextResponse.json(deck);
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      return NextResponse.json({ error: error.message }, { status: 500 });
     }
   }
 }

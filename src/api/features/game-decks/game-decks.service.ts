@@ -1,8 +1,8 @@
-import { db } from "@/lib/db";
+import { prisma } from "../../../lib/prisma";
 
 export class GameDecksService {
   static async createDeck(data: { userId: number; gameModeId: number; title?: string }) {
-    return await db.gameDeck.create({
+    return await prisma.gameDeck.create({
       data: {
         userId: data.userId,
         gameModeId: data.gameModeId,
@@ -13,7 +13,7 @@ export class GameDecksService {
   }
 
   static async listDecks(userId: number) {
-    return await db.gameDeck.findMany({
+    return await prisma.gameDeck.findMany({
       where: { userId },
       include: {
         gameMode: true,
@@ -23,7 +23,7 @@ export class GameDecksService {
   }
 
   static async markDeckAsSaved(id: number) {
-    return await db.gameDeck.update({
+    return await prisma.gameDeck.update({
       where: { id },
       data: { isSaved: true },
     });

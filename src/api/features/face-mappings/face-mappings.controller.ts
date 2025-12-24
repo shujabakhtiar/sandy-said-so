@@ -1,30 +1,30 @@
-import { Request, Response } from "express";
+import { NextRequest, NextResponse } from "next/server";
 import { FaceMappingsService } from "./face-mappings.service";
 
 export class FaceMappingsController {
-  static async create(req: Request, res: Response) {
+  static async create(req: NextRequest) {
     try {
-      const { faceId, personId } = req.body;
+      const { faceId, personId } = await req.json();
       if (!faceId || !personId) {
-        return res.status(400).json({ error: "faceId and personId are required" });
+        return NextResponse.json({ error: "faceId and personId are required" }, { status: 400 });
       }
       const mapping = await FaceMappingsService.mapFaceToPerson({ 
         faceId: Number(faceId), 
         personId: Number(personId) 
       });
-      res.status(201).json(mapping);
+      return NextResponse.json(mapping, { status: 201 });
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      return NextResponse.json({ error: error.message }, { status: 500 });
     }
   }
 
-  static async delete(req: Request, res: Response) {
+  static async delete(req: NextRequest, { params }: { params: { id: string } }) {
     try {
-      const { id } = req.params;
+      const { id } = params;
       await FaceMappingsService.removeMapping(Number(id));
-      res.status(204).send();
+      return new NextResponse(null, { status: 204 });
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      return NextResponse.json({ error: error.message }, { status: 500 });
     }
   }
 }

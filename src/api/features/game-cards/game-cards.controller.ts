@@ -1,12 +1,12 @@
-import { Request, Response } from "express";
+import { NextRequest, NextResponse } from "next/server";
 import { GameCardsService } from "./game-cards.service";
 
 export class GameCardsController {
-  static async create(req: Request, res: Response) {
+  static async create(req: NextRequest) {
     try {
-      const { deckId, ruleText, photoId, orderIndex } = req.body;
+      const { deckId, ruleText, photoId, orderIndex } = await req.json();
       if (!deckId || !ruleText || orderIndex === undefined) {
-        return res.status(400).json({ error: "deckId, ruleText, and orderIndex are required" });
+        return NextResponse.json({ error: "deckId, ruleText, and orderIndex are required" }, { status: 400 });
       }
       const card = await GameCardsService.addCard({ 
         deckId: Number(deckId), 
@@ -14,22 +14,23 @@ export class GameCardsController {
         photoId: photoId ? Number(photoId) : undefined, 
         orderIndex: Number(orderIndex) 
       });
-      res.status(201).json(card);
+      return NextResponse.json(card, { status: 201 });
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      return NextResponse.json({ error: error.message }, { status: 500 });
     }
   }
 
-  static async list(req: Request, res: Response) {
+  static async list(req: NextRequest) {
     try {
-      const deckId = req.query.deckId;
+      const { searchParams } = new URL(req.url);
+      const deckId = searchParams.get("deckId");
       if (!deckId) {
-        return res.status(400).json({ error: "deckId is required" });
+        return NextResponse.json({ error: "deckId is required" }, { status: 400 });
       }
       const cards = await GameCardsService.listCards(Number(deckId));
-      res.json(cards);
+      return NextResponse.json(cards);
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      return NextResponse.json({ error: error.message }, { status: 500 });
     }
   }
 }

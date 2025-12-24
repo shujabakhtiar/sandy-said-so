@@ -1,10 +1,12 @@
 import { NextResponse } from "next/server";
 import { OrderService } from "./orders.service";
 import { CreateOrderSchema } from "./orders.schema";
+import { requireAuth } from "@/api/utils/auth";
 
 export class OrderController {
   static async placeOrder(req: Request) {
     try {
+      await requireAuth();
       const body = await req.json();
       const validatedData = CreateOrderSchema.parse(body);
 

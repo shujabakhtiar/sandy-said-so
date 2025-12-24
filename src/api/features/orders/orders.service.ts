@@ -1,23 +1,23 @@
-import { db } from "@/lib/db";
+import { prisma } from "../../../lib/prisma";
 
 export class OrderService {
   /**
    * Places an order for a physical deck.
    */
   static async placeOrder(data: {
-    deckId: string;
+    deckId: number;
     customerEmail: string;
     address: string;
   }) {
-    // 1. Verify deck exists and is ready
-    const deck = await db.deck.findUnique({
+    // 1. Verify deck exists
+    const deck = await prisma.gameDeck.findUnique({
       where: { id: data.deckId },
     });
 
     if (!deck) throw new Error("Deck not found");
 
     // 2. Create Order
-    const order = await db.order.create({
+    const order = await prisma.order.create({
       data: {
         deckId: data.deckId,
         customerEmail: data.customerEmail,
@@ -26,20 +26,14 @@ export class OrderService {
       },
     });
 
-    // 3. Update Deck Status
-    await db.deck.update({
-      where: { id: data.deckId },
-      data: { status: "ORDERED" },
-    });
-
     return order;
   }
 
   /**
-   * Fetches order history for an email (simplified for demo).
+   * Fetches order history for an email.
    */
   static async getOrdersByEmail(email: string) {
-    return await db.order.findMany({
+    return await prisma.order.findMany({
       where: { customerEmail: email },
       include: {
         deck: true,

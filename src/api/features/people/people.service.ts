@@ -1,9 +1,9 @@
-import { db } from "@/lib/db";
+import { prisma } from "../../../lib/prisma";
 import { CreatePersonDto, UpdatePersonDto } from "./people.types";
 
 export class PeopleService {
   static async createPerson(data: CreatePersonDto) {
-    return await db.person.create({
+    return await prisma.person.create({
       data: {
         name: data.name,
         note: data.note,
@@ -13,16 +13,16 @@ export class PeopleService {
   }
 
   static async listPeople(userId: number) {
-    return await db.person.findMany({
+    return await prisma.person.findMany({
       where: { userId },
       include: {
-        faceMaps: true,
+        facePersonMaps: true,
       },
     });
   }
 
   static async updatePerson(id: number, data: UpdatePersonDto) {
-    return await db.person.update({
+    return await prisma.person.update({
       where: { id },
       data,
     });
@@ -33,11 +33,11 @@ export class PeopleService {
     // but we can explicitly delete them if needed. 
     // In our schema, we don't have onDelete: Cascade explicitly in the file I saw, 
     // but usually it's better to be safe.
-    await db.facePersonMap.deleteMany({
+    await prisma.facePersonMap.deleteMany({
       where: { personId: id },
     });
 
-    return await db.person.delete({
+    return await prisma.person.delete({
       where: { id },
     });
   }

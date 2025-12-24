@@ -1,8 +1,8 @@
-import { db } from "@/lib/db";
+import { prisma } from "../../../lib/prisma";
 
 export class GameCardsService {
   static async addCard(data: { deckId: number; ruleText: string; photoId?: number; orderIndex: number }) {
-    return await db.gameCard.create({
+    return await prisma.gameCard.create({
       data: {
         deckId: data.deckId,
         ruleText: data.ruleText,
@@ -13,7 +13,7 @@ export class GameCardsService {
   }
 
   static async listCards(deckId: number) {
-    return await db.gameCard.findMany({
+    return await prisma.gameCard.findMany({
       where: { deckId },
       orderBy: { orderIndex: "asc" },
       include: {
