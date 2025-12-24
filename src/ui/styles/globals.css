@@ -1,0 +1,69 @@
+@import "tailwindcss";
+
+@theme inline {
+  /* Design Tokens - Colors */
+  --color-brand-cream: #faf7f2;
+  --color-brand-brown: #4a2c2a;
+  --color-brand-tan: #d2b48c;
+  --color-brand-blue: #96c3eb;
+  --color-brand-red: #cc3333;
+  --color-brand-text: #2c1810;
+  --color-brand-text-muted: rgba(44, 24, 16, 0.6);
+  
+  /* Typography Variables */
+  --font-serif: var(--font-serif);
+  --font-sans: var(--font-sans);
+  --font-script: var(--font-script);
+
+  /* Spacing & Sizes */
+  --radius-xl: 1.5rem;
+  --radius-2xl: 2rem;
+  --radius-3xl: 3rem;
+  --radius-full: 9999px;
+}
+
+:root {
+  --background: #faf7f2;
+  --foreground: #2c1810;
+}
+
+body {
+  background-color: var(--color-brand-cream);
+  color: var(--color-brand-text);
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Base Utilities */
+.sunkissed {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.15;
+  pointer-events: none;
+  z-index: 100;
+  background-image: url("https://www.transparenttextures.com/patterns/stardust.png");
+}
+
+/* Standardized Animations */
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+  100% { transform: translateY(0px); }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* Custom Component Defaults */
+.shadow-espresso {
+  box-shadow: 0 10px 30px rgba(74, 44, 42, 0.08);
+}
+
+.shadow-espresso-hover {
+  box-shadow: 0 20px 40px rgba(74, 44, 42, 0.12);
+}

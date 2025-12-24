@@ -1,0 +1,59 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Deck {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  name      String?
+  gameMode  String   // DRINKING, TRUTH_DARE, COUPLES
+  status    String   @default("DRAFT") // DRAFT, GENERATING, READY, ORDERED
+  
+  persons   Person[]
+  cards     Card[]
+  orders    Order[]
+}
+
+model Person {
+  id      String  @id @default(cuid())
+  name    String
+  deckId  String
+  deck    Deck    @relation(fields: [deckId], references: [id], onDelete: Cascade)
+  photos  Photo[]
+  cards   Card[]  // Cards that specifically refer to this person
+}
+
+model Photo {
+  id        String   @id @default(cuid())
+  url       String
+  personId  String
+  person    Person   @relation(fields: [personId], references: [id], onDelete: Cascade)
+}
+
+model Card {
+  id        String   @id @default(cuid())
+  text      String
+  type      String   // RULE, DARE, CHALLENGE
+  deckId    String
+  deck      Deck     @relation(fields: [deckId], references: [id], onDelete: Cascade)
+  personId  String?
+  person    Person?  @relation(fields: [personId], references: [id])
+}
+
+model Order {
+  id            String   @id @default(cuid())
+  createdAt     DateTime @default(now())
+  status        String   @default("PENDING") // PENDING, PAID, SHIPPED, DELIVERED
+  deckId        String
+  deck          Deck     @relation(fields: [deckId], references: [id])
+  customerEmail String
+  address       String
+}
