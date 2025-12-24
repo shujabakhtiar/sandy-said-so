@@ -24,7 +24,10 @@ export class GameDecksController {
       });
       
       // Generate initial cards for the deck
-      await DeckService.generateCards(deck.id);
+      
+      // We will generate cards via the AI service separately
+      // await DeckService.generateCards(deck.id);
+
 
       return NextResponse.json(deck, { status: 201 });
     } catch (error: any) {

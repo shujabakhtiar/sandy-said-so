@@ -41,6 +41,7 @@ export default function BuildDeckPage() {
 
     setLoading(true);
     try {
+      // 1. Create the Deck
       const response = await fetch("/api/game-decks", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -58,10 +59,21 @@ export default function BuildDeckPage() {
 
       if (response.ok) {
         const deck = await response.json();
-        // Artificial delay for "Sandy's cooking" effect
-        setTimeout(() => {
+        
+        // 2. Generate AI Cards
+        const aiResponse = await fetch("/api/ai-cards-generator", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ deckId: deck.id }),
+        });
+
+        if (aiResponse.ok) {
           router.push(`/decks/${deck.id}`);
-        }, 2000);
+        } else {
+          console.error("Failed to generate AI cards");
+          // Still redirect but maybe show an error or empty state later
+          router.push(`/decks/${deck.id}`);
+        }
       } else {
         console.error("Failed to create deck");
         setLoading(false);
