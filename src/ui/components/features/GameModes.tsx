@@ -2,9 +2,9 @@ import Image from "next/image";
 
 export const GameModes = () => {
   const modes = [
-    { title: "Sandy's Confession", tag: "Exposed Mode", color: "bg-brand-tan" },
-    { title: "Pure Provocation", tag: "Chaos Only", color: "bg-brand-blue" },
-    { title: "The Verdict", tag: "Final Warnings", color: "bg-brand-red" }
+    { title: "Sandy's Confession", tag: "Truth or Dare", color: "bg-brand-tan" },
+    { title: "Pure Provocation", tag: "Drinking Rituals • Kings Cup", color: "bg-brand-blue" },
+    { title: "The Verdict", tag: "Naughty & Spicy • Sex Games", color: "bg-brand-red" }
   ];
 
   return (

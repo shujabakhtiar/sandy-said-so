@@ -87,6 +87,12 @@ model GameDeck {
   gameModeId Int      @map("game_mode_id")
   gameMode   GameMode @relation(fields: [gameModeId], references: [id])
   title      String?
+  notes      String?
+  goal       String?
+  secrets    String?
+  extra      String?
+  chaosLevel Int      @default(3) @map("chaos_level")
+  useImages  Boolean  @default(false) @map("use_images")
   isSaved    Boolean  @default(false) @map("is_saved")
   createdAt  DateTime @default(now()) @map("created_at")
 

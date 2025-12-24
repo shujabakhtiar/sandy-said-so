@@ -43,7 +43,12 @@ export default function DecksPage() {
             <p className="mt-4 text-brand-text-muted font-medium italic text-xl">The secrets you&apos;ve collected so far.</p>
           </div>
           
-          <Button variant="primary" size="lg" className="shadow-espresso">
+          <Button 
+            variant="primary" 
+            size="lg" 
+            className="shadow-espresso"
+            onClick={() => router.push("/decks/build")}
+          >
             Build a New Deck
           </Button>
         </header>
@@ -57,14 +62,22 @@ export default function DecksPage() {
             <p className="text-brand-text-muted mb-10 max-w-md mx-auto leading-relaxed">
               Sandy is bored. She needs photos of your friends and a bit of your imagination to start generating dares.
             </p>
-            <Button variant="outline" size="xl">
+            <Button 
+              variant="outline" 
+              size="xl"
+              onClick={() => router.push("/decks/build")}
+            >
               Start Your First Deck
             </Button>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {decks.map((deck: any) => (
-              <div key={deck.id} className="group bg-white rounded-[32px] overflow-hidden border border-brand-tan/20 shadow-espresso hover:shadow-2xl transition-all duration-500 cursor-pointer">
+              <div 
+                key={deck.id} 
+                onClick={() => router.push(`/decks/${deck.id}`)}
+                className="group bg-white rounded-[32px] overflow-hidden border border-brand-tan/20 shadow-espresso hover:shadow-2xl transition-all duration-500 cursor-pointer"
+              >
                 <div className="aspect-video relative overflow-hidden">
                   <div className="absolute inset-0 bg-brand-brown/10 group-hover:bg-brand-brown/0 transition-colors duration-500 z-10" />
                   <Image 

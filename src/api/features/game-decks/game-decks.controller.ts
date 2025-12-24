@@ -1,20 +1,31 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GameDecksService } from "./game-decks.service";
 import { requireAuth } from "@/api/utils/auth";
+import { DeckService } from "../decks/decks.service";
 
 export class GameDecksController {
   static async create(req: NextRequest) {
     try {
       const userId = await requireAuth();
-      const { gameModeId, title } = await req.json();
+      const { gameModeId, title, notes, useImages, goal, secrets, extra, chaosLevel } = await req.json();
       if (!gameModeId) {
         return NextResponse.json({ error: "gameModeId is required" }, { status: 400 });
       }
       const deck = await GameDecksService.createDeck({ 
         userId: userId, 
         gameModeId: Number(gameModeId), 
-        title 
+        title,
+        notes,
+        useImages,
+        goal,
+        secrets,
+        extra,
+        chaosLevel
       });
+      
+      // Generate initial cards for the deck
+      await DeckService.generateCards(deck.id);
+
       return NextResponse.json(deck, { status: 201 });
     } catch (error: any) {
       return NextResponse.json({ error: error.message }, { status: 500 });
