@@ -9,7 +9,7 @@
   --color-brand-red: #cc3333;
   --color-brand-text: #2c1810;
   --color-brand-text-muted: rgba(44, 24, 16, 0.6);
-  
+
   /* Typography Variables */
   --font-serif: var(--font-serif);
   --font-sans: var(--font-sans);
@@ -25,6 +25,10 @@
 :root {
   --background: #faf7f2;
   --foreground: #2c1810;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
@@ -50,9 +54,15 @@ body {
 
 /* Standardized Animations */
 @keyframes float {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-20px); }
-  100% { transform: translateY(0px); }
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
 }
 
 .animate-float {

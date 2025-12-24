@@ -29,8 +29,8 @@ const scriptFont = La_Belle_Aurore({
 });
 
 export const metadata: Metadata = {
-  title: "Flip it Drink it | The Espresso Edition",
-  description: "A shots-sized card game for your social life. Custom rules, your photos, pure vibes.",
+  title: "Sandy said so | The Imaginary Instigator",
+  description: "The drinking game where your secrets aren't safe. Sandy knows your friends, Sandy makes the rules, and you do what Sandy says.",
 };
 
 export default function RootLayout({

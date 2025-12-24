@@ -2,30 +2,30 @@ import Image from "next/image";
 
 export const GameModes = () => {
   const modes = [
-    { title: "Drinking Classic", tag: "Heavy Social", color: "bg-brand-tan" },
-    { title: "Truth or Dare", tag: "Chaos Mode", color: "bg-brand-blue" },
-    { title: "Couples Night", tag: "Strictly Spicy", color: "bg-brand-red" }
+    { title: "Sandy's Confession", tag: "Exposed Mode", color: "bg-brand-tan" },
+    { title: "Pure Provocation", tag: "Chaos Only", color: "bg-brand-blue" },
+    { title: "The Verdict", tag: "Final Warnings", color: "bg-brand-red" }
   ];
 
   return (
-    <section id="modes" className="py-32 px-6 bg-brand-cream/50">
+    <section id="modes" className="py-32 px-6 bg-brand-cream/50 scroll-mt-32">
       <div className="container mx-auto max-w-7xl">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-24 items-center">
           <div className="relative rounded-[48px] overflow-hidden aspect-square border-8 border-white shadow-2xl">
             <Image 
               src="https://images.unsplash.com/photo-1517457373958-b7bdd4587205?q=80&w=2069&auto=format&fit=crop" 
-              alt="Friends laughing" 
+              alt="People doing what Sandy says" 
               fill 
               className="object-cover"
             />
             <div className="absolute inset-x-0 bottom-0 p-8 bg-linear-to-t from-brand-brown to-transparent h-1/2 flex items-end">
-              <p className="text-white font-script text-3xl italic">Laughter guaranteed, or the next round is on us.</p>
+              <p className="text-white font-script text-3xl italic">Don&apos;t look at me, Sandy's the one who wrote it.</p>
             </div>
           </div>
 
           <div>
-            <h2 className="text-5xl md:text-6xl text-brand-brown mb-8 leading-tight font-bold font-serif">Three ways to <br />break the ice.</h2>
-            <p className="text-xl text-brand-text-muted mb-12 font-medium">Select the game mode that fits your group&apos;s dynamic. Every deck is generated uniquely for you.</p>
+            <h2 className="text-5xl md:text-6xl text-brand-brown mb-8 leading-tight font-bold font-serif">Three ways to <br />lose your dignity.</h2>
+            <p className="text-xl text-brand-text-muted mb-12 font-medium">Sandy has many moods. Choose the one that matches how much you&apos;re willing to regret tomorrow morning.</p>
             
             <div className="space-y-6">
               {modes.map((mode, i) => (

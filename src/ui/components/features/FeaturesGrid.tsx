@@ -3,31 +3,31 @@ import { SectionHeader } from "@/ui/components/ui/SectionHeader";
 export const FeaturesGrid = () => {
   const steps = [
     {
-      title: "Upload Photos",
-      sub: "STEP ONE",
-      desc: "Upload 10-20 photos of your friends. Groups or individuals, our system handles it all.",
-      icon: "📸"
+      title: "Identify Targets",
+      sub: "PHASE ONE",
+      desc: "Upload 10-20 photos of your friends. Sandy needs to know exactly who she's dealing with.",
+      icon: "🎯"
     },
     {
-      title: "Name the Faces",
-      sub: "STEP TWO",
-      desc: "Tell us who and what they are to the group. We generate dares tailored to each personality.",
-      icon: "🏷️"
+      title: "Spill the Tea",
+      sub: "PHASE TWO",
+      desc: "Tell Sandy their nicknames and soft spots. She'll use this information... responsibly.",
+      icon: "🤫"
     },
     {
-      title: "Play or Print",
-      sub: "STEP THREE",
-      desc: "Play instantly on your phone for free, or order a premium physical deck delivered to your door.",
-      icon: "🚚"
+      title: "Obey the Deck",
+      sub: "PHASE THREE",
+      desc: "Receive your custom deck. Whether it's on your phone or at your door, remember: Sandy said so.",
+      icon: "📜"
     }
   ];
 
   return (
-    <section id="how-it-works" className="py-32 px-6 bg-white relative overflow-hidden">
+    <section id="how-it-works" className="py-32 px-6 bg-white relative overflow-hidden scroll-mt-32">
       <div className="container mx-auto max-w-6xl">
         <SectionHeader 
-          title={<>Custom rules for <br /><span className="text-brand-blue italic">specific people.</span></>}
-          subtitle="We don't just put a face on a card. We build a logic engine that knows who is playing."
+          title={<>Sandy knows your group <br /><span className="text-brand-blue italic">better than you do.</span></>}
+          subtitle="It's not just a card game. it's an intervention guided by an imaginary instigator."
           className="mb-24"
         />
 
