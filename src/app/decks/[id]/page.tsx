@@ -52,7 +52,12 @@ export default function DeckViewPage() {
             <Button variant="outline" size="lg" onClick={() => router.push("/decks")}>
               Back to Decks
             </Button>
-            <Button variant="primary" size="lg" className="shadow-espresso">
+            <Button 
+              variant="primary" 
+              size="lg" 
+              className="shadow-espresso"
+              onClick={() => router.push(`/decks/play/${id}`)}
+            >
               Start Game
             </Button>
           </div>
