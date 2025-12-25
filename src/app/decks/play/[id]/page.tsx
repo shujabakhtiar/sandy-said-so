@@ -6,6 +6,7 @@ import { Navbar } from "@/ui/components/layout/Navbar";
 import { Button } from "@/ui/components/ui/Button";
 import { useParams, useRouter } from "next/navigation";
 import { cn } from "@/ui/lib/utils";
+import { GameCard } from "@/ui/components/features/GameCard";
 
 export default function GamePlayPage() {
   const { id } = useParams();
@@ -81,23 +82,14 @@ export default function GamePlayPage() {
           </p>
         </header>
 
-        <div className="flex-1 flex flex-col items-center justify-center gap-12">
+        <div className="flex-1 flex flex-col md:flex-row-reverse items-center justify-center gap-12 md:gap-16 lg:gap-24 relative px-4">
           {/* Current Card Display */}
           {currentCard && (
-            <div 
-              className={cn(
-                "w-full max-w-2xl bg-white p-12 rounded-[48px] shadow-espresso border-2 border-brand-brown relative overflow-hidden",
-                "animate-in zoom-in-95 fade-in duration-500"
-              )}
-            >
-              <div className="absolute top-0 right-0 p-8 font-serif text-5xl text-brand-tan/20 italic">
-                #{revealedCards.length}
-              </div>
-              <p className="text-3xl md:text-4xl font-serif font-bold text-brand-brown leading-relaxed text-center relative z-10">
-                {currentCard.ruleText}
-              </p>
-              <div className="mt-12 pt-8 border-t-2 border-brand-tan/20 text-center text-sm font-bold uppercase tracking-widest text-brand-text-muted">
-                Sandy says...
+            <div className="w-full max-w-[320px] md:max-w-sm animate-in zoom-in-95 fade-in duration-500 perspective-1000">
+              <div className="relative transform transition-all duration-700 transform-3d">
+                <GameCard 
+                  card={currentCard} 
+                />
               </div>
             </div>
           )}
@@ -109,36 +101,51 @@ export default function GamePlayPage() {
                 onClick={handleDeckClick}
                 disabled={isRevealing}
                 className={cn(
-                  "relative group transition-all duration-300",
-                  isRevealing ? "scale-95 opacity-50" : "hover:scale-105 active:scale-95"
+                  "relative group transition-all duration-700",
+                  isRevealing 
+                    ? "-translate-y-20 md:translate-y-0 md:translate-x-32 opacity-0 scale-110" 
+                    : "hover:scale-105 active:scale-95"
                 )}
               >
-                {/* Stack effect with multiple cards */}
-                <div className="absolute inset-0 bg-brand-brown rounded-[32px] translate-x-2 translate-y-2 opacity-30" />
-                <div className="absolute inset-0 bg-brand-brown rounded-[32px] translate-x-1 translate-y-1 opacity-50" />
+                {/* Physical Stack Shadow effect */}
+                <div className="absolute inset-0 bg-brand-brown/20 rounded-[32px] translate-x-3 translate-y-3 blur-md" />
+                <div className="absolute inset-x-0 bottom-[-12px] h-10 bg-brand-brown/10 rounded-[32px] -z-10" />
+                <div className="absolute inset-x-0 bottom-[-6px] h-10 bg-brand-brown/20 rounded-[32px] -z-10" />
                 
-                {/* Main deck card */}
-                <div className="relative w-64 h-96 bg-linear-to-br from-brand-brown to-brand-brown/80 rounded-[32px] shadow-espresso border-4 border-brand-tan/30 flex flex-col items-center justify-center p-8 overflow-hidden">
-                  {/* Decorative pattern */}
-                  <div className="absolute inset-0 opacity-10">
-                    <div className="absolute top-4 left-4 w-16 h-16 border-4 border-brand-cream rounded-full" />
-                    <div className="absolute bottom-4 right-4 w-16 h-16 border-4 border-brand-cream rounded-full" />
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 border-4 border-brand-cream rounded-full" />
+                {/* Main deck card back */}
+                <div className="relative w-72 md:w-80 aspect-2/3 bg-brand-brown rounded-[32px] shadow-2xl border-4 border-brand-tan/20 flex flex-col items-center justify-center p-10 overflow-hidden">
+                  {/* Decorative corner indices */}
+                  <div className="absolute top-6 left-6 flex flex-col items-center text-brand-cream/30">
+                    <span className="text-[10px] font-bold tracking-tighter mb-1 select-none">SANDY</span>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2s-5 7-5 10c0 3 2.5 5 5 5s5-2 5-5c0-3-5-10-5-10z"/></svg>
+                  </div>
+
+                  <div className="absolute bottom-6 right-6 flex flex-col items-center text-brand-cream/30 rotate-180">
+                    <span className="text-[10px] font-bold tracking-tighter mb-1 select-none">SANDY</span>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2s-5 7-5 10c0 3 2.5 5 5 5s5-2 5-5c0-3-5-10-5-10z"/></svg>
+                  </div>
+
+                  {/* Center Content: Deck Title */}
+                  <div className="relative z-10 text-center px-4">
+                    <div className="font-script text-8xl text-brand-cream/20 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 select-none italic">S</div>
+                    <h3 className="text-3xl md:text-4xl font-serif font-black text-brand-cream leading-tight mb-4 relative z-10 wrap-break-word">
+                      {deck.title}
+                    </h3>
+                    <div className="text-brand-tan font-bold text-xs uppercase tracking-[0.3em] relative z-10">
+                      {cardsRemaining} cards remaining
+                    </div>
                   </div>
                   
-                  {/* Content */}
-                  <div className="relative z-10 text-center">
-                    <div className="font-script text-7xl text-brand-cream mb-6">S</div>
-                    <div className="text-brand-cream/90 font-bold text-sm uppercase tracking-widest mb-2">
-                      Sandy Said So
-                    </div>
-                    <div className="text-brand-cream/70 font-bold text-xs uppercase tracking-wider">
-                      {cardsRemaining} Cards Left
-                    </div>
+                  {/* Bottom Left: Sandy Said So */}
+                  <div className="absolute bottom-10 left-10 flex flex-col items-start gap-1">
+                    <div className="h-px w-6 bg-brand-tan/30 rounded-full" />
+                    <p className="text-[9px] font-serif italic text-brand-tan font-bold tracking-[0.2em] uppercase">
+                      Sandy said so
+                    </p>
                   </div>
                   
                   {/* Tap indicator */}
-                  <div className="absolute bottom-8 left-1/2 -translate-x-1/2 text-brand-cream/60 text-xs font-bold uppercase tracking-widest animate-pulse">
+                  <div className="absolute bottom-10 right-1/2 translate-x-1/2 text-brand-cream/40 text-[10px] font-bold uppercase tracking-[0.3em] animate-pulse">
                     Tap to reveal
                   </div>
                 </div>
