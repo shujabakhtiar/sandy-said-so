@@ -20,7 +20,7 @@ export class AICardsGeneratorService {
 
     // 3. Generate content using new API
     const response = await this.genAI.models.generateContent({
-      model: "gemini-2.5-flash",
+      model: "gemini-3-flash",
       contents: prompt,
     });
 
