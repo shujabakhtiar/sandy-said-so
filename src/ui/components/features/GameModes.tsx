@@ -1,11 +1,19 @@
+"use client";
+
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 export const GameModes = () => {
+  const router = useRouter();
   const modes = [
-    { title: "Sandy's Confession", tag: "Truth or Dare", color: "bg-brand-tan" },
-    { title: "Pure Provocation", tag: "Drinking Rituals", color: "bg-brand-blue" },
-    { title: "The Verdict", tag: "Naughty & Spicy • Couples only", color: "bg-brand-red" }
+    { id: 1, title: "Sandy's Confession", tag: "Truth or Dare", color: "bg-brand-tan" },
+    { id: 2, title: "Pure Provocation", tag: "Drinking Rituals", color: "bg-brand-blue" },
+    { id: 3, title: "The Verdict", tag: "Naughty & Spicy • Couples only", color: "bg-brand-red" }
   ];
+
+  const handleModeClick = (modeId: number) => {
+    router.push(`/decks/build?mode=${modeId}`);
+  };
 
   return (
     <section id="modes" className="py-32 px-6 bg-brand-cream/50 scroll-mt-32">
@@ -29,7 +37,11 @@ export const GameModes = () => {
             
             <div className="space-y-6">
               {modes.map((mode, i) => (
-                <div key={i} className="flex items-center justify-between p-8 bg-white rounded-3xl group cursor-pointer hover:shadow-2xl transition-all border border-transparent hover:border-brand-tan/20">
+                <div 
+                  key={i} 
+                  onClick={() => handleModeClick(mode.id)}
+                  className="flex items-center justify-between p-8 bg-white rounded-3xl group cursor-pointer hover:shadow-2xl transition-all border border-transparent hover:border-brand-tan/20"
+                >
                   <div className="flex items-center gap-6">
                     <div className={`w-4 h-4 rounded-full ${mode.color} shadow-inner shadow-black/20`} />
                     <div>

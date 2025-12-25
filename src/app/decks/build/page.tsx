@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Navbar } from "@/ui/components/layout/Navbar";
 import { Button } from "@/ui/components/ui/Button";
 import { useAuth } from "@/ui/providers/AuthContext";
@@ -17,11 +17,24 @@ const modes = [
   { id: 3, title: "The Verdict", tag: "Naughty & Spicy", description: "For the brave ones. High-stakes adult games and spicy sex dares.", color: "bg-brand-red" }
 ];
 
-export default function BuildDeckPage() {
+function BuildDeckContent() {
   const { user } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const modeParam = searchParams.get("mode");
+  
   const [step, setStep] = useState(1);
   const [selectedMode, setSelectedMode] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (modeParam) {
+      const modeId = parseInt(modeParam);
+      if (!isNaN(modeId) && modes.some(m => m.id === modeId)) {
+        setSelectedMode(modeId);
+        setStep(2);
+      }
+    }
+  }, [modeParam]);
   const [useImages, setUseImages] = useState<boolean | null>(null);
   const [notes, setNotes] = useState("");
   const [goal, setGoal] = useState("");
@@ -252,5 +265,17 @@ export default function BuildDeckPage() {
         <div className="font-script text-6xl text-brand-red rotate-12">Listen to Sandy.</div>
       </div>
     </div>
+  );
+}
+
+export default function BuildDeckPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-brand-cream flex items-center justify-center">
+        <div className="animate-pulse font-serif text-2xl text-brand-brown">Sandy is watching...</div>
+      </div>
+    }>
+      <BuildDeckContent />
+    </Suspense>
   );
 }
