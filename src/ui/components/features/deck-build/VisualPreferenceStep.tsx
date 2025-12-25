@@ -18,10 +18,26 @@ export const VisualPreferenceStep = ({
 }: VisualPreferenceStepProps) => {
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <h1 className="text-5xl font-serif font-bold text-brand-brown mb-4">The visual element.</h1>
-      <p className="text-xl text-brand-text-muted mb-12 italic font-medium">
-        Do you want Sandy to analyze photos of your friends for specific dares?
-      </p>
+      <div className="flex items-center gap-6">
+        <button 
+          onClick={() => onPrev()}
+          className="group flex items-center gap-2 shrink-0"
+          title="Back to Decks"
+        >
+          <div className="w-11 h-11 rounded-full bg-brand-cream border-2 border-brand-tan/20 text-brand-brown flex items-center justify-center group-hover:bg-brand-brown group-hover:text-white group-hover:shadow-espresso transition-all duration-500">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                  </svg>
+                </div>
+              </button>
+        <div>
+          <h1 className="text-5xl font-serif font-bold text-brand-brown mb-4">The visual element.</h1>
+          <p className="text-xl text-brand-text-muted mb-12 italic font-medium">
+            Do you want Sandy to analyze photos of your friends for specific dares?
+          </p>
+        </div>
+      </div>
+     
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         {/* Use Images - Disabled for V1 */}
@@ -51,7 +67,7 @@ export const VisualPreferenceStep = ({
 
         {/* Text Only - Default and only option for V1 */}
         <div
-          onClick={() => onSetUseImages(false)}
+          onClick={() => {onSetUseImages(false); onNext()}}
           className={cn(
             "p-10 bg-white rounded-[32px] border-2 text-center transition-all cursor-pointer hover:shadow-xl",
             useImages === false ? "border-brand-brown shadow-espresso" : "border-transparent"
@@ -69,23 +85,6 @@ export const VisualPreferenceStep = ({
             Generic but brutal rules. No camera needed.
           </p>
         </div>
-      </div>
-
-      <div className="mt-12 flex justify-between items-center">
-        <button
-          onClick={onPrev}
-          className="text-sm font-bold uppercase tracking-widest text-brand-text-muted hover:text-brand-brown transition-colors"
-        >
-          Back
-        </button>
-        <Button
-          variant="primary"
-          size="xl"
-          disabled={useImages === null}
-          onClick={onNext}
-        >
-          Continue to Details
-        </Button>
       </div>
     </div>
   );

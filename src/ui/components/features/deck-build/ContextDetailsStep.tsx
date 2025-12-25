@@ -50,10 +50,25 @@ export const ContextDetailsStep = ({
 }: ContextDetailsStepProps) => {
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <h1 className="text-5xl font-serif font-bold text-brand-brown mb-4">Context matters.</h1>
-      <p className="text-xl text-brand-text-muted mb-12 italic font-medium">
-        Tell Sandy about the occasion or any specific rules you want her to enforce.
-      </p>
+      <div className="flex items-center">
+        <button 
+          onClick={() => onPrev()}
+          className="group flex items-center gap-2 shrink-0"
+          title="Back to Decks"
+        >
+          <div className="w-11 h-11 rounded-full bg-brand-cream border-2 border-brand-tan/20 text-brand-brown flex items-center justify-center group-hover:bg-brand-brown group-hover:text-white group-hover:shadow-espresso transition-all duration-500">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                  </svg>
+                </div>
+              </button>
+        <div className="flex flex-col">
+          <h1 className="text-5xl font-serif font-bold text-brand-brown mb-4">Context matters.</h1>
+          <p className="text-xl text-brand-text-muted mb-12 italic font-medium">
+            Tell Sandy about the occasion or any specific rules you want her to enforce.
+          </p>
+        </div>
+      </div>
 
       <div className="space-y-10">
         {/* Title */}

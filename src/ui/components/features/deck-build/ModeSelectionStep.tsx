@@ -37,6 +37,7 @@ export const ModeSelectionStep = ({
             key={mode.id}
             onClick={() => {
               onSelectMode(mode.id);
+              onNext();
             }}
             className={cn(
               "p-8 bg-white rounded-[32px] border-2 transition-all cursor-pointer group hover:shadow-xl",
@@ -57,17 +58,6 @@ export const ModeSelectionStep = ({
             </div>
           </div>
         ))}
-      </div>
-
-      <div className="mt-12 flex justify-end">
-        <Button
-          variant="primary"
-          size="xl"
-          disabled={!selectedMode}
-          onClick={onNext}
-        >
-          Continue to Config
-        </Button>
       </div>
     </div>
   );
