@@ -5,7 +5,7 @@ export const FeaturesGrid = () => {
     {
       title: "Identify Targets",
       sub: "PHASE ONE",
-      desc: "Upload 10-20 photos of your friends. Sandy needs to know exactly who she's dealing with.",
+      desc: "Add names of your friends. Sandy needs to know exactly who she's dealing with.",
       icon: "🎯"
     },
     {
