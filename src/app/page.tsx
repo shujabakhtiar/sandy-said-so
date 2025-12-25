@@ -7,7 +7,7 @@ import { CTA } from "@/ui/components/features/CTA";
 
 export default function Home() {
   return (
-    <div className="relative min-h-screen bg-brand-cream selection:bg-brand-tan/30 selection:text-brand-brown">
+    <div className="relative bg-brand-cream selection:bg-brand-tan/30 selection:text-brand-brown">
       {/* Visual Overlays */}
       <div className="sunkissed" />
       
