@@ -45,7 +45,6 @@ function BuildDeckContent() {
   const [personNote, setPersonNote] = useState("");
   const [title, setTitle] = useState("");
   const [chaosLevel, setChaosLevel] = useState(3);
-  const [showChaosModal, setShowChaosModal] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const addPerson = () => {
@@ -63,14 +62,6 @@ function BuildDeckContent() {
   const handleCreateDeck = async () => {
     if (!selectedMode) return;
     
-    // Check if any fields are set
-    const hasContext = goal.trim() || secrets.trim() || extra.trim() || notes.trim() || people.length > 0;
-    
-    if (!hasContext && !showChaosModal) {
-      setShowChaosModal(true);
-      return;
-    }
-
     setLoading(true);
     
     // Append people to extra context to inform AI without DB change
@@ -192,73 +183,13 @@ function BuildDeckContent() {
             onPrev={prevStep}
             onCreateDeck={handleCreateDeck}
             loading={loading}
+            chaosLevel={chaosLevel}
+            setChaosLevel={setChaosLevel}
           />
         )}
       </main>
 
-      {/* Chaos Selection Modal */}
-      {showChaosModal && (
-        <div className="fixed inset-0 z-100 flex items-center justify-center p-6">
-          <div className="absolute inset-0 bg-brand-brown/40 backdrop-blur-sm" onClick={() => setShowChaosModal(false)} />
-          <div className="bg-white rounded-[48px] p-12 max-w-xl w-full relative shadow-espresso animate-in zoom-in-95 duration-300">
-            <h2 className="text-4xl font-serif font-bold text-brand-brown mb-6 text-center">Sandy likes it empty...</h2>
-            <p className="text-lg text-brand-text-muted text-center mb-10 italic">
-              Since you aren&apos;t telling her what to do, Sandy will decide the vibe. How much chaos can you handle?
-            </p>
-            
-            <div className="mb-12">
-              <div className="flex justify-between text-xs font-bold uppercase tracking-widest text-brand-text-muted mb-4">
-                <span>Total Chill</span>
-                <span>Pure Chaos</span>
-              </div>
-              <input 
-                type="range" 
-                min="1" 
-                max="5" 
-                step="1"
-                value={chaosLevel}
-                onChange={(e) => setChaosLevel(parseInt(e.target.value))}
-                className="w-full h-2 bg-brand-tan/30 rounded-lg appearance-none cursor-pointer accent-brand-red"
-              />
-              <div className="flex justify-between mt-4 px-1">
-                {[1, 2, 3, 4, 5].map((i) => (
-                  <div 
-                    key={i} 
-                    className={cn(
-                      "w-2 h-2 rounded-full transition-colors",
-                      chaosLevel >= i ? "bg-brand-red" : "bg-brand-tan/30"
-                    )} 
-                  />
-                ))}
-              </div>
-              <div className="mt-8 text-center bg-brand-cream/50 py-4 rounded-2xl border border-brand-tan/20">
-                <span className="text-sm font-bold text-brand-brown uppercase tracking-[0.2em]">
-                  {chaosLevel === 1 && "Level 1: Just talking"}
-                  {chaosLevel === 2 && "Level 2: Mild discomfort"}
-                  {chaosLevel === 3 && "Level 3: The standard secret"}
-                  {chaosLevel === 4 && "Level 4: High alert"}
-                  {chaosLevel === 5 && "Level 5: Sandy's Revenge"}
-                </span>
-              </div>
-            </div>
 
-            <Button 
-              variant="primary" 
-              size="xl" 
-              className="w-full shadow-lg"
-              onClick={handleCreateDeck}
-            >
-              Let the Games Begin
-            </Button>
-            <button 
-              onClick={() => setShowChaosModal(false)}
-              className="w-full mt-6 text-xs font-bold uppercase tracking-widest text-brand-text-muted hover:text-brand-brown transition-colors"
-            >
-              Wait, let me add notes
-            </button>
-          </div>
-        </div>
-      )}
 
       {/* Decorative Branding */}
       <div className="fixed bottom-10 right-10 pointer-events-none opacity-20 select-none">

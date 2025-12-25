@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/ui/components/ui/Button";
+import { cn } from "@/ui/lib/utils";
 
 interface Person {
   name: string;
@@ -26,6 +27,8 @@ interface ContextDetailsStepProps {
   onPrev: () => void;
   onCreateDeck: () => void;
   loading: boolean;
+  chaosLevel: number;
+  setChaosLevel: (level: number) => void;
 }
 
 export const ContextDetailsStep = ({
@@ -47,6 +50,8 @@ export const ContextDetailsStep = ({
   onPrev,
   onCreateDeck,
   loading,
+  chaosLevel,
+  setChaosLevel,
 }: ContextDetailsStepProps) => {
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -159,6 +164,50 @@ export const ContextDetailsStep = ({
               ))}
             </div>
           )}
+        </div>
+
+        {/* Chaos Level */}
+        <div className="bg-white rounded-[40px] p-10 border border-brand-tan/10 shadow-espresso/5 mb-2">
+          <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-brand-text-muted mb-8 ml-1">
+            Chaos Level: How much trouble do you want?
+          </label>
+          
+          <div className="px-2">
+            <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest text-brand-text-muted mb-6">
+              <span>Total Chill</span>
+              <span>Pure Chaos</span>
+            </div>
+            <input 
+              type="range" 
+              min="1" 
+              max="5" 
+              step="1"
+              value={chaosLevel}
+              onChange={(e) => setChaosLevel(parseInt(e.target.value))}
+              className="w-full h-2 bg-brand-tan/20 rounded-lg appearance-none cursor-pointer accent-brand-red mb-6"
+            />
+            <div className="flex justify-between px-1 mb-10">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <div 
+                  key={i} 
+                  className={cn(
+                    "w-2.5 h-2.5 rounded-full transition-all duration-300",
+                    chaosLevel >= i ? "bg-brand-red scale-110" : "bg-brand-tan/20 scale-100"
+                  )} 
+                />
+              ))}
+            </div>
+            
+            <div className="text-center bg-brand-cream/50 py-5 rounded-3xl border border-brand-tan/10">
+              <span className="text-sm font-bold text-brand-brown uppercase tracking-[0.2em]">
+                {chaosLevel === 1 && "Level 1: Just talking"}
+                {chaosLevel === 2 && "Level 2: Mild discomfort"}
+                {chaosLevel === 3 && "Level 3: The standard secret"}
+                {chaosLevel === 4 && "Level 4: High alert"}
+                {chaosLevel === 5 && "Level 5: Sandy's Revenge"}
+              </span>
+            </div>
+          </div>
         </div>
 
         {/* Goal */}
