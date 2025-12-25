@@ -137,7 +137,7 @@ export default function SelectCardsPage() {
         <div className="mb-12">
           <h1 className="text-5xl font-serif font-bold text-brand-brown mb-4">Pick your poison.</h1>
           <p className="text-xl text-brand-text-muted italic font-medium mb-6">
-            Sandy has prepared three variations of your chosen game mode. Select individual cards or entire decks.
+            Sandy has prepared two variations of your chosen game mode. Select individual cards or entire decks.
           </p>
           <div className="flex items-center gap-4 bg-white rounded-3xl p-6 shadow-sm">
             <div className="flex-1">
@@ -176,7 +176,6 @@ export default function SelectCardsPage() {
             // Better labels for the variations
             const variationLabels = [
               { name: "Bold & Daring", description: "Push boundaries and create memorable moments" },
-              { name: "Light & Fun", description: "Keep the energy inclusive and conversational" },
               { name: "Wild & Chaotic", description: "Maximum unpredictability and hilarious chaos" }
             ];
             

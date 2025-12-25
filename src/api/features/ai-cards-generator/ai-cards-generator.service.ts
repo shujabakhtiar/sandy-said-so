@@ -63,7 +63,7 @@ export class AICardsGeneratorService {
 
     if (!deck) throw new Error("Deck not found");
 
-    // 2. Generate 3 different variations based on game mode
+    // 2. Generate 2 different variations based on game mode
     // These variations stay within the game mode but offer different styles
     const variations = [
       { 
@@ -72,10 +72,6 @@ export class AICardsGeneratorService {
       },
       { 
         name: "Deck 2", 
-        instruction: "Focus on social sabotage and psychological mind games. Make it personal and delightfully awkward." 
-      },
-      { 
-        name: "Deck 3", 
         instruction: "Create cards that maximize chaos and unpredictability. Make them wild and hilarious within the game mode." 
       }
     ];

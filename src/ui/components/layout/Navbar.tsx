@@ -164,7 +164,7 @@ export const Navbar = () => {
       {/* Mobile Side Nav - Completely isolated from the nav scaling/transform context */}
       <div 
         className={cn(
-          "fixed inset-0 z-[9999] md:hidden transition-all duration-300 pointer-events-none",
+          "fixed inset-0 z-9999 md:hidden transition-all duration-300 pointer-events-none",
           isSideNavOpen ? "pointer-events-auto" : ""
         )}
       >
@@ -177,7 +177,7 @@ export const Navbar = () => {
         />
         <div 
           className={cn(
-            "absolute right-0 top-0 h-full w-80 max-w-[85vw] bg-brand-cream shadow-2xl p-8 transition-transform duration-500 ease-out flex flex-col z-[10000]",
+            "absolute right-0 top-0 h-full w-80 max-w-[85vw] bg-brand-cream shadow-2xl p-8 transition-transform duration-500 ease-out flex flex-col z-10000",
             isSideNavOpen ? "translate-x-0" : "translate-x-full"
           )}
         >
