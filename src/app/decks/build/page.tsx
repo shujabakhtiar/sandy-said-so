@@ -7,6 +7,10 @@ import { Button } from "@/ui/components/ui/Button";
 import { useAuth } from "@/ui/providers/AuthContext";
 import { cn } from "@/ui/lib/utils";
 
+import { ModeSelectionStep } from "@/ui/components/features/deck-build/ModeSelectionStep";
+import { VisualPreferenceStep } from "@/ui/components/features/deck-build/VisualPreferenceStep";
+import { ContextDetailsStep } from "@/ui/components/features/deck-build/ContextDetailsStep";
+
 const modes = [
   { id: 1, title: "Sandy's Confession", tag: "Truth or Dare", description: "Deep secrets, uncomfortable truths, and social sabotage.", color: "bg-brand-tan" },
   { id: 2, title: "Pure Provocation", tag: "Drinking Rituals", description: "The ultimate drinking game. Sandy makes the rules for the circle, Kings Cup style.", color: "bg-brand-blue" },
@@ -138,287 +142,44 @@ export default function BuildDeckPage() {
         </div>
 
         {step === 1 && (
-          <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <h1 className="text-5xl font-serif font-bold text-brand-brown mb-4">How dangerous?</h1>
-            <p className="text-xl text-brand-text-muted mb-12 italic font-medium">Sandy has several ways of ruining your night. Choose wisely.</p>
-            
-            <div className="space-y-4">
-              {modes.map((mode) => (
-                <div 
-                  key={mode.id}
-                  onClick={() => {setSelectedMode(mode.id); nextStep()}}
-                  className={cn(
-                    "p-8 bg-white rounded-[32px] border-2 transition-all cursor-pointer group hover:shadow-xl",
-                    selectedMode === mode.id ? "border-brand-brown shadow-espresso" : "border-transparent"
-                  )}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-6">
-                      <div className={cn("w-4 h-4 rounded-full shadow-inner shadow-black/20", mode.color)} />
-                      <div>
-                        <h3 className="text-2xl font-serif font-bold text-brand-brown">{mode.title}</h3>
-                        <p className="text-brand-text-muted text-sm font-medium">{mode.description}</p>
-                      </div>
-                    </div>
-                    <div className="text-[10px] font-bold uppercase tracking-widest text-brand-text-muted opacity-50">
-                      {mode.tag}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-12 flex justify-end">
-              <Button 
-                variant="primary" 
-                size="xl" 
-                disabled={!selectedMode}
-                onClick={nextStep}
-              >
-                Continue to Config
-              </Button>
-            </div>
-          </div>
+          <ModeSelectionStep
+            modes={modes}
+            selectedMode={selectedMode}
+            onSelectMode={setSelectedMode}
+            onNext={nextStep}
+          />
         )}
 
         {step === 2 && (
-          <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <h1 className="text-5xl font-serif font-bold text-brand-brown mb-4">The visual element.</h1>
-            <p className="text-xl text-brand-text-muted mb-12 italic font-medium">Do you want Sandy to analyze photos of your friends for specific dares?</p>
-            
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div 
-                onClick={() => {setUseImages(true); nextStep()}}
-                className={cn(
-                  "p-10 bg-white rounded-[32px] border-2 text-center transition-all cursor-pointer hover:shadow-xl",
-                  useImages === true ? "border-brand-brown shadow-espresso" : "border-transparent"
-                )}
-              >
-                <div className="w-16 h-16 bg-brand-blue/10 rounded-2xl flex items-center justify-center mx-auto mb-6 text-brand-blue">
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
-                </div>
-                <h3 className="text-xl font-serif font-bold text-brand-brown mb-2">Use Images</h3>
-                <p className="text-brand-text-muted text-xs font-bold uppercase tracking-widest leading-relaxed">Personalized chaos based on who is actually there.</p>
-              </div>
-
-              <div 
-                onClick={() => {setUseImages(false); nextStep()}}
-                className={cn(
-                  "p-10 bg-white rounded-[32px] border-2 text-center transition-all cursor-pointer hover:shadow-xl",
-                  useImages === false ? "border-brand-brown shadow-espresso" : "border-transparent"
-                )}
-              >
-                <div className="w-16 h-16 bg-brand-tan/20 rounded-2xl flex items-center justify-center mx-auto mb-6 text-brand-brown">
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3v19"/><path d="M5 8h14"/><path d="M15 21a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h6Z"/></svg>
-                </div>
-                <h3 className="text-xl font-serif font-bold text-brand-brown mb-2">Text Only</h3>
-                <p className="text-brand-text-muted text-xs font-bold uppercase tracking-widest leading-relaxed">Generic but brutal rules. No camera needed.</p>
-              </div>
-            </div>
-
-            <div className="mt-12 flex justify-between items-center">
-              <button 
-                onClick={prevStep}
-                className="text-sm font-bold uppercase tracking-widest text-brand-text-muted hover:text-brand-brown transition-colors"
-              >
-                Back
-              </button>
-              <Button 
-                variant="primary" 
-                size="xl" 
-                disabled={useImages === null}
-                onClick={nextStep}
-              >
-                Continue to Details
-              </Button>
-            </div>
-          </div>
+          <VisualPreferenceStep
+            useImages={useImages}
+            onSetUseImages={setUseImages}
+            onNext={nextStep}
+            onPrev={prevStep}
+          />
         )}
 
         {step === 3 && (
-          <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <h1 className="text-5xl font-serif font-bold text-brand-brown mb-4">Context matters.</h1>
-            <p className="text-xl text-brand-text-muted mb-12 italic font-medium">Tell Sandy about the occasion or any specific rules you want her to enforce.</p>
-            
-            <div className="space-y-10">
-              <div>
-                <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-brand-text-muted mb-3 ml-1">
-                  Deck Title (Optional)
-                </label>
-                <input
-                  type="text"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  className="w-full px-8 py-5 rounded-3xl bg-white border border-brand-tan/30 focus:border-brand-brown focus:ring-0 outline-none text-brand-brown font-medium shadow-sm transition-all"
-                  placeholder="The Saturday Secret..."
-                />
-              </div>
-
-              <div>
-                <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-brand-text-muted mb-3 ml-1">
-                  Who is in the room? (Sandy likes names)
-                </label>
-                <div className="flex flex-col gap-4 mb-6 bg-white p-6 rounded-3xl border border-brand-tan/20 shadow-sm">
-                  <div className="flex flex-col gap-4">
-                    <input
-                      type="text"
-                      value={personInput}
-                      onChange={(e) => setPersonInput(e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addPerson())}
-                      className="px-6 py-4 rounded-xl bg-brand-cream/30 border border-brand-tan/10 focus:border-brand-brown focus:ring-0 outline-none text-brand-brown font-medium transition-all"
-                      placeholder="Name (e.g. Harshal)"
-                    />
-                    <input
-                      type="text"
-                      value={personNote}
-                      onChange={(e) => setPersonNote(e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addPerson())}
-                      className="px-6 py-4 rounded-xl bg-brand-cream/30 border border-brand-tan/10 focus:border-brand-brown focus:ring-0 outline-none text-brand-brown font-medium transition-all"
-                      placeholder="One line about them (Optional personalization)"
-                    />
-                  </div>
-                  <div className="flex justify-end">
-                    <Button 
-                      variant="outline" 
-                      onClick={(e) => {e.preventDefault(); addPerson()}}
-                      className="rounded-xl w-40"
-                    >
-                      Add Person
-                    </Button>
-                  </div>
-                </div>
-
-                {people.length > 0 && (
-                  <div className="flex flex-wrap gap-2 p-4 bg-brand-tan/5 rounded-3xl border border-dashed border-brand-tan/30">
-                    {people.map((person) => (
-                      <button
-                        key={person.name}
-                        onClick={() => removePerson(person.name)}
-                        className="group flex flex-col items-start px-5 py-3 bg-white rounded-2xl border border-brand-tan/20 hover:border-brand-red/30 hover:bg-brand-red/5 transition-all text-left"
-                      >
-                        <div className="flex items-center gap-2 w-full justify-between">
-                          <span className="text-sm font-bold text-brand-brown group-hover:text-brand-red transition-colors">{person.name}</span>
-                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-brand-tan/60 group-hover:text-brand-red/60 transition-colors">
-                            <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
-                          </svg>
-                        </div>
-                        {person.note && (
-                          <span className="text-[10px] text-brand-text-muted italic leading-tight group-hover:text-brand-red/80 transition-colors mt-0.5">
-                            {person.note}
-                          </span>
-                        )}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-brand-text-muted mb-3 ml-1">
-                  Tell Sandy how you want to have a good time? (Optional)
-                </label>
-                <textarea
-                  rows={2}
-                  value={goal}
-                  onChange={(e) => setGoal(e.target.value)}
-                  className="w-full px-8 py-5 rounded-3xl bg-white border border-brand-tan/30 focus:border-brand-brown focus:ring-0 outline-none text-brand-brown font-medium shadow-sm transition-all resize-none mb-3"
-                  placeholder="What's the goal for the night?"
-                />
-                <div className="flex flex-wrap gap-2">
-                  {[
-                    "Help us get drunk really fast.",
-                    "Make us laugh our asses off.",
-                    "Keep it chill and conversational.",
-                    "Absolute chaos and bad decisions."
-                  ].map((ex) => (
-                    <button
-                      key={ex}
-                      onClick={() => setGoal(ex)}
-                      className="text-[10px] font-bold px-3 py-1.5 rounded-full bg-brand-tan/10 text-brand-brown border border-brand-tan/20 hover:bg-brand-tan/20 transition-colors"
-                    >
-                      {ex}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-brand-text-muted mb-3 ml-1">
-                  Any secrets or running jokes for Sandy? (Optional)
-                </label>
-                <textarea
-                  rows={2}
-                  value={secrets}
-                  onChange={(e) => setSecrets(e.target.value)}
-                  className="w-full px-8 py-5 rounded-3xl bg-white border border-brand-tan/30 focus:border-brand-brown focus:ring-0 outline-none text-brand-brown font-medium shadow-sm transition-all resize-none mb-3"
-                  placeholder="Sandy won't tell... probably."
-                />
-                <div className="flex flex-wrap gap-2">
-                  {[
-                    "The incident in Paris 2023.",
-                    "David is secretly a cat person.",
-                    "Mention the 'accounting' mishap.",
-                    "Someone here has a crush on X."
-                  ].map((ex) => (
-                    <button
-                      key={ex}
-                      onClick={() => setSecrets(ex)}
-                      className="text-[10px] font-bold px-3 py-1.5 rounded-full bg-brand-red/5 text-brand-red border border-brand-red/10 hover:bg-brand-red/10 transition-colors"
-                    >
-                      {ex}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-brand-text-muted mb-3 ml-1">
-                  Help Sandy make the game? (Optional)
-                </label>
-                <textarea
-                  rows={3}
-                  value={extra}
-                  onChange={(e) => setExtra(e.target.value)}
-                  className="w-full px-8 py-6 rounded-[32px] bg-white border border-brand-tan/30 focus:border-brand-brown focus:ring-0 outline-none text-brand-brown font-medium shadow-sm transition-all resize-none mb-3"
-                  placeholder="Occasion, specific rules, or vibes..."
-                />
-                <div className="flex flex-wrap gap-2">
-                  {[
-                    "It's a bachelor party.",
-                    "No physical dares, please.",
-                    "Focus more on group votes.",
-                    "Include rules about the birthday girl."
-                  ].map((ex) => (
-                    <button
-                      key={ex}
-                      onClick={() => setExtra(ex)}
-                      className="text-[10px] font-bold px-3 py-1.5 rounded-full bg-brand-blue/5 text-brand-blue border border-brand-blue/10 hover:bg-brand-blue/10 transition-colors"
-                    >
-                      {ex}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-12 flex justify-between items-center">
-              <button 
-                onClick={prevStep}
-                className="text-sm font-bold uppercase tracking-widest text-brand-text-muted hover:text-brand-brown transition-colors"
-              >
-                Back
-              </button>
-              <Button 
-                variant="primary" 
-                size="xl" 
-                className="shadow-espresso"
-                disabled={loading}
-                onClick={handleCreateDeck}
-              >
-                Generate My Secret Deck
-              </Button>
-            </div>
-          </div>
+          <ContextDetailsStep
+            title={title}
+            setTitle={setTitle}
+            personInput={personInput}
+            setPersonInput={setPersonInput}
+            personNote={personNote}
+            setPersonNote={setPersonNote}
+            people={people}
+            onAddPerson={addPerson}
+            onRemovePerson={removePerson}
+            goal={goal}
+            setGoal={setGoal}
+            secrets={secrets}
+            setSecrets={setSecrets}
+            extra={extra}
+            setExtra={setExtra}
+            onPrev={prevStep}
+            onCreateDeck={handleCreateDeck}
+            loading={loading}
+          />
         )}
       </main>
 
