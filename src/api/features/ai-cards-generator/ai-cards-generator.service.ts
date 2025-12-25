@@ -124,8 +124,8 @@ User-provided Context:
 Instructions for each card:
 1. Each card should be a "command" or "situation" from Sandy.
 2. The tone should be consistent with the game mode. 
-3. If participants are listed, use their names in 5-7 of the cards to create personalized challenges. If a participant has a note in parentheses (e.g. "Name (Note)"), use that information to make the challenge more specific and hilarious.
-4. If secrets or inside jokes are provided, try to weave them into 2-3 of the cards subtly or explicitly (depending on chaos level).
+3. If participants are listed, use their names in 70% of the cards to create personalized challenges. If a participant has a note in parentheses (e.g. "Name (Note)"), use that information to make the challenge more specific and hilarious.
+4. If secrets or inside jokes are provided, try to weave them into 40% of the cards subtly or explicitly (depending on chaos level).
 4. If chaos level is high (4 or 5), make the dares more daring or the "punishments" (drinks) more frequent.
 5. If chaos level is low (1 or 2), keep it more conversational and light.
 6. Use "Sandy says..." or similar phrasing for some cards to maintain the persona.
