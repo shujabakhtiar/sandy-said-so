@@ -17,3 +17,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
+export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+  const { GameDecksController } = await import("@/api/features/game-decks/game-decks.controller");
+  return GameDecksController.update(req, { params });
+}

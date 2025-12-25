@@ -124,7 +124,7 @@ export default function BuildDeckPage() {
               {modes.map((mode) => (
                 <div 
                   key={mode.id}
-                  onClick={() => setSelectedMode(mode.id)}
+                  onClick={() => {setSelectedMode(mode.id); nextStep()}}
                   className={cn(
                     "p-8 bg-white rounded-[32px] border-2 transition-all cursor-pointer group hover:shadow-xl",
                     selectedMode === mode.id ? "border-brand-brown shadow-espresso" : "border-transparent"
@@ -166,7 +166,7 @@ export default function BuildDeckPage() {
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div 
-                onClick={() => setUseImages(true)}
+                onClick={() => {setUseImages(true); nextStep()}}
                 className={cn(
                   "p-10 bg-white rounded-[32px] border-2 text-center transition-all cursor-pointer hover:shadow-xl",
                   useImages === true ? "border-brand-brown shadow-espresso" : "border-transparent"
@@ -180,7 +180,7 @@ export default function BuildDeckPage() {
               </div>
 
               <div 
-                onClick={() => setUseImages(false)}
+                onClick={() => {setUseImages(false); nextStep()}}
                 className={cn(
                   "p-10 bg-white rounded-[32px] border-2 text-center transition-all cursor-pointer hover:shadow-xl",
                   useImages === false ? "border-brand-brown shadow-espresso" : "border-transparent"

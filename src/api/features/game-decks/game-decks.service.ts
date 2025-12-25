@@ -57,4 +57,10 @@ export class GameDecksService {
       },
     });
   }
+  static async updateDeck(id: number, data: { title?: string }) {
+    return await prisma.gameDeck.update({
+      where: { id },
+      data: { title: data.title },
+    });
+  }
 }

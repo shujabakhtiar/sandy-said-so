@@ -54,4 +54,16 @@ export class GameDecksController {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
   }
+  static async update(req: NextRequest, { params }: { params: { id: string } }) {
+    try {
+      const userId = await requireAuth();
+      const { id } = await params;
+      const { title } = await req.json();
+      
+      const deck = await GameDecksService.updateDeck(Number(id), { title });
+      return NextResponse.json(deck);
+    } catch (error: any) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+  }
 }

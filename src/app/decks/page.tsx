@@ -9,7 +9,10 @@ import Image from "next/image";
 
 export default function DecksPage() {
   const { user, loading } = useAuth();
-  const [decks, setDecks] = useState([]);
+  const [decks, setDecks] = useState<any[]>([]);
+  const [editingDeck, setEditingDeck] = useState<any>(null);
+  const [newTitle, setNewTitle] = useState("");
+  const [isUpdating, setIsUpdating] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -18,14 +21,38 @@ export default function DecksPage() {
     }
   }, [user, loading, router]);
 
-  useEffect(() => {
+  const fetchDecks = () => {
     if (user) {
       fetch("/api/game-decks")
         .then((res) => res.json())
         .then((data) => setDecks(data))
         .catch((err) => console.error(err));
     }
+  };
+
+  useEffect(() => {
+    fetchDecks();
   }, [user]);
+
+  const handleUpdateTitle = async () => {
+    if (!editingDeck) return;
+    setIsUpdating(true);
+    try {
+      const res = await fetch(`/api/game-decks/${editingDeck.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title: newTitle }),
+      });
+      if (res.ok) {
+        setDecks(decks.map(d => d.id === editingDeck.id ? { ...d, title: newTitle } : d));
+        setEditingDeck(null);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
 
   if (loading) return null;
 
@@ -93,7 +120,24 @@ export default function DecksPage() {
                   </div>
                 </div>
                 <div className="p-8">
-                  <h3 className="text-2xl font-serif font-bold text-brand-brown mb-2">{deck.title || "Untitled Secret"}</h3>
+                  <div className="flex justify-between items-start gap-4 mb-2">
+                    <h3 className="text-2xl font-serif font-bold text-brand-brown flex-1">
+                      {deck.title || "New deck"}
+                    </h3>
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setEditingDeck(deck);
+                        setNewTitle(deck.title || "");
+                      }}
+                      className="p-2 -mr-2 text-brand-text-muted hover:text-brand-brown transition-colors group/btn"
+                      title="Edit Title"
+                    >
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="group-hover/btn:scale-110 transition-transform">
+                        <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                      </svg>
+                    </button>
+                  </div>
                   <div className="flex items-center gap-4 text-xs font-bold uppercase tracking-widest text-brand-text-muted">
                     <span>{deck._count?.gameCards || 0} Cards</span>
                     <span className="w-1 h-1 bg-brand-tan rounded-full" />
@@ -105,6 +149,57 @@ export default function DecksPage() {
           </div>
         )}
       </main>
+
+      {/* Edit Title Modal */}
+      {editingDeck && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+          <div className="absolute inset-0 bg-brand-brown/40 backdrop-blur-sm" onClick={() => setEditingDeck(null)} />
+          <div className="bg-white rounded-[40px] p-10 max-w-md w-full relative shadow-espresso animate-in zoom-in-95 duration-300">
+            <div className="text-center mb-8">
+              <h2 className="text-3xl font-serif font-bold text-brand-brown mb-2">Change the secret.</h2>
+              <p className="text-sm text-brand-text-muted italic">Sandy is listening...</p>
+            </div>
+            
+            <div className="mb-8">
+              <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-brand-text-muted mb-3 ml-1">
+                Deck Title
+              </label>
+              <input
+                type="text"
+                autoFocus
+                value={newTitle}
+                onChange={(e) => setNewTitle(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleUpdateTitle();
+                  if (e.key === "Escape") setEditingDeck(null);
+                }}
+                className="w-full px-6 py-4 rounded-2xl bg-brand-cream/50 border border-brand-tan/30 focus:border-brand-brown focus:ring-0 outline-none text-brand-brown font-medium transition-all"
+                placeholder="New deck..."
+              />
+            </div>
+
+            <div className="flex gap-4">
+              <Button 
+                variant="outline" 
+                size="lg" 
+                className="flex-1"
+                onClick={() => setEditingDeck(null)}
+              >
+                Cancel
+              </Button>
+              <Button 
+                variant="primary" 
+                size="lg" 
+                className="flex-1 shadow-md"
+                disabled={isUpdating}
+                onClick={handleUpdateTitle}
+              >
+                {isUpdating ? "Saving..." : "Save Title"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Decorative Overlays */}
       <div className="absolute top-[20%] right-0 w-[500px] h-[500px] bg-brand-red/5 rounded-full blur-[120px] pointer-events-none -z-10" />
