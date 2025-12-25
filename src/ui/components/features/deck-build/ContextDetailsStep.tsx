@@ -50,21 +50,21 @@ export const ContextDetailsStep = ({
 }: ContextDetailsStepProps) => {
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="flex items-center">
+      <div className="flex items-start gap-1 mb-12">
         <button 
-          onClick={() => onPrev()}
-          className="group flex items-center gap-2 shrink-0"
-          title="Back to Decks"
+          onClick={onPrev}
+          className="group shrink-0 pt-1"
+          title="Go Back"
         >
-          <div className="w-11 h-11 rounded-full bg-brand-cream border-2 border-brand-tan/20 text-brand-brown flex items-center justify-center group-hover:bg-brand-brown group-hover:text-white group-hover:shadow-espresso transition-all duration-500">
+          <div className="w-10 h-10 rounded-full text-brand-brown flex items-center justify-center group-hover:bg-brand-brown/10 transition-all duration-300">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M19 12H5M12 19l-7-7 7-7"/>
-                  </svg>
-                </div>
-              </button>
-        <div className="flex flex-col">
-          <h1 className="text-5xl font-serif font-bold text-brand-brown mb-4">Context matters.</h1>
-          <p className="text-xl text-brand-text-muted mb-12 italic font-medium">
+              <path d="m15 18-6-6 6-6"/>
+            </svg>
+          </div>
+        </button>
+        <div>
+          <h1 className="text-5xl font-serif font-bold text-brand-brown mb-4 tracking-tight">Context matters.</h1>
+          <p className="text-xl text-brand-text-muted italic font-medium leading-relaxed">
             Tell Sandy about the occasion or any specific rules you want her to enforce.
           </p>
         </div>
@@ -252,13 +252,7 @@ export const ContextDetailsStep = ({
         </div>
       </div>
 
-      <div className="mt-12 flex justify-between items-center">
-        <button
-          onClick={onPrev}
-          className="text-sm font-bold uppercase tracking-widest text-brand-text-muted hover:text-brand-brown transition-colors"
-        >
-          Back
-        </button>
+      <div className="mt-12 flex justify-end">
         <Button
           variant="primary"
           size="xl"

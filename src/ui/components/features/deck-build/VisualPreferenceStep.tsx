@@ -18,21 +18,21 @@ export const VisualPreferenceStep = ({
 }: VisualPreferenceStepProps) => {
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="flex items-center gap-6">
+      <div className="flex items-start gap-1 mb-12">
         <button 
-          onClick={() => onPrev()}
-          className="group flex items-center gap-2 shrink-0"
-          title="Back to Decks"
+          onClick={onPrev}
+          className="group shrink-0 pt-1"
+          title="Go Back"
         >
-          <div className="w-11 h-11 rounded-full bg-brand-cream border-2 border-brand-tan/20 text-brand-brown flex items-center justify-center group-hover:bg-brand-brown group-hover:text-white group-hover:shadow-espresso transition-all duration-500">
+          <div className="w-10 h-10 rounded-full text-brand-brown flex items-center justify-center group-hover:bg-brand-brown/10 transition-all duration-300">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M19 12H5M12 19l-7-7 7-7"/>
-                  </svg>
-                </div>
-              </button>
+              <path d="m15 18-6-6 6-6"/>
+            </svg>
+          </div>
+        </button>
         <div>
-          <h1 className="text-5xl font-serif font-bold text-brand-brown mb-4">The visual element.</h1>
-          <p className="text-xl text-brand-text-muted mb-12 italic font-medium">
+          <h1 className="text-5xl font-serif font-bold text-brand-brown mb-4 tracking-tight">The visual element.</h1>
+          <p className="text-xl text-brand-text-muted italic font-medium leading-relaxed">
             Do you want Sandy to analyze photos of your friends for specific dares?
           </p>
         </div>
