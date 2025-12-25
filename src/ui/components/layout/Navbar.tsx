@@ -55,187 +55,207 @@ export const Navbar = () => {
   };
 
   return (
-    <nav 
-      className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-300 px-8 py-4 lg:px-16 w-full",
-        isScrolled 
-          ? "bg-brand-cream/80 backdrop-blur-md shadow-espresso py-4" 
-          : "bg-transparent py-8"
-      )}
-    >
-      <div className="container mx-auto flex items-center justify-between">
-        <Link href="/" className="font-serif text-2xl tracking-tight font-bold text-brand-brown">
-          Sandy <span className="font-script text-3xl font-normal ml-1">said so.</span>
-        </Link>
+    <>
+      <nav 
+        className={cn(
+          "fixed top-0 left-0 right-0 z-50 transition-all duration-500 px-8 w-full",
+          isScrolled 
+            ? "bg-brand-cream/90 backdrop-blur-lg shadow-espresso py-3 lg:px-16" 
+            : "bg-transparent py-8 lg:px-16"
+        )}
+      >
+        <div className={cn(
+          "container mx-auto flex items-center justify-between transition-all duration-500",
+          isScrolled ? "scale-[0.98] opacity-100" : "scale-100"
+        )}>
+          <Link href="/" className="font-serif text-2xl tracking-tight font-bold text-brand-brown">
+            Sandy <span className="font-script text-3xl font-normal ml-1">said so.</span>
+          </Link>
 
-        <div className="hidden md:flex gap-10 text-sm font-semibold uppercase tracking-widest text-brand-text-muted items-center">
-          {navLinks.map((link) => (
-            link.href.startsWith("#") ? (
-              <a key={link.href} href={link.href} className="hover:text-brand-brown transition-all duration-300">
-                {link.label}
-              </a>
-            ) : (
-              <Link key={link.href} href={link.href} className={cn(
-                "hover:text-brand-brown transition-all duration-300",
-                pathname === link.href && "text-brand-brown font-bold"
-              )}>
-                {link.label}
-              </Link>
-            )
-          ))}
-        </div>
+          <div className="hidden md:flex gap-10 text-sm font-semibold uppercase tracking-widest text-brand-text-muted items-center">
+            {navLinks.map((link) => (
+              link.href.startsWith("#") ? (
+                <a key={link.href} href={link.href} className="hover:text-brand-brown transition-all duration-300">
+                  {link.label}
+                </a>
+              ) : (
+                <Link key={link.href} href={link.href} className={cn(
+                  "hover:text-brand-brown transition-all duration-300",
+                  pathname === link.href && "text-brand-brown font-bold"
+                )}>
+                  {link.label}
+                </Link>
+              )
+            ))}
+          </div>
 
-        <div className="flex items-center gap-4">
-          {/* Hamburger Menu - Mobile Only */}
-          <button 
-            onClick={() => setIsSideNavOpen(true)}
-            className="md:hidden p-2 text-brand-brown hover:bg-brand-brown/5 rounded-full transition-colors order-last"
-            title="Open Menu"
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="18" x2="21" y2="18" />
-            </svg>
-          </button>
+          <div className="flex items-center gap-4">
+            {/* Hamburger Menu - Mobile Only */}
+            <button 
+              onClick={() => setIsSideNavOpen(true)}
+              className="md:hidden p-2 text-brand-brown hover:bg-brand-brown/5 rounded-full transition-colors order-last"
+              title="Open Menu"
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="18" x2="21" y2="18" />
+              </svg>
+            </button>
 
-          {!user && (
-            <div className="hidden md:block">
-              <Button variant="primary" size="md" onClick={handleCTA}>
-                Build Now
-              </Button>
-            </div>
-          )}
+            {!user && (
+              <div className="hidden md:block">
+                <Button variant="primary" size="md" onClick={handleCTA}>
+                  Build Now
+                </Button>
+              </div>
+            )}
 
-          {user && (
-            <div className="hidden md:flex items-center gap-8 relative user-menu">
-              <Link 
-                href="/decks" 
-                className={cn(
-                  "text-xs font-bold uppercase tracking-[0.2em] text-brand-text-muted hover:text-brand-brown transition-all duration-300",
-                  pathname === "/decks" && "text-brand-brown"
-                )}
-              >
-                Your Decks
-              </Link>
-              
-              <button 
-                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                className={cn(
-                  "flex items-center justify-center w-10 h-10 rounded-full border-2 transition-all duration-300 shadow-sm user-menu-trigger",
-                  isDropdownOpen 
-                    ? "border-brand-red text-brand-red bg-brand-red/5 shadow-inner" 
-                    : "border-brand-brown text-brand-brown bg-transparent hover:border-brand-red hover:text-brand-red hover:bg-brand-red/5"
-                )}
-              >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
-                </svg>
-              </button>
+            {user && (
+              <div className="hidden md:flex items-center gap-8 relative user-menu">
+                <Link 
+                  href="/decks" 
+                  className={cn(
+                    "text-xs font-bold uppercase tracking-[0.2em] text-brand-text-muted hover:text-brand-brown transition-all duration-300",
+                    pathname === "/decks" && "text-brand-brown"
+                  )}
+                >
+                  Your Decks
+                </Link>
+                
+                <button 
+                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                  className={cn(
+                    "flex items-center justify-center w-10 h-10 rounded-full border-2 transition-all duration-300 shadow-sm user-menu-trigger",
+                    isDropdownOpen 
+                      ? "border-brand-red text-brand-red bg-brand-red/5 shadow-inner" 
+                      : "border-brand-brown text-brand-brown bg-transparent hover:border-brand-red hover:text-brand-red hover:bg-brand-red/5"
+                  )}
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
+                  </svg>
+                </button>
 
-              {isDropdownOpen && (
-                <div className="absolute right-0 top-full mt-4 w-64 bg-white rounded-3xl shadow-2xl border border-brand-tan/20 py-6 px-6 animate-in fade-in zoom-in-95 slide-in-from-top-2 duration-200 z-100">
-                  <div className="mb-4">
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-brand-text-muted mb-1">Hey there,</p>
-                    <p className="text-brand-brown font-script font-bold text-lg leading-tight">{user.name || "Mystery Culprit"}</p>
+                {isDropdownOpen && (
+                  <div className="absolute right-0 top-full mt-4 w-64 bg-white rounded-3xl shadow-2xl border border-brand-tan/20 py-6 px-6 animate-in fade-in zoom-in-95 slide-in-from-top-2 duration-200 z-100">
+                    <div className="mb-4">
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-brand-text-muted mb-1">Hey there,</p>
+                      <p className="text-brand-brown font-script font-bold text-lg leading-tight">{user.name || "Mystery Culprit"}</p>
+                    </div>
+                    
+                    <div className="h-px bg-brand-tan/10 w-full mb-4" />
+                    
+                    <button 
+                      onClick={logout}
+                      className="w-full text-left flex items-center gap-3 text-sm font-bold uppercase tracking-widest text-brand-red hover:bg-brand-red/5 p-2 rounded-xl transition-colors"
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" />
+                      </svg>
+                      Logout
+                    </button>
                   </div>
-                  
-                  <div className="h-px bg-brand-tan/10 w-full mb-4" />
-                  
-                  <button 
-                    onClick={logout}
-                    className="w-full text-left flex items-center gap-3 text-sm font-bold uppercase tracking-widest text-brand-red hover:bg-brand-red/5 p-2 rounded-xl transition-colors"
-                  >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" />
-                    </svg>
-                    Logout
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Mobile Side Nav */}
-      {isSideNavOpen && (
-        <div className="fixed inset-0 z-[100] flex md:hidden">
-          <div className="absolute inset-0 bg-brand-brown/40 backdrop-blur-sm transition-opacity duration-300" onClick={() => setIsSideNavOpen(false)} />
-          <div className="absolute right-0 top-0 h-full w-80 max-w-[85vw] bg-brand-cream shadow-2xl p-8 animate-in slide-in-from-right duration-300 flex flex-col">
-            <div className="flex justify-between items-center mb-10">
-              <Link href="/" className="font-serif text-xl tracking-tight font-bold text-brand-brown">
-                Sandy <span className="font-script text-2xl font-normal ml-1">said so.</span>
-              </Link>
-              <button 
-                onClick={() => setIsSideNavOpen(false)}
-                className="p-2 text-brand-text-muted hover:text-brand-brown transition-colors"
-                title="Close Menu"
-              >
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
-                </svg>
-              </button>
-            </div>
-
-            <div className="flex flex-col gap-12 grow overflow-y-auto py-4 px-2">
-              {user && (
-                <div className="flex flex-col gap-6">
-                  <div>
-                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-text-muted mb-4">Hello my darling,</p>
-                    <h2 className="font-script text-2xl font-normal ml-1">{user.name || "Mystery Culprit"}</h2>
-                  </div>
-                  
-                  <Link 
-                    href="/decks" 
-                    onClick={() => setIsSideNavOpen(false)}
-                    className={cn(
-                      "text-2xl font-serif font-bold transition-colors",
-                      pathname === "/decks" ? "text-brand-red underline decoration-2 underline-offset-8" : "text-brand-brown hover:text-brand-red"
-                    )}
-                  >
-                    Your Decks
-                  </Link>
-                </div>
-              )}
-
-              <div className="flex flex-col gap-6">
-                {navLinks.map((link) => (
-                  <a 
-                    key={link.href} 
-                    href={link.href} 
-                    onClick={() => setIsSideNavOpen(false)}
-                    className="text-2xl font-serif font-bold text-brand-brown hover:text-brand-red transition-colors"
-                  >
-                    {link.label}
-                  </a>
-                ))}
-                {!user && (
-                   <Link 
-                   href="/login" 
-                   onClick={() => setIsSideNavOpen(false)}
-                   className="text-2xl font-serif font-bold text-brand-brown hover:text-brand-red transition-colors"
-                 >
-                   Log In
-                 </Link>
                 )}
               </div>
-              <div className="mt-8 pt-6 border-t border-brand-tan/10 pointer-events-none text-center">
-                <div className="font-script text-3xl text-brand-red rotate-3 opacity-60">Sandy said it.</div>
-              </div>
-
-              {user && (
-                <div className="mt-auto pt-8 border-t border-brand-tan/10">
-                  <button 
-                    onClick={logout}
-                    className="text-lg font-bold uppercase tracking-[0.2em] text-brand-red hover:text-brand-red/80 transition-colors"
-                  >
-                    Logout
-                  </button>
-                </div>
-              )}
-            </div>
+            )}
           </div>
         </div>
-      )}
-    </nav>
+      </nav>
+
+      {/* Mobile Side Nav - Completely isolated from the nav scaling/transform context */}
+      <div 
+        className={cn(
+          "fixed inset-0 z-[9999] md:hidden transition-all duration-300 pointer-events-none",
+          isSideNavOpen ? "pointer-events-auto" : ""
+        )}
+      >
+        <div 
+          className={cn(
+            "absolute inset-0 bg-brand-brown/60 backdrop-blur-md transition-opacity duration-500",
+            isSideNavOpen ? "opacity-100" : "opacity-0"
+          )} 
+          onClick={() => setIsSideNavOpen(false)} 
+        />
+        <div 
+          className={cn(
+            "absolute right-0 top-0 h-full w-80 max-w-[85vw] bg-brand-cream shadow-2xl p-8 transition-transform duration-500 ease-out flex flex-col z-[10000]",
+            isSideNavOpen ? "translate-x-0" : "translate-x-full"
+          )}
+        >
+          <div className="flex justify-between items-center mb-10 shrink-0">
+            <Link href="/" className="font-serif text-xl tracking-tight font-bold text-brand-brown">
+              Sandy <span className="font-script text-2xl font-normal ml-1">said so.</span>
+            </Link>
+            <button 
+              onClick={() => setIsSideNavOpen(false)}
+              className="p-2 text-brand-text-muted hover:text-brand-brown transition-colors"
+              title="Close Menu"
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+          </div>
+
+          <div className="flex flex-col gap-12 grow overflow-y-auto py-4 px-2">
+            {user && (
+              <div className="flex flex-col gap-6">
+                <div className="mb-4">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-text-muted mb-4">Hello my darling,</p>
+                  <h2 className="font-script text-2xl font-normal text-brand-brown">{user.name || "Mystery Culprit"}</h2>
+                </div>
+                
+                <Link 
+                  href="/decks" 
+                  onClick={() => setIsSideNavOpen(false)}
+                  className={cn(
+                    "text-2xl font-serif font-bold transition-colors",
+                    pathname === "/decks" ? "text-brand-red underline decoration-2 underline-offset-8" : "text-brand-brown hover:text-brand-red"
+                  )}
+                >
+                  Your Decks
+                </Link>
+              </div>
+            )}
+
+            <div className="flex flex-col gap-8">
+              {navLinks.map((link) => (
+                <a 
+                  key={link.href} 
+                  href={link.href} 
+                  onClick={() => setIsSideNavOpen(false)}
+                  className="text-2xl font-serif font-bold text-brand-brown hover:text-brand-red transition-colors"
+                >
+                  {link.label}
+                </a>
+              ))}
+              {!user && (
+                  <Link 
+                  href="/login" 
+                  onClick={() => setIsSideNavOpen(false)}
+                  className="text-2xl font-serif font-bold text-brand-brown hover:text-brand-red transition-colors"
+                >
+                  Log In
+                </Link>
+              )}
+            </div>
+            
+            <div className="mt-8 pt-10 border-t border-brand-tan/10 pointer-events-none text-center">
+              <div className="font-script text-4xl text-brand-red rotate-3 opacity-60">Sandy said it.</div>
+            </div>
+
+            {user && (
+              <div className="mt-auto pt-8 border-t border-brand-tan/10">
+                <button 
+                  onClick={logout}
+                  className="text-lg font-bold uppercase tracking-[0.2em] text-brand-red hover:text-brand-red/80 transition-colors"
+                >
+                  Logout
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </>
   );
 };
