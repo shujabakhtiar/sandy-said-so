@@ -26,11 +26,8 @@ export const CTA = () => {
           Ready to listen?
         </h2>
         <div className="flex flex-col sm:flex-row gap-6 justify-center">
-          <Button variant="primary" size="xl" className="shadow-xl" onClick={handleCTA}>
-            Give Sandy Your Photos
-          </Button>
-          <Button variant="outline" size="xl">
-            Order for Party
+          <Button variant="outline" size="xl" onClick={handleCTA}>
+            Now give me the tea...
           </Button>
         </div>
         <p className="mt-14 text-brand-text-muted text-xs font-bold uppercase tracking-[0.5em]">
