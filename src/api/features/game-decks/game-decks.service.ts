@@ -63,4 +63,15 @@ export class GameDecksService {
       data: { title: data.title },
     });
   }
+
+  static async deleteDeck(id: number) {
+    // Delete cards first (cascading might be on, but explicit is safer or required depending on prisma setup)
+    await prisma.gameCard.deleteMany({
+      where: { deckId: id }
+    });
+    
+    return await prisma.gameDeck.delete({
+      where: { id },
+    });
+  }
 }

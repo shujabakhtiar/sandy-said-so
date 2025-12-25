@@ -12,6 +12,12 @@ export default function DeckViewPage() {
   const { user, loading: authLoading } = useAuth();
   const [deck, setDeck] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [editingCard, setEditingCard] = useState<any>(null);
+  const [newCardText, setNewCardText] = useState("");
+  const [deletingCard, setDeletingCard] = useState<any>(null);
+  const [isDeletingDeck, setIsDeletingDeck] = useState(false);
+  const [confirmDeckName, setConfirmDeckName] = useState("");
+  const [isProcessing, setIsProcessing] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -20,8 +26,9 @@ export default function DeckViewPage() {
     }
   }, [user, authLoading, router]);
 
-  useEffect(() => {
+  const fetchDeck = () => {
     if (user && id) {
+      setLoading(true);
       fetch(`/api/game-decks/${id}`)
         .then(res => res.json())
         .then(data => {
@@ -29,7 +36,74 @@ export default function DeckViewPage() {
         })
         .finally(() => setLoading(false));
     }
+  };
+
+  useEffect(() => {
+    fetchDeck();
   }, [user, id]);
+
+  const handleUpdateCard = async () => {
+    if (!editingCard) return;
+    setIsProcessing(true);
+    try {
+      const res = await fetch(`/api/game-cards/${editingCard.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ruleText: newCardText }),
+      });
+      if (res.ok) {
+        setDeck({
+          ...deck,
+          gameCards: deck.gameCards.map((c: any) => 
+            c.id === editingCard.id ? { ...c, ruleText: newCardText } : c
+          )
+        });
+        setEditingCard(null);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleDeleteCard = async () => {
+    if (!deletingCard) return;
+    setIsProcessing(true);
+    try {
+      const res = await fetch(`/api/game-cards/${deletingCard.id}`, {
+        method: "DELETE",
+      });
+      if (res.ok) {
+        setDeck({
+          ...deck,
+          gameCards: deck.gameCards.filter((c: any) => c.id !== deletingCard.id)
+        });
+        setDeletingCard(null);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleDeleteDeck = async () => {
+    if (confirmDeckName !== deck.title) return;
+    setIsProcessing(true);
+    try {
+      const res = await fetch(`/api/game-decks/${id}`, {
+        method: "DELETE",
+      });
+      if (res.ok) {
+        router.push("/decks");
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
 
   if (authLoading || loading) return null;
   if (!deck) return <div className="p-20 text-center">Deck not found.</div>;
@@ -53,6 +127,14 @@ export default function DeckViewPage() {
               Back to Decks
             </Button>
             <Button 
+              variant="outline" 
+              size="lg" 
+              className="border-brand-red/30 text-brand-red hover:bg-brand-red/5"
+              onClick={() => setIsDeletingDeck(true)}
+            >
+              Delete Deck
+            </Button>
+            <Button 
               variant="primary" 
               size="lg" 
               className="shadow-espresso"
@@ -67,12 +149,136 @@ export default function DeckViewPage() {
           {deck.gameCards?.map((card: any, index: number) => (
             <div key={card.id} className="bg-white p-10 rounded-[40px] shadow-espresso border border-brand-tan/10 relative overflow-hidden group hover:scale-[1.02] transition-all duration-300">
               <div className="absolute top-0 right-0 p-6 font-serif text-4xl text-brand-tan/20 italic group-hover:text-brand-red/20 transition-colors">#{index + 1}</div>
-              <p className="text-2xl font-serif font-bold text-brand-brown leading-relaxed relative z-10">{card.ruleText}</p>
+              
+              <div className="absolute bottom-6 right-8 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <button 
+                  onClick={() => {
+                    setEditingCard(card);
+                    setNewCardText(card.ruleText);
+                  }}
+                  className="p-3 bg-brand-cream rounded-full text-brand-brown hover:bg-brand-tan/20 transition-colors"
+                  title="Edit Card"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                </button>
+                <button 
+                  onClick={() => setDeletingCard(card)}
+                  className="p-3 bg-brand-red/10 rounded-full text-brand-red hover:bg-brand-red/20 transition-colors"
+                  title="Delete Card"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+                </button>
+              </div>
+
+              <p className="text-2xl font-serif font-bold text-brand-brown leading-relaxed relative z-10 pr-4">{card.ruleText}</p>
               <div className="mt-10 pt-6 border-t border-brand-tan/10 text-[10px] font-bold uppercase tracking-widest text-brand-text-muted">Sandy says...</div>
             </div>
           ))}
         </div>
       </main>
+
+      {/* Edit Card Modal */}
+      {editingCard && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+          <div className="absolute inset-0 bg-brand-brown/40 backdrop-blur-sm" onClick={() => setEditingCard(null)} />
+          <div className="bg-white rounded-[40px] p-10 max-w-xl w-full relative shadow-espresso animate-in zoom-in-95 duration-300">
+            <h2 className="text-3xl font-serif font-bold text-brand-brown mb-6">Edit Card</h2>
+            <textarea
+              autoFocus
+              value={newCardText}
+              onChange={(e) => setNewCardText(e.target.value)}
+              className="w-full h-40 px-6 py-4 rounded-2xl bg-brand-cream/50 border border-brand-tan/30 focus:border-brand-brown focus:ring-0 outline-none text-brand-brown font-medium transition-all mb-8 resize-none text-xl leading-relaxed"
+            />
+            <div className="flex gap-4">
+              <Button variant="outline" size="lg" className="flex-1" onClick={() => setEditingCard(null)}>
+                Cancel
+              </Button>
+              <Button 
+                variant="primary" 
+                size="lg" 
+                className="flex-1" 
+                onClick={handleUpdateCard}
+                disabled={isProcessing}
+              >
+                {isProcessing ? "Saving..." : "Save Card"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Card Confirmation */}
+      {deletingCard && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+          <div className="absolute inset-0 bg-brand-brown/40 backdrop-blur-sm" onClick={() => setDeletingCard(null)} />
+          <div className="bg-white rounded-[40px] p-10 max-w-md w-full relative shadow-espresso animate-in zoom-in-95 duration-300 text-center">
+            <div className="w-20 h-20 bg-brand-red/10 rounded-full flex items-center justify-center mx-auto mb-6 text-brand-red">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+            </div>
+            <h2 className="text-3xl font-serif font-bold text-brand-brown mb-4">Delete this card?</h2>
+            <p className="text-brand-text-muted mb-10 italic">This card will be gone forever. Sandy won&apos;t be able to suggest it again.</p>
+            <div className="flex gap-4">
+              <Button variant="outline" size="lg" className="flex-1" onClick={() => setDeletingCard(null)}>
+                No, Keep it
+              </Button>
+              <Button 
+                variant="primary" 
+                size="lg" 
+                className="flex-1 bg-brand-red border-brand-red hover:bg-brand-red/90" 
+                onClick={handleDeleteCard}
+                disabled={isProcessing}
+              >
+                {isProcessing ? "Deleting..." : "Delete it"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Deck Confirmation */}
+      {isDeletingDeck && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+          <div className="absolute inset-0 bg-brand-brown/40 backdrop-blur-sm" onClick={() => setIsDeletingDeck(false)} />
+          <div className="bg-white rounded-[40px] p-10 max-w-md w-full relative shadow-espresso animate-in zoom-in-95 duration-300">
+            <div className="text-center mb-8">
+              <div className="w-20 h-20 bg-brand-red/10 rounded-full flex items-center justify-center mx-auto mb-6 text-brand-red font-serif text-4xl italic">S</div>
+              <h2 className="text-3xl font-serif font-bold text-brand-brown mb-2">Destroy this deck?</h2>
+              <p className="text-sm text-brand-text-muted italic px-4">
+                This action cannot be undone. All cards and rules will be permanently erased from Sandy&apos;s memory.
+              </p>
+            </div>
+
+            <div className="mb-8">
+              <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-brand-text-muted mb-4 text-center">
+                Type <span className="text-brand-brown font-black select-none">&quot;{deck.title}&quot;</span> to confirm
+              </label>
+              <input
+                type="text"
+                autoFocus
+                value={confirmDeckName}
+                onChange={(e) => setConfirmDeckName(e.target.value)}
+                className="w-full px-6 py-4 rounded-2xl bg-brand-cream/50 border border-brand-tan/30 focus:border-brand-brown focus:ring-0 outline-none text-brand-brown font-medium transition-all text-center"
+                placeholder="Type deck name..."
+              />
+            </div>
+
+            <div className="flex gap-4">
+              <Button variant="outline" size="lg" className="flex-1" onClick={() => setIsDeletingDeck(false)}>
+                Cancel
+              </Button>
+              <Button 
+                variant="primary" 
+                size="lg" 
+                className="flex-1 bg-brand-red border-brand-red hover:bg-brand-red/90" 
+                onClick={handleDeleteDeck}
+                disabled={confirmDeckName !== deck.title || isProcessing}
+              >
+                {isProcessing ? "Destroying..." : "Destroy Deck"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Decorative Branding */}
       <div className="fixed bottom-10 left-10 pointer-events-none opacity-10 select-none -rotate-12">

@@ -21,3 +21,8 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   const { GameDecksController } = await import("@/api/features/game-decks/game-decks.controller");
   return GameDecksController.update(req, { params });
 }
+
+export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+  const { GameDecksController } = await import("@/api/features/game-decks/game-decks.controller");
+  return GameDecksController.delete(req, { params });
+}

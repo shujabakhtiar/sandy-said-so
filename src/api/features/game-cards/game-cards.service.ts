@@ -38,4 +38,17 @@ export class GameCardsService {
       })),
     });
   }
+
+  static async updateCard(id: number, data: { ruleText?: string }) {
+    return await prisma.gameCard.update({
+      where: { id },
+      data: { ruleText: data.ruleText },
+    });
+  }
+
+  static async deleteCard(id: number) {
+    return await prisma.gameCard.delete({
+      where: { id },
+    });
+  }
 }

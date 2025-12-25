@@ -66,4 +66,16 @@ export class GameDecksController {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
   }
+
+  static async delete(req: NextRequest, { params }: { params: { id: string } }) {
+    try {
+      const userId = await requireAuth();
+      const { id } = await params;
+      
+      await GameDecksService.deleteDeck(Number(id));
+      return NextResponse.json({ success: true });
+    } catch (error: any) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+  }
 }

@@ -50,4 +50,25 @@ export class GameCardsController {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
   }
+
+  static async update(req: NextRequest, { params }: { params: { id: string } }) {
+    try {
+      const { id } = await params;
+      const { ruleText } = await req.json();
+      const card = await GameCardsService.updateCard(Number(id), { ruleText });
+      return NextResponse.json(card);
+    } catch (error: any) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+  }
+
+  static async delete(req: NextRequest, { params }: { params: { id: string } }) {
+    try {
+      const { id } = await params;
+      await GameCardsService.deleteCard(Number(id));
+      return NextResponse.json({ success: true });
+    } catch (error: any) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+  }
 }
