@@ -23,16 +23,31 @@ export default function BuildDeckPage() {
   const [goal, setGoal] = useState("");
   const [secrets, setSecrets] = useState("");
   const [extra, setExtra] = useState("");
+  const [people, setPeople] = useState<{name: string, note: string}[]>([]);
+  const [personInput, setPersonInput] = useState("");
+  const [personNote, setPersonNote] = useState("");
   const [title, setTitle] = useState("");
   const [chaosLevel, setChaosLevel] = useState(3);
   const [showChaosModal, setShowChaosModal] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const addPerson = () => {
+    if (personInput.trim() && !people.some(p => p.name === personInput.trim())) {
+      setPeople([...people, { name: personInput.trim(), note: personNote.trim() }]);
+      setPersonInput("");
+      setPersonNote("");
+    }
+  };
+
+  const removePerson = (name: string) => {
+    setPeople(people.filter(p => p.name !== name));
+  };
+
   const handleCreateDeck = async () => {
     if (!selectedMode) return;
     
     // Check if any fields are set
-    const hasContext = goal.trim() || secrets.trim() || extra.trim() || notes.trim();
+    const hasContext = goal.trim() || secrets.trim() || extra.trim() || notes.trim() || people.length > 0;
     
     if (!hasContext && !showChaosModal) {
       setShowChaosModal(true);
@@ -40,6 +55,13 @@ export default function BuildDeckPage() {
     }
 
     setLoading(true);
+    
+    // Append people to extra context to inform AI without DB change
+    const peopleContext = people.map(p => `${p.name}${p.note ? ` (${p.note})` : ''}`).join(', ');
+    const fullExtra = people.length > 0 
+      ? `${extra}${extra ? '\n' : ''}People in the room: ${peopleContext}`
+      : extra;
+
     try {
       // Create the Deck
       const response = await fetch("/api/game-decks", {
@@ -51,7 +73,7 @@ export default function BuildDeckPage() {
           notes,
           goal,
           secrets,
-          extra,
+          extra: fullExtra,
           chaosLevel,
           useImages
         }),
@@ -230,6 +252,65 @@ export default function BuildDeckPage() {
                   className="w-full px-8 py-5 rounded-3xl bg-white border border-brand-tan/30 focus:border-brand-brown focus:ring-0 outline-none text-brand-brown font-medium shadow-sm transition-all"
                   placeholder="The Saturday Secret..."
                 />
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-brand-text-muted mb-3 ml-1">
+                  Who is in the room? (Sandy likes names)
+                </label>
+                <div className="flex flex-col gap-4 mb-6 bg-white p-6 rounded-3xl border border-brand-tan/20 shadow-sm">
+                  <div className="flex flex-col gap-4">
+                    <input
+                      type="text"
+                      value={personInput}
+                      onChange={(e) => setPersonInput(e.target.value)}
+                      onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addPerson())}
+                      className="px-6 py-4 rounded-xl bg-brand-cream/30 border border-brand-tan/10 focus:border-brand-brown focus:ring-0 outline-none text-brand-brown font-medium transition-all"
+                      placeholder="Name (e.g. Harshal)"
+                    />
+                    <input
+                      type="text"
+                      value={personNote}
+                      onChange={(e) => setPersonNote(e.target.value)}
+                      onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addPerson())}
+                      className="px-6 py-4 rounded-xl bg-brand-cream/30 border border-brand-tan/10 focus:border-brand-brown focus:ring-0 outline-none text-brand-brown font-medium transition-all"
+                      placeholder="One line about them (Optional personalization)"
+                    />
+                  </div>
+                  <div className="flex justify-end">
+                    <Button 
+                      variant="outline" 
+                      onClick={(e) => {e.preventDefault(); addPerson()}}
+                      className="rounded-xl w-40"
+                    >
+                      Add Person
+                    </Button>
+                  </div>
+                </div>
+
+                {people.length > 0 && (
+                  <div className="flex flex-wrap gap-2 p-4 bg-brand-tan/5 rounded-3xl border border-dashed border-brand-tan/30">
+                    {people.map((person) => (
+                      <button
+                        key={person.name}
+                        onClick={() => removePerson(person.name)}
+                        className="group flex flex-col items-start px-5 py-3 bg-white rounded-2xl border border-brand-tan/20 hover:border-brand-red/30 hover:bg-brand-red/5 transition-all text-left"
+                      >
+                        <div className="flex items-center gap-2 w-full justify-between">
+                          <span className="text-sm font-bold text-brand-brown group-hover:text-brand-red transition-colors">{person.name}</span>
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-brand-tan/60 group-hover:text-brand-red/60 transition-colors">
+                            <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+                          </svg>
+                        </div>
+                        {person.note && (
+                          <span className="text-[10px] text-brand-text-muted italic leading-tight group-hover:text-brand-red/80 transition-colors mt-0.5">
+                            {person.note}
+                          </span>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div>
