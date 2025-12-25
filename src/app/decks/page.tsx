@@ -152,7 +152,7 @@ export default function DecksPage() {
 
       {/* Edit Title Modal */}
       {editingDeck && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+        <div className="fixed inset-0 z-100 flex items-center justify-center p-6">
           <div className="absolute inset-0 bg-brand-brown/40 backdrop-blur-sm" onClick={() => setEditingDeck(null)} />
           <div className="bg-white rounded-[40px] p-10 max-w-md w-full relative shadow-espresso animate-in zoom-in-95 duration-300">
             <div className="text-center mb-8">

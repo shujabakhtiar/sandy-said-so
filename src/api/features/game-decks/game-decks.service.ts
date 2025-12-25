@@ -53,7 +53,11 @@ export class GameDecksService {
       where: { id },
       include: {
         gameMode: true,
-        gameCards: true,
+        gameCards: {
+          include: {
+            photo: true
+          }
+        },
       },
     });
   }
