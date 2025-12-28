@@ -15,9 +15,11 @@ interface GameEngineProps {
     };
     gameCards: any[];
   };
+  isExample?: boolean;
+  onBack?: () => void;
 }
 
-export const GameEngine = ({ deck }: GameEngineProps) => {
+export const GameEngine = ({ deck, isExample, onBack }: GameEngineProps) => {
   const router = useRouter();
   const [shuffledCards, setShuffledCards] = useState<any[]>([]);
   const [currentCardIndex, setCurrentCardIndex] = useState<number | null>(null);
@@ -161,13 +163,15 @@ export const GameEngine = ({ deck }: GameEngineProps) => {
 
       {/* Action Buttons */}
       <div className="mt-12 flex justify-center gap-4">
-        <Button 
-          variant="outline" 
-          size="lg" 
-          onClick={() => router.push(`/decks/${deck.id}`)}
-        >
-          View All Cards
-        </Button>
+        {!isExample && (
+          <Button 
+            variant="outline" 
+            size="lg" 
+            onClick={() => router.push(`/decks/${deck.id}`)}
+          >
+            View All Cards
+          </Button>
+        )}
         {revealedCards.length > 0 && (
           <Button 
             variant="secondary" 
@@ -180,9 +184,9 @@ export const GameEngine = ({ deck }: GameEngineProps) => {
         <Button 
           variant="outline" 
           size="lg" 
-          onClick={() => router.push("/decks")}
+          onClick={() => isExample && onBack ? onBack() : router.push("/decks")}
         >
-          Back to Decks
+          {isExample ? "Try Another Mode" : "Back to Decks"}
         </Button>
       </div>
 

@@ -40,7 +40,7 @@ export const Hero = () => {
               Do What Sandy Says
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14m-7-7 7 7-7 7"/></svg>
             </Button>
-            <Button variant="outline" size="xl">
+            <Button variant="outline" size="xl" onClick={() => router.push("/examples")}>
               See Examples
             </Button>
           </div>
