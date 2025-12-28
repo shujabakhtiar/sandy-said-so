@@ -30,9 +30,6 @@ export default function ExamplesPage() {
       {!selectedDeck ? (
         <main className="container mx-auto px-6 max-w-5xl grow flex flex-col text-center">
           <header className="mb-16">
-            <div className="inline-block mb-6 px-4 py-1.5 rounded-full bg-brand-tan/20 text-brand-brown font-bold text-[10px] tracking-[0.2em] uppercase">
-              Sandbox Mode
-            </div>
             <h1 className="text-5xl md:text-7xl font-serif font-bold text-brand-brown mb-8 leading-tight">
               See how <br />
               <span className="text-brand-red italic underline decoration-brand-tan/30 underline-offset-8">Sandy Plays.</span>
