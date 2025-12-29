@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { cn } from "@/ui/lib/utils";
 import { Button } from "@/ui/components/ui/Button";
 import { GameCard } from "@/ui/components/features/GameCard";
+import { getRulesForMode } from "@/lib/game-rules";
 
 interface GameEngineProps {
   deck: {
@@ -25,6 +26,10 @@ export const GameEngine = ({ deck, isExample, onBack }: GameEngineProps) => {
   const [currentCardIndex, setCurrentCardIndex] = useState<number | null>(null);
   const [revealedCards, setRevealedCards] = useState<number[]>([]);
   const [isRevealing, setIsRevealing] = useState(false);
+  const [showRules, setShowRules] = useState(false);
+
+  const modeName = deck.gameMode?.name || "Standard Mode";
+  const rules = getRulesForMode(modeName);
 
   useEffect(() => {
     if (deck?.gameCards) {
@@ -67,14 +72,30 @@ export const GameEngine = ({ deck, isExample, onBack }: GameEngineProps) => {
 
   return (
     <main className="container mx-auto px-6 max-w-5xl grow flex flex-col">
-      <header className="mb-12 text-center">
-        <div className="inline-block mb-4 px-3 py-1 rounded-full bg-brand-red/10 text-brand-red font-bold text-[10px] tracking-widest uppercase">
-          {deck.gameMode?.name || "Standard Mode"}
+      <header className="mb-12 text-center relative">
+        <div className="inline-block px-3 py-1 rounded-full bg-brand-red/10 text-brand-red font-bold text-[10px] tracking-widest uppercase mb-6">
+          {modeName}
         </div>
-        <h1 className="text-5xl md:text-6xl font-serif font-bold text-brand-brown mb-4">{deck.title}</h1>
-        <p className="text-xl text-brand-text-muted italic font-medium">
-          {gameComplete ? "Game Complete!" : `${cardsRemaining} cards remaining`}
-        </p>
+
+        <h1 className="text-5xl md:text-6xl font-serif font-bold text-brand-brown mb-6">
+          {deck.title}
+        </h1>
+
+        <div className="flex items-center justify-center gap-6">
+          <p className="text-xl text-brand-text-muted italic font-medium">
+            {gameComplete ? "Game Complete!" : `${cardsRemaining} cards remaining`}
+          </p>
+
+          <div className="w-px h-4 bg-brand-tan/30" />
+
+          <button 
+            onClick={() => setShowRules(true)}
+            className="flex items-center gap-2 text-[10px] font-black tracking-[0.2em] text-brand-brown/40 hover:text-brand-red transition-colors uppercase group"
+          >
+            <span className="w-4 h-4 rounded-full border border-current flex items-center justify-center text-[8px] font-bold group-hover:scale-110 transition-transform">?</span>
+            How to play
+          </button>
+        </div>
       </header>
 
       <div className="flex-1 flex flex-col md:flex-row-reverse items-center justify-center gap-12 md:gap-16 lg:gap-24 relative px-4">
@@ -91,7 +112,7 @@ export const GameEngine = ({ deck, isExample, onBack }: GameEngineProps) => {
 
         {/* Deck Stack */}
         {!gameComplete && (
-          <div className="relative">
+          <div className="relative flex flex-col items-center">
             <button
               onClick={handleDeckClick}
               disabled={isRevealing}
@@ -138,13 +159,17 @@ export const GameEngine = ({ deck, isExample, onBack }: GameEngineProps) => {
                     Sandy said so
                   </p>
                 </div>
-                
-                {/* Tap indicator */}
-                <div className="absolute bottom-10 right-1/2 translate-x-1/2 text-brand-cream/40 text-[10px] font-bold uppercase tracking-[0.3em] animate-pulse">
-                  Tap to reveal
-                </div>
               </div>
             </button>
+
+            {/* Tap indicator - Now below the card */}
+            <div className={cn(
+              "mt-8 text-brand-brown/40 text-[10px] font-bold uppercase tracking-[0.4em] animate-pulse flex flex-col items-center gap-2 transition-opacity duration-300",
+              isRevealing ? "opacity-0" : "opacity-100"
+            )}>
+              <div className="w-px h-8 bg-linear-to-b from-brand-brown/40 to-transparent" />
+              Tap to reveal
+            </div>
           </div>
         )}
 
@@ -212,6 +237,71 @@ export const GameEngine = ({ deck, isExample, onBack }: GameEngineProps) => {
             <span className="text-xs font-bold text-brand-brown">
               {revealedCards.length}/{shuffledCards.length}
             </span>
+          </div>
+        </div>
+      )}
+
+      {/* Rules Modal */}
+      {showRules && (
+        <div className="fixed inset-0 z-100 flex items-center justify-center p-6">
+          <div 
+            className="absolute inset-0 bg-brand-brown/60 backdrop-blur-md animate-in fade-in duration-300" 
+            onClick={() => setShowRules(false)}
+          />
+          
+          <div className="relative w-full max-w-xl bg-[#faf9f6] rounded-[24px] shadow- espresso overflow-hidden animate-in zoom-in-95 duration-300 border-2 border-brand-tan/20 flex flex-col max-h-[85vh]">
+            {/* Modal Header */}
+            <div className="bg-brand-brown p-8 text-center relative">
+              <div className="inline-block px-3 py-1 rounded-full bg-white/10 text-brand-tan font-bold text-[9px] tracking-widest uppercase mb-4">
+                Rulebook
+              </div>
+              <h2 className="text-3xl font-serif font-black text-white italic">How to play {modeName}</h2>
+              <button 
+                onClick={() => setShowRules(false)}
+                className="absolute top-6 right-6 text-brand-tan/40 hover:text-white transition-colors"
+              >
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div className="flex-1 overflow-y-auto p-8 md:p-10">
+              <p className="text-lg text-brand-text-muted font-medium italic mb-10 text-center leading-relaxed">
+                &quot;{rules.description}&quot;
+              </p>
+
+              <div className="space-y-8">
+                {rules.rules.map((rule) => (
+                  <div key={rule.step} className="flex gap-6 group">
+                    <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-brand-red/10 flex items-center justify-center text-brand-red font-serif font-black text-xl group-hover:bg-brand-red group-hover:text-white transition-all">
+                      {rule.step}
+                    </div>
+                    <div className="flex-1 pt-1">
+                      <h4 className="font-serif font-black text-brand-brown text-xl mb-1 uppercase tracking-tight">
+                        {rule.title}
+                      </h4>
+                      <p className="text-brand-text-muted leading-relaxed font-medium">
+                        {rule.description}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-8 border-t border-brand-tan/10 bg-brand-cream/30 text-center">
+              <Button 
+                variant="primary" 
+                size="lg" 
+                className="w-full sm:w-auto px-12"
+                onClick={() => setShowRules(false)}
+              >
+                Understood, Sandy.
+              </Button>
+            </div>
           </div>
         </div>
       )}
