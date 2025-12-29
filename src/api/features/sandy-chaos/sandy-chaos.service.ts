@@ -11,7 +11,7 @@ export class SandyChaosService {
       include: { gameMode: true },
     });
 
-    if (!deck) throw new Error("Deck not found");
+    if (!deck) throw new Error(`Deck not found for ID: ${deckId}`);
 
     // Fetch all applicable chaos cards for this mode and chaos level (or lower)
     const applicableCards = await prisma.sandyChaosCard.findMany({

@@ -1,5 +1,6 @@
 import React from "react";
 import Image from "next/image";
+import { cn } from "@/ui/lib/utils";
 
 interface GameCardProps {
   card: {
@@ -17,11 +18,32 @@ interface GameCardProps {
 export const GameCard = ({ card, gameType = "standard", onEdit, onDelete }: GameCardProps) => {
   // We can add more layouts here based on gameType
   if (gameType === "standard") {
+    const isChaos = (card as any).isChaos;
+
     return (
-      <div className="aspect-2/3 bg-[#faf9f6] rounded-[24px] shadow-2xl border border-brand-tan/20 relative overflow-hidden group hover:scale-[1.05] hover:-rotate-1 transition-all duration-500 cursor-default flex flex-col p-6">
+      <div 
+        className={cn(
+          "aspect-2/3 rounded-[24px] shadow-2xl border relative overflow-hidden group hover:scale-[1.05] hover:-rotate-1 transition-all duration-500 cursor-default flex flex-col p-6",
+          isChaos 
+            ? "bg-brand-red border-brand-red/50 shadow-brand-red/20" 
+            : "bg-[#faf9f6] border-brand-tan/20"
+        )}
+      >
+        {/* Chaos Glow Effect */}
+        {isChaos && (
+          <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent pointer-events-none" />
+        )}
+
         {/* Corner Indicators - Top Left */}
-        <div className="absolute top-4 left-4 flex flex-col items-center text-brand-red opacity-80 group-hover:opacity-100 transition-opacity">
-          <span className="text-[10px] font-bold tracking-tighter mb-1 uppercase">SANDY</span>
+        <div 
+          className={cn(
+            "absolute top-4 left-4 flex flex-col items-center opacity-80 group-hover:opacity-100 transition-opacity",
+            isChaos ? "text-white" : "text-brand-red"
+          )}
+        >
+          <span className="text-[10px] font-bold tracking-tighter mb-1 uppercase">
+            {isChaos ? "CHAOS" : "SANDY"}
+          </span>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
             <path d="M12 2s-5 7-5 10c0 3 2.5 5 5 5s5-2 5-5c0-3-5-10-5-10z" />
           </svg>
@@ -29,20 +51,32 @@ export const GameCard = ({ card, gameType = "standard", onEdit, onDelete }: Game
 
         {/* Card Header */}
         <div className="text-center mt-6 mb-4">
-          <h3 className="text-2xl font-serif font-black italic text-brand-red leading-none underline decoration-brand-red/20 underline-offset-4">
-            Sandy says...
+          <h3 
+            className={cn(
+              "text-2xl font-serif font-black italic leading-none underline decoration-offset-4",
+              isChaos 
+                ? "text-white underline-white/40" 
+                : "text-brand-red underline-brand-red/20"
+            )}
+          >
+            {isChaos ? "SANDY'S CHAOS" : "Sandy says..."}
           </h3>
         </div>
 
         {/* Main Card Graphic / Content Area */}
         <div className="flex-1 flex flex-col items-start justify-center px-8 pb-12 pt-4 relative">
           <div className="absolute inset-x-12 top-1/2 -translate-y-1/2 opacity-[0.02] pointer-events-none select-none">
-            <svg width="100%" height="auto" viewBox="0 0 24 24" fill="currentColor" className="text-brand-brown">
+            <svg width="100%" height="auto" viewBox="0 0 24 24" fill="currentColor" className={isChaos ? "text-white" : "text-brand-brown"}>
               <path d="M12 2s-5 7-5 10c0 3 2.5 5 5 5s5-2 5-5c0-3-5-10-5-10z" />
             </svg>
           </div>
 
-          <p className="text-sm md:text-base font-serif font-black text-brand-brown text-left leading-relaxed relative z-10 w-full">
+          <p 
+            className={cn(
+              "text-sm md:text-lg font-serif font-black text-left leading-relaxed relative z-10 w-full",
+              isChaos ? "text-white" : "text-brand-brown"
+            )}
+          >
             {card.ruleText}
           </p>
         </div>
@@ -50,14 +84,26 @@ export const GameCard = ({ card, gameType = "standard", onEdit, onDelete }: Game
         {/* Bottom Decoration & Actions Layer */}
         <div className="absolute bottom-5 left-8 right-6 flex items-end justify-between pointer-events-none z-10">
           <div className="flex flex-col items-start gap-1">
-            <div className="h-px w-6 bg-brand-red/30 rounded-full" />
-            <p className="text-[9px] font-serif italic text-brand-red font-bold animate-pulse tracking-[0.2em] uppercase">
+            <div className={cn("h-px w-6 rounded-full", isChaos ? "bg-white/50" : "bg-brand-red/30")} />
+            <p 
+              className={cn(
+                "text-[9px] font-serif italic font-bold animate-pulse tracking-[0.2em] uppercase",
+                isChaos ? "text-white/80" : "text-brand-red"
+              )}
+            >
               Drink if you dare
             </p>
           </div>
 
-          <div className="flex flex-col items-center text-brand-red opacity-80 group-hover:opacity-100 transition-opacity rotate-180">
-            <span className="text-[10px] font-bold tracking-tighter mb-1 uppercase">SANDY</span>
+          <div 
+            className={cn(
+              "flex flex-col items-center opacity-80 group-hover:opacity-100 transition-opacity rotate-180",
+              isChaos ? "text-white" : "text-brand-red"
+            )}
+          >
+            <span className="text-[10px] font-bold tracking-tighter mb-1 uppercase">
+              {isChaos ? "CHAOS" : "SANDY"}
+            </span>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 2s-5 7-5 10c0 3 2.5 5 5 5s5-2 5-5c0-3-5-10-5-10z" />
             </svg>
@@ -65,7 +111,7 @@ export const GameCard = ({ card, gameType = "standard", onEdit, onDelete }: Game
         </div>
 
         {/* Card Actions (Hover Overlay) */}
-        {(onEdit || onDelete) && (
+        {(onEdit || onDelete) && !isChaos && (
           <div className="absolute inset-0 bg-brand-brown/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4 z-20 backdrop-blur-[1px] pointer-events-auto">
             {onEdit && (
               <button

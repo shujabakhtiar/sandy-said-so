@@ -29,8 +29,8 @@ export const GameEngine = ({ deck, isExample, onBack }: GameEngineProps) => {
   useEffect(() => {
     if (deck?.gameCards) {
       // Collect both types of cards
-      const regularCards = deck.gameCards || [];
-      const chaosCards = (deck as any).sandyChaosCards || [];
+      const regularCards = (deck.gameCards || []).map(card => ({ ...card, isChaos: false }));
+      const chaosCards = ((deck as any).sandyChaosCards || []).map((card: any) => ({ ...card, isChaos: true }));
       
       const allCards = [...regularCards, ...chaosCards];
       
