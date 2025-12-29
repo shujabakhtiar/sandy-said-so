@@ -30,9 +30,12 @@ export class GameDecksService {
     return deck;
   }
 
-  static async listDecks(userId: number) {
+  static async listDecks(userId: number, gameModeId?: number) {
     return await prisma.gameDeck.findMany({
-      where: { userId },
+      where: { 
+        userId,
+        ...(gameModeId ? { gameModeId } : {})
+      },
       include: {
         gameMode: true,
         gameCards: true,

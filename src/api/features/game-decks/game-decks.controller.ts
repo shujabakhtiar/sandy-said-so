@@ -38,7 +38,10 @@ export class GameDecksController {
   static async list(req: NextRequest) {
     try {
       const userId = await requireAuth();
-      const decks = await GameDecksService.listDecks(userId);
+      const { searchParams } = new URL(req.url);
+      const gameModeId = searchParams.get("gameModeId");
+      
+      const decks = await GameDecksService.listDecks(userId, gameModeId ? Number(gameModeId) : undefined);
       return NextResponse.json(decks);
     } catch (error: any) {
       return NextResponse.json({ error: error.message }, { status: 500 });
