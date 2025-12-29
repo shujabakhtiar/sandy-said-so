@@ -25,13 +25,13 @@ export const GameCard = ({ card, gameType = "standard", onEdit, onDelete }: Game
         className={cn(
           "aspect-2/3 rounded-[24px] shadow-2xl border relative overflow-hidden group hover:scale-[1.05] hover:-rotate-1 transition-all duration-500 cursor-default flex flex-col p-6",
           isChaos 
-            ? "bg-brand-red border-brand-red/50 shadow-brand-red/20" 
+            ? "bg-[#811331] border-white/20 shadow-[#811331]/30" 
             : "bg-[#faf9f6] border-brand-tan/20"
         )}
       >
         {/* Chaos Glow Effect */}
         {isChaos && (
-          <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent pointer-events-none" />
+          <div className="absolute inset-0 bg-linear-to-br from-white/10 to-transparent pointer-events-none" />
         )}
 
         {/* Corner Indicators - Top Left */}
