@@ -180,7 +180,7 @@ export default function DeckViewPage() {
           <div className="absolute inset-0 bg-brand-brown/40 backdrop-blur-sm" onClick={() => setEditingCard(null)} />
           
           <div className="relative group animate-in zoom-in-95 duration-300 w-full max-w-md">
-            <div className="bg-[#faf9f6] border-2 border-brand-tan/20 rounded-[32px] md:rounded-[40px] shadow-espresso relative overflow-hidden flex flex-col p-8 md:p-10 aspect-2/3">
+            <div className="bg-[#faf9f6] border-2 border-brand-tan/20 rounded-[24px] shadow-espresso relative overflow-hidden flex flex-col p-8 md:p-10 aspect-2/3">
               
               {/* Top Action Buttons */}
               <div className="absolute top-6 right-6 md:top-8 md:right-8 flex gap-4 md:gap-6 items-center z-30">
@@ -199,12 +199,16 @@ export default function DeckViewPage() {
                 </button>
               </div>
 
-              {/* Corner Indicator (Left Only) */}
-              <div className="absolute top-6 left-6 md:top-8 md:left-8 flex flex-col items-center opacity-80 text-brand-red">
-                <span className="text-[10px] md:text-[12px] font-bold tracking-tighter mb-1 uppercase">SANDY</span>
-                <svg width="14" height="14" md-width="18" md-height="18" viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5 md:w-[18px] md:h-[18px]">
-                  <path d="M12 2s-5 7-5 10c0 3 2.5 5 5 5s5-2 5-5c0-3-5-10-5-10z" />
-                </svg>
+              {/* Top Logo */}
+              <div className="absolute top-6 left-6 md:top-8 md:left-8 opacity-80">
+                <div className="flex items-baseline gap-1 text-brand-red">
+                  <span className="font-serif text-xs md:text-sm tracking-tight font-bold">
+                    Sandy
+                  </span>
+                  <span className="font-script text-base md:text-lg font-normal">
+                    said so.
+                  </span>
+                </div>
               </div>
 
               {/* Card Header */}
@@ -216,12 +220,6 @@ export default function DeckViewPage() {
 
               {/* Main Content Area */}
               <div className="flex-1 flex flex-col items-start justify-center px-4 md:px-6 relative">
-                <div className="absolute inset-x-8 md:inset-x-12 top-1/2 -translate-y-1/2 opacity-[0.02] pointer-events-none select-none">
-                  <svg width="100%" height="auto" viewBox="0 0 24 24" fill="currentColor" className="text-brand-brown">
-                    <path d="M12 2s-5 7-5 10c0 3 2.5 5 5 5s5-2 5-5c0-3-5-10-5-10z" />
-                  </svg>
-                </div>
-
                 <textarea
                   autoFocus
                   value={newCardText}
@@ -240,11 +238,15 @@ export default function DeckViewPage() {
                   </p>
                 </div>
                 
-                <div className="flex flex-col items-center opacity-80 text-brand-red rotate-180">
-                  <span className="text-[10px] md:text-[12px] font-bold tracking-tighter mb-1 uppercase">SANDY</span>
-                  <svg width="14" height="14" md-width="18" md-height="18" viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5 md:w-[18px] md:h-[18px]">
-                    <path d="M12 2s-5 7-5 10c0 3 2.5 5 5 5s5-2 5-5c0-3-5-10-5-10z" />
-                  </svg>
+                <div className="opacity-80">
+                  <div className="flex items-baseline gap-1 text-brand-red rotate-180">
+                    <span className="font-serif text-xs md:text-sm tracking-tight font-bold">
+                      Sandy
+                    </span>
+                    <span className="font-script text-base md:text-lg font-normal">
+                      said so.
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>

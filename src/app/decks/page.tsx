@@ -6,6 +6,7 @@ import { Navbar } from "@/ui/components/layout/Navbar";
 import { Button } from "@/ui/components/ui/Button";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { cn } from "@/ui/lib/utils";
 
 export default function DecksPage() {
   const { user, loading } = useAuth();
@@ -98,54 +99,88 @@ export default function DecksPage() {
             </Button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {decks.map((deck: any) => (
-              <div 
-                key={deck.id} 
-                onClick={() => router.push(`/decks/${deck.id}`)}
-                className="group bg-white rounded-[32px] overflow-hidden border border-brand-tan/20 shadow-espresso hover:shadow-2xl transition-all duration-500 cursor-pointer"
-              >
-                <div className="aspect-video relative overflow-hidden">
-                  <div className="absolute inset-0 bg-brand-brown/10 group-hover:bg-brand-brown/0 transition-colors duration-500 z-10" />
-                  <Image 
-                    src="/espresso_cards.png" 
-                    alt={deck.title} 
-                    fill 
-                    className="object-cover group-hover:scale-110 transition-transform duration-700" 
-                  />
-                  <div className="absolute top-4 right-4 z-20">
-                    <div className="px-3 py-1 bg-white/90 backdrop-blur rounded-full text-[10px] font-bold uppercase tracking-widest text-brand-brown">
-                      {deck.gameMode?.name || "Standard"}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 md:gap-10">
+            {decks.map((deck: any) => {
+              const isChaos = deck.gameMode?.name?.toLowerCase().includes("chaos");
+              return (
+                <div 
+                  key={deck.id} 
+                  onClick={() => router.push(`/decks/${deck.id}`)}
+                  className="group relative cursor-pointer"
+                >
+                  {/* Subtle 3D Depth Layer */}
+                  <div className="absolute inset-0 bg-brand-brown/5 rounded-[24px] translate-x-2 translate-y-2 group-hover:translate-x-3 group-hover:translate-y-3 transition-all duration-500 ease-out" />
+                  
+                  {/* The Deck Card */}
+                  <div className="relative aspect-[3/4.2] bg-white border border-brand-tan/10 rounded-[24px] shadow-xl group-hover:shadow-2xl group-hover:-translate-y-2 transition-all duration-500 ease-out overflow-hidden flex flex-col">
+                    
+                    {/* Header: Consistent Height & Clean Gradient */}
+                    <div className={cn(
+                      "h-36 w-full relative overflow-hidden flex flex-col items-center justify-center",
+                      isChaos 
+                        ? "bg-linear-to-b from-brand-red to-[#811331]" 
+                        : "bg-linear-to-b from-brand-brown to-brand-text"
+                    )}>
+                      {/* Subdued Decorative Gloss */}
+                      <div className="absolute inset-0 bg-linear-to-tr from-white/5 to-transparent opacity-30" />
+                      
+                      <div className="relative z-10 flex flex-col items-center gap-4">
+                        <div className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center border border-white/20">
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" className="text-white">
+                            <path d="M12 2s-5 7-5 10c0 3 2.5 5 5 5s5-2 5-5c0-3-5-10-5-10z" />
+                          </svg>
+                        </div>
+                        <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/90">
+                          {deck.gameMode?.name ? deck.gameMode.name : (isChaos ? "CHAOS MODE" : "SANDY'S CONFESSION")}
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                </div>
-                <div className="p-8">
-                  <div className="flex justify-between items-start gap-4 mb-2">
-                    <h3 className="text-2xl font-serif font-bold text-brand-brown flex-1">
-                      {deck.title || "New deck"}
-                    </h3>
+
+                    {/* Content Section: Left Aligned as per image */}
+                    <div className="flex-1 p-8 flex flex-col relative">
+                      <div className="flex-1 flex flex-col justify-start pt-2">
+                        <h3 className="text-3xl font-serif font-black text-brand-brown tracking-tight leading-none mb-4 group-hover:text-brand-red transition-colors duration-300">
+                          {deck.title || "New Deck"}
+                        </h3>
+                      </div>
+
+                      {/* Footer: Stats & Brand Mark */}
+                      <div className="mt-auto flex items-end justify-between border-t border-brand-tan/10 pt-6">
+                        <div className="flex flex-col">
+                          <span className="text-[9px] font-bold uppercase tracking-widest text-brand-tan mb-1">Total Cards</span>
+                          <span className="text-4xl font-serif font-black text-brand-brown leading-none">
+                            {deck._count?.gameCards || 0}
+                          </span>
+                        </div>
+                        
+                        {/*div className="flex items-baseline gap-1 text-brand-red pb-1">
+                          <span className="font-serif text-base tracking-tight font-bold">
+                            Sandy
+                          </span>
+                          <span className="font-script text-xl font-normal">
+                            said so.
+                          </span>
+                        </div> */}
+                      </div>
+                    </div>
+
+                    {/* Rename Anchor Tool */}
                     <button 
                       onClick={(e) => {
                         e.stopPropagation();
                         setEditingDeck(deck);
                         setNewTitle(deck.title || "");
                       }}
-                      className="p-2 -mr-2 text-brand-text-muted hover:text-brand-brown transition-colors group/btn"
-                      title="Edit Title"
+                      className="absolute top-4 right-4 z-20 w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-300"
                     >
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="group-hover/btn:scale-110 transition-transform">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
                       </svg>
                     </button>
                   </div>
-                  <div className="flex items-center gap-4 text-xs font-bold uppercase tracking-widest text-brand-text-muted">
-                    <span>{deck._count?.gameCards || 0} Cards</span>
-                    <span className="w-1 h-1 bg-brand-tan rounded-full" />
-                    <span>Created {new Date(deck.createdAt).toLocaleDateString()}</span>
-                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </main>
