@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { authResource } from "@/ui/resources/auth.resource";
 
 interface User {
   id: number;
@@ -27,13 +28,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const checkAuth = async () => {
     try {
-      const res = await fetch("/api/auth/me");
-      if (res.ok) {
-        const data = await res.json();
-        setUser(data);
-      } else {
-        setUser(null);
-      }
+      const data = await authResource.me<User>();
+      setUser(data);
     } catch (error) {
       setUser(null);
     } finally {
@@ -46,41 +42,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const login = async (data: any, redirectTo?: string) => {
-    const res = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
- 
-    if (res.ok) {
-      const userData = await res.json();
+    try {
+      const userData = await authResource.login<User>(data);
       setUser(userData);
       router.push(redirectTo || "/decks");
-    } else {
-      const error = await res.json();
-      throw new Error(error.error || "Login failed");
+    } catch (error: any) {
+      throw new Error(error.message || "Login failed");
     }
   };
 
   const signup = async (data: any) => {
-    const res = await fetch("/api/auth/signup", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
-
-    if (res.ok) {
+    try {
+      await authResource.signup(data);
       router.push("/login");
-    } else {
-      const error = await res.json();
-      throw new Error(error.error || "Signup failed");
+    } catch (error: any) {
+      throw new Error(error.message || "Signup failed");
     }
   };
 
   const logout = async () => {
-    await fetch("/api/auth/logout", { method: "POST" });
-    setUser(null);
-    router.push("/");
+    try {
+      await authResource.logout();
+    } catch (error) {
+      console.error("Logout error:", error);
+    } finally {
+      setUser(null);
+      router.push("/");
+    }
   };
 
   return (

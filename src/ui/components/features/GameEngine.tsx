@@ -275,7 +275,7 @@ export const GameEngine = ({ deck, isExample, onBack }: GameEngineProps) => {
               <div className="space-y-8">
                 {rules.rules.map((rule) => (
                   <div key={rule.step} className="flex gap-6 group">
-                    <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-brand-red/10 flex items-center justify-center text-brand-red font-serif font-black text-xl group-hover:bg-brand-red group-hover:text-white transition-all">
+                    <div className="shrink-0 w-10 h-10 rounded-xl bg-brand-red/10 flex items-center justify-center text-brand-red font-serif font-black text-xl group-hover:bg-brand-red group-hover:text-white transition-all">
                       {rule.step}
                     </div>
                     <div className="flex-1 pt-1">

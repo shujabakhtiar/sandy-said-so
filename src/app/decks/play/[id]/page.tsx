@@ -5,6 +5,7 @@ import { useAuth } from "@/ui/providers/AuthContext";
 import { Navbar } from "@/ui/components/layout/Navbar";
 import { useParams, useRouter } from "next/navigation";
 import { GameEngine } from "@/ui/components/features/GameEngine";
+import { gameDecksResource } from "@/ui/resources/game-decks.resource";
 
 export default function GamePlayPage() {
   const { id } = useParams();
@@ -20,14 +21,19 @@ export default function GamePlayPage() {
   }, [user, authLoading, router]);
 
   useEffect(() => {
-    if (user && id) {
-      fetch(`/api/game-decks/${id}`)
-        .then(res => res.json())
-        .then(data => {
+    const fetchDeck = async () => {
+      if (user && id) {
+        try {
+          const data = await gameDecksResource.getById(id as string);
           setDeck(data);
-        })
-        .finally(() => setLoading(false));
-    }
+        } catch (err) {
+          console.error(err);
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+    fetchDeck();
   }, [user, id]);
 
   if (authLoading || loading) {

@@ -7,6 +7,7 @@ import { Button } from "@/ui/components/ui/Button";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { cn } from "@/ui/lib/utils";
+import { gameDecksResource } from "@/ui/resources/game-decks.resource";
 
 export default function DecksPage() {
   const { user, loading } = useAuth();
@@ -22,12 +23,14 @@ export default function DecksPage() {
     }
   }, [user, loading, router]);
 
-  const fetchDecks = () => {
+  const fetchDecks = async () => {
     if (user) {
-      fetch("/api/game-decks")
-        .then((res) => res.json())
-        .then((data) => setDecks(data))
-        .catch((err) => console.error(err));
+      try {
+        const data = await gameDecksResource.getAll();
+        setDecks(data);
+      } catch (err) {
+        console.error(err);
+      }
     }
   };
 
@@ -39,15 +42,9 @@ export default function DecksPage() {
     if (!editingDeck) return;
     setIsUpdating(true);
     try {
-      const res = await fetch(`/api/game-decks/${editingDeck.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title: newTitle }),
-      });
-      if (res.ok) {
-        setDecks(decks.map(d => d.id === editingDeck.id ? { ...d, title: newTitle } : d));
-        setEditingDeck(null);
-      }
+      await gameDecksResource.update(editingDeck.id, { title: newTitle });
+      setDecks(decks.map(d => d.id === editingDeck.id ? { ...d, title: newTitle } : d));
+      setEditingDeck(null);
     } catch (err) {
       console.error(err);
     } finally {

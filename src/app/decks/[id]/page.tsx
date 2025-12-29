@@ -7,6 +7,8 @@ import { Button } from "@/ui/components/ui/Button";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import { GameCard } from "@/ui/components/features/GameCard";
+import { gameDecksResource } from "@/ui/resources/game-decks.resource";
+import { gameCardsResource } from "@/ui/resources/game-cards.resource";
 
 export default function DeckViewPage() {
   const { id } = useParams();
@@ -27,15 +29,17 @@ export default function DeckViewPage() {
     }
   }, [user, authLoading, router]);
 
-  const fetchDeck = () => {
+  const fetchDeck = async () => {
     if (user && id) {
       setLoading(true);
-      fetch(`/api/game-decks/${id}`)
-        .then(res => res.json())
-        .then(data => {
-            setDeck(data);
-        })
-        .finally(() => setLoading(false));
+      try {
+        const data = await gameDecksResource.getById(id as string);
+        setDeck(data);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -47,20 +51,14 @@ export default function DeckViewPage() {
     if (!editingCard) return;
     setIsProcessing(true);
     try {
-      const res = await fetch(`/api/game-cards/${editingCard.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ruleText: newCardText }),
+      await gameCardsResource.update(editingCard.id, { ruleText: newCardText });
+      setDeck({
+        ...deck,
+        gameCards: deck.gameCards.map((c: any) => 
+          c.id === editingCard.id ? { ...c, ruleText: newCardText } : c
+        )
       });
-      if (res.ok) {
-        setDeck({
-          ...deck,
-          gameCards: deck.gameCards.map((c: any) => 
-            c.id === editingCard.id ? { ...c, ruleText: newCardText } : c
-          )
-        });
-        setEditingCard(null);
-      }
+      setEditingCard(null);
     } catch (err) {
       console.error(err);
     } finally {
@@ -72,16 +70,12 @@ export default function DeckViewPage() {
     if (!deletingCard) return;
     setIsProcessing(true);
     try {
-      const res = await fetch(`/api/game-cards/${deletingCard.id}`, {
-        method: "DELETE",
+      await gameCardsResource.delete(deletingCard.id);
+      setDeck({
+        ...deck,
+        gameCards: deck.gameCards.filter((c: any) => c.id !== deletingCard.id)
       });
-      if (res.ok) {
-        setDeck({
-          ...deck,
-          gameCards: deck.gameCards.filter((c: any) => c.id !== deletingCard.id)
-        });
-        setDeletingCard(null);
-      }
+      setDeletingCard(null);
     } catch (err) {
       console.error(err);
     } finally {
@@ -93,12 +87,8 @@ export default function DeckViewPage() {
     if (confirmDeckName !== deck.title) return;
     setIsProcessing(true);
     try {
-      const res = await fetch(`/api/game-decks/${id}`, {
-        method: "DELETE",
-      });
-      if (res.ok) {
-        router.push("/decks");
-      }
+      await gameDecksResource.delete(id as string);
+      router.push("/decks");
     } catch (err) {
       console.error(err);
     } finally {
