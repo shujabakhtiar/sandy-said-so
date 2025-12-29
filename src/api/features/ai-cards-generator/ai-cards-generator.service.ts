@@ -6,55 +6,6 @@ export class AICardsGeneratorService {
     apiKey: process.env.GOOGLE_AI_API_KEY,
   });
 
-  static async generateCards(deckId: number) {
-    // 1. Fetch deck details
-    const deck = await prisma.gameDeck.findUnique({
-      where: { id: deckId },
-      include: { gameMode: true },
-    });
-
-    if (!deck) throw new Error("Deck not found");
-
-    // 2. Prepare the prompt based on deck info
-    const prompt = this.constructPrompt(deck);
-
-    // 3. Generate content using new API
-    const response = await this.genAI.models.generateContent({
-      model: "gemini-3-flash",
-      contents: prompt,
-    });
-
-    const text = response.text || "";
-
-    // 4. Parse the generated cards
-    const cards = this.parseGeneratedCards(text);
-
-    // 5. Save cards to database
-    const savedCards = await Promise.all(
-      cards.map((cardText, index) =>
-        prisma.gameCard.create({
-          data: {
-            deckId: deck.id,
-            ruleText: cardText,
-            orderIndex: index,
-            isDraft: false, // Core generated deck is not a draft
-          },
-        })
-      )
-    );
-
-    // 6. Log the generation
-    await prisma.aiGeneration.create({
-      data: {
-        deckId: deck.id,
-        prompt: prompt,
-        model: "gemini-2.5-flash",
-      },
-    });
-
-    return savedCards;
-  }
-
   static async generateDeckSuggestions(deckId: number) {
     // 1. Fetch deck details
     const deck = await prisma.gameDeck.findUnique({
@@ -70,17 +21,17 @@ export class AICardsGeneratorService {
     if (!deck) throw new Error("Deck not found");
 
     // 2. Check if we already have drafts for this deck
-    if (deck.gameCards && deck.gameCards.length >= 40) {
+    if (deck.gameCards && deck.gameCards.length >= 20) {
       console.log("Returning existing draft cards for deck", deckId);
       // Group them into the expected theme structure for the UI
       return [
         { 
           theme: "Bold & Daring", 
-          cards: deck.gameCards.slice(0, 20).map(c => c.ruleText) 
+          cards: deck.gameCards.slice(0, 10).map(c => c.ruleText) 
         },
         { 
           theme: "Wild & Chaotic", 
-          cards: deck.gameCards.slice(20, 40).map(c => c.ruleText) 
+          cards: deck.gameCards.slice(10, 20).map(c => c.ruleText) 
         }
       ];
     }
@@ -117,7 +68,7 @@ export class AICardsGeneratorService {
               data: {
                 deckId: deck.id,
                 ruleText: cardText,
-                orderIndex: cardIndex + (index * 20),
+                orderIndex: cardIndex + (index * 10),
                 isDraft: true
               }
             })
@@ -134,84 +85,47 @@ export class AICardsGeneratorService {
     return deckSuggestions;
   }
 
-  private static constructPrompt(deck: any) {
-    const modeName = deck.gameMode.name;
-    const { goal, secrets, extra, chaosLevel } = deck;
-    // Extract people if they exist in the extra field pattern
-    const peopleMatch = extra?.match(/People in the room: (.*)/);
-    const peopleList = peopleMatch ? peopleMatch[1] : null;
-    const cleanExtra = extra?.replace(/People in the room: .*/, '').trim();
-
-    let basePrompt = `You are "Sandy", a mischievous and witty game master for a drinking game called "Sandy Said So". 
-Your goal is to generate 15-20 creative, engaging, and sometimes brutal cards for a game deck.
-
-Game Mode: ${modeName}
-Chaos Level (1-5): ${chaosLevel}
-User-provided Context:
-- Goal: ${goal || "Not specified"}
-- Secrets/Inside Jokes: ${secrets || "None"}
-- Participants (People in the room): ${peopleList || "None specified, use general pronouns"}
-- Extra Rules/Vibe: ${cleanExtra || "None"}
-
-Instructions for each card:
-1. Each card should be a "command" or "situation" from Sandy.
-2. The tone should be consistent with the game mode. 
-3. If participants are listed, use their names in 70% of the cards to create personalized challenges. If a participant has a note in parentheses (e.g. "Name (Note)"), use that information to make the challenge more specific and hilarious.
-4. If secrets or inside jokes are provided, try to weave them into 40% of the cards subtly or explicitly (depending on chaos level).
-4. If chaos level is high (4 or 5), make the dares more daring or the "punishments" (drinks) more frequent.
-5. If chaos level is low (1 or 2), keep it more conversational but still provocative.
-6. Use "Sandy says..." or similar phrasing for some cards to maintain the persona.
-
-OUTPUT FORMAT:
-Return ONLY a valid JSON array of strings, where each string is the text for one card. No other text or markdown formatting outside the JSON.
-Example: ["Sandy says: Drink if you've ever lied about your age.", "The person to your left must reveal their most embarrassing secret or take 3 sips."]
-`;
-
-    return basePrompt;
-  }
 
   private static constructVariationPrompt(deck: any, variation: { name: string; instruction: string }, deckNumber: number) {
-    const modeName = deck.gameMode.name;
     const { goal, secrets, extra, chaosLevel } = deck;
-    // Extract people if they exist in the extra field pattern
+    const modeName = deck.gameMode.name;
+    
+    // Map mode-specific focus outside the prompt
+    const modeFocusMap: Record<string, string> = {
+      "Sandy's Confession": "Focus on revealing secrets, uncomfortable truths, and social challenges.",
+      "Pure Provocation": "Focus on drinking rules, group challenges, and circle-based gameplay.",
+      "The Verdict": "Focus on adult content, intimate dares, and spicy challenges."
+    };
+    const modeFocus = modeFocusMap[modeName] || "";
+
+    // Extract people and extra context
     const peopleMatch = extra?.match(/People in the room: (.*)/);
     const peopleList = peopleMatch ? peopleMatch[1] : null;
     const cleanExtra = extra?.replace(/People in the room: .*/, '').trim();
 
-    let basePrompt = `You are "Sandy", a mischievous and witty game master for a drinking game called "Sandy Said So". 
-Your goal is to generate exactly 20 creative, engaging cards for a game deck.
+    // Dynamically build context lines
+    const contextLines = [
+      goal && `- Goal: ${goal}`,
+      secrets && `- Secrets: ${secrets}`,
+      peopleList && `- Participants: ${peopleList}`,
+      cleanExtra && `- Extra vibe: ${cleanExtra}`
+    ].filter(Boolean);
 
-IMPORTANT CONTEXT:
-Game Mode: ${modeName}
-- If this is "Sandy's Confession" (Truth or Dare mode): Focus on revealing secrets, uncomfortable truths, and social challenges.
-- If this is "Pure Provocation" (Kings Cup/Drinking Rituals): Focus on drinking rules, group challenges, and circle-based gameplay.
-- If this is "The Verdict" (Naughty & Spicy/Sex Games): Focus on adult content, intimate dares, and spicy challenges.
+    return `You are "Sandy", a mischievous/witty game master for "Sandy Said So". 
+Generate exactly 10 cards for: ${modeName}.
+${modeFocus}
 
-Chaos Level (1-5): ${chaosLevel}
-Deck Variation #${deckNumber}: ${variation.instruction}
+Rules:
+1. Variation: ${variation.instruction}
+2. Chaos Level: ${chaosLevel}
+3. ${peopleList ? "Use participant names in most cards." : ""}
+4. ${secrets ? "Weave in secrets naturally." : ""}
+5. Output format: Valid JSON array of 10 strings.
 
-User-provided Context:
-- Goal: ${goal || "Not specified"}
-- Secrets/Inside Jokes: ${secrets || "None"}
-- Participants (People in the room): ${peopleList || "None specified, use general pronouns"}
-- Extra Rules/Vibe: ${cleanExtra || "None"}
+Context:
+${contextLines.join('\n')}
 
-Instructions for each card:
-1. Each card MUST align with the "${modeName}" game mode. Stay true to the mode's theme.
-2. Apply the variation style: ${variation.instruction}
-3. If participants are listed, use their names in 5-7 of the cards to create personalized challenges. Leverage any notes provided in parentheses for extra humor.
-4. The tone should match both the game mode AND the variation style.
-5. If secrets or inside jokes are provided, weave them into 2-3 cards naturally.
-5. Use "Sandy says..." or similar phrasing for some cards to maintain the persona.
-6. Make each card unique, engaging, and appropriate for the game mode.
-7. Consider the chaos level - higher levels mean more intense/frequent consequences.
-
-OUTPUT FORMAT:
-Return ONLY a valid JSON array of exactly 20 strings, where each string is the text for one card. No other text or markdown formatting outside the JSON.
-Example: ["Sandy says: Drink if you've ever lied about your age.", "The person to your left must reveal their most embarrassing secret or take 3 sips."]
-`;
-
-    return basePrompt;
+Example: ["Sandy says: Drink if you've ever lied about your age.", "The person to your left must reveal their secret or take 3 sips."]`;
   }
 
   private static parseGeneratedCards(text: string): string[] {
@@ -222,7 +136,7 @@ Example: ["Sandy says: Drink if you've ever lied about your age.", "The person t
     } catch (error) {
       console.error("Failed to parse AI response:", text);
       // Fallback: split by lines if JSON parsing fails, though prompt asks for JSON
-      return text.split("\n").filter(line => line.trim().length > 0).slice(0, 20);
+      return text.split("\n").filter(line => line.trim().length > 0).slice(0, 10);
     }
   }
 }
