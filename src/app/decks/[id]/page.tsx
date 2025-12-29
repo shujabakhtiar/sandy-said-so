@@ -157,15 +157,18 @@ export default function DeckViewPage() {
         </header>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-          {deck.gameCards?.map((card: any) => (
+          {[
+            ...(deck.gameCards || []).map((c: any) => ({ ...c, isChaos: false })),
+            ...(deck.sandyChaosCards || []).map((c: any) => ({ ...c, isChaos: true }))
+          ].map((card: any, idx: number) => (
             <GameCard 
-              key={card.id} 
+              key={card.isChaos ? `chaos-${card.id}` : `reg-${card.id}`} 
               card={card} 
-              onEdit={(card) => {
+              onEdit={card.isChaos ? undefined : (card) => {
                 setEditingCard(card);
                 setNewCardText(card.ruleText);
               }}
-              onDelete={(card) => setDeletingCard(card)}
+              onDelete={card.isChaos ? undefined : (card) => setDeletingCard(card)}
             />
           ))}
         </div>
