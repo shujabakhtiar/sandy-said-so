@@ -1,24 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useAuth } from "@/ui/providers/AuthContext";
 import { Button } from "@/ui/components/ui/Button";
 import Link from "next/link";
 import { Navbar } from "@/ui/components/layout/Navbar";
+import { useSearchParams } from "next/navigation";
 
-export default function LoginPage() {
+function LoginContent() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirect") || "/decks";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setLoading(true);
     try {
-      await login({ email, password });
+      await login({ email, password }, redirectTo);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -85,7 +88,10 @@ export default function LoginPage() {
               <div className="mt-8 text-center">
                 <p className="text-sm text-brand-text-muted font-medium">
                   Don&apos;t have a deck yet?{" "}
-                  <Link href="/signup" className="text-brand-red font-bold hover:underline underline-offset-4 decoration-brand-red/30 italic">
+                  <Link 
+                    href={searchParams.get("redirect") ? `/signup?redirect=${encodeURIComponent(searchParams.get("redirect")!)}` : "/signup"} 
+                    className="text-brand-red font-bold hover:underline underline-offset-4 decoration-brand-red/30 italic"
+                  >
                     Tell Sandy who you are.
                   </Link>
                 </p>
@@ -100,5 +106,13 @@ export default function LoginPage() {
         <div className="font-script text-6xl text-brand-red rotate-12">Sandy knows.</div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginContent />
+    </Suspense>
   );
 }

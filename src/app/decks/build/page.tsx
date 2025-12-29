@@ -18,13 +18,21 @@ const modes = [
 ];
 
 function BuildDeckContent() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const modeParam = searchParams.get("mode");
   
   const [step, setStep] = useState(1);
   const [selectedMode, setSelectedMode] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (!authLoading && !user) {
+      const mode = searchParams.get("mode");
+      const redirectPath = mode ? `/decks/build?mode=${mode}` : "/decks/build";
+      router.push(`/login?redirect=${encodeURIComponent(redirectPath)}`);
+    }
+  }, [user, authLoading, router, searchParams]);
 
   useEffect(() => {
     if (modeParam) {

@@ -2,9 +2,12 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/ui/providers/AuthContext";
 
 export const GameModes = () => {
   const router = useRouter();
+  const { user } = useAuth();
+  
   const modes = [
     { id: 1, title: "Sandy's Confession", tag: "Truth or Dare", color: "bg-brand-tan" },
     { id: 2, title: "Pure Provocation", tag: "Drinking Rituals", color: "bg-brand-blue" },
@@ -12,6 +15,10 @@ export const GameModes = () => {
   ];
 
   const handleModeClick = (modeId: number) => {
+    if (!user) {
+      router.push(`/login?redirect=/decks/build?mode=${modeId}`);
+      return;
+    }
     router.push(`/decks/build?mode=${modeId}`);
   };
 

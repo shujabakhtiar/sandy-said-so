@@ -12,7 +12,7 @@ interface User {
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  login: (data: any) => Promise<void>;
+  login: (data: any, redirectTo?: string) => Promise<void>;
   signup: (data: any) => Promise<void>;
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
@@ -45,17 +45,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     checkAuth();
   }, []);
 
-  const login = async (data: any) => {
+  const login = async (data: any, redirectTo?: string) => {
     const res = await fetch("/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
-
+ 
     if (res.ok) {
       const userData = await res.json();
       setUser(userData);
-      router.push("/decks");
+      router.push(redirectTo || "/decks");
     } else {
       const error = await res.json();
       throw new Error(error.error || "Login failed");
