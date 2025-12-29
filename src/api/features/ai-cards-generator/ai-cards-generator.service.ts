@@ -116,8 +116,7 @@ Rules:
 2. ${context.peopleList ? "Use participant names to target individuals directly." : ""}
 3. ${context.secrets ? "Incorporate these secrets: " + context.secrets : ""}
 4. Cards must be unpredictable and hilarious.
-5. Limits: Max 30 words and 160 chars per card.
-6. Format: Valid JSON array of 10 strings.
+${this.getTechnicalConstraints()}
 
 Context: ${context.summary}
 Example: ["Sandy says: [Name], point to the person you'd least trust with your phone.", "Confess your cringiest high school memory or take 3 sips."]`;
@@ -138,8 +137,7 @@ Rules:
 2. Include "Physical Rules" (e.g., "Sandy says: If I touch my nose, the last person to do the same drinks").
 3. Include singing, rhyming, or category challenges.
 4. ${context.peopleList ? "Challenge specific people: " + context.peopleList : ""}
-5. Limits: Max 30 words and 160 chars per card.
-6. Format: Valid JSON array of 10 strings.
+${this.getTechnicalConstraints()}
 
 Context: ${context.summary}
 Example: ["Sandy says: Categories! Types of shots. [Name] starts.", "Thumb Master: When you put your thumb on the table, everyone follows. Last person drinks."]`;
@@ -151,29 +149,24 @@ Example: ["Sandy says: Categories! Types of shots. [Name] starts.", "Thumb Maste
 Game: The Verdict (Intimate & Spicy).
 Persona: Sultry, demanding, and sophisticated. You speak in a sexy, teasing tone.
 
-TASK: Generate a deck of 10–15 adult intimacy prompt cards for couples.
+TASK: Generate adult intimacy prompt cards for couples.
 Variation: ${variation.instruction}
 Chaos Level: ${deck.chaosLevel}/5
 
 Instructions: Each card should include:
-Title (2–3 words, bold/punchy, e.g., “Hands Behind,” “Dominatrix”)
-Description (1–2 sentences, clear, sexual intent, kinky or playful, but non-explicit about body acts)
-Themes to include: bondage, role-playing, power exchange, toys, sexual tension, anticipation, control, denial, and positions.
-The tone should be erotic, seductive, and consent-focused.
-Cards should be usable in a choose 3–5 style, where couples pick a few and incorporate them in their play.
-Avoid explicit pornographic detail. Focus on mood, power, and rules.
-Give the output as a numbered list of cards with title and description.
+Title (2–3 words, bold/punchy, e.g., **Hands Behind**)
+Description (1–2 sentences, clear intent, kinky or playful)
+Themes: bondage, role-playing, power exchange, toys, anticipation, control, denial, positions.
 
 Rules:
-1. Focus on intimate activities: neck kisses, strip-tease elements, teasing and sex positions.
-2. If context mentions items (ice, blindfolds, etc.), use them.
-3. Tone: Sophisticated and sexy. Use a "Mistress" persona.
+1. Focus on intimate activities: neck kisses, strip-tease, teasing and sex positions.
+2. If context mentions items (ice, blindfolds), use them.
+3. Tone: Sultry Mistress. 
 4. ${context.peopleList ? "Focus on the chemistry between: " + context.peopleList : ""}
-5. Limits: Max 30 words and 160 chars per card.
-6. Format: Valid JSON array of 10 strings.
+${this.getTechnicalConstraints()}
 
 Context: ${context.summary}
-Example: ["Sandy says: Whisper your dirtiest fantasy into [Name]'s ear.", "Sandy commands: Remove one piece of clothing. Slowly."]`;
+Example: ["**Whisper Secrets**: Whisper your dirtiest fantasy into [Name]'s ear.", "**Master's Command**: Remove one piece of clothing. Slowly."]`;
   }
 
   private static buildStandardPrompt(deck: any, variation: { instruction: string }) {
@@ -206,15 +199,55 @@ Context: ${context.summary}`;
     };
   }
 
+  private static getTechnicalConstraints() {
+    return `
+TECHNICAL CONSTRAINTS:
+1. OUTPUT: ONLY a valid JSON array of strings. 
+2. NO PREAMBLE: Do not include "Here is your JSON" or any text outside the array.
+3. STRUCTURE: Flat array. No nested arrays. No objects.
+4. VALIDATION: Keys and values must use double quotes.
+5. LIMITS: Exactly 10 strings. Max 30 words and 160 chars per card.`;
+  }
+
   private static parseGeneratedCards(text: string): string[] {
     try {
-      // Remove any potential markdown code blocks
-      const cleanJson = text.replace(/```json|```/g, "").trim();
-      return JSON.parse(cleanJson);
+      // 1. Extreme cleaning: find the first '[' and last ']'
+      let cleanJson = text.trim();
+      
+      // Remove markdown blocks if present
+      cleanJson = cleanJson.replace(/```json/gi, "").replace(/```/gi, "").trim();
+      
+      // Remove common AI prefixes like "json" or "Result:"
+      if (cleanJson.toLowerCase().startsWith("json")) {
+        cleanJson = cleanJson.substring(4).trim();
+      }
+
+      const startBracket = cleanJson.indexOf('[');
+      const endBracket = cleanJson.lastIndexOf(']');
+
+      if (startBracket !== -1 && endBracket !== -1) {
+        cleanJson = cleanJson.substring(startBracket, endBracket + 1);
+      }
+
+      const parsed = JSON.parse(cleanJson);
+
+      // 2. Handle nested arrays or weird objects
+      if (Array.isArray(parsed)) {
+        // Flatten if AI returned [[...]]
+        const flat = parsed.flat(2);
+        return flat.filter(item => typeof item === 'string').slice(0, 15);
+      }
+
+      // 3. Fallback to line splitting if it's not an array
+      throw new Error("Parsed result is not an array");
     } catch (error) {
-      console.error("Failed to parse AI response:", text);
-      // Fallback: split by lines if JSON parsing fails, though prompt asks for JSON
-      return text.split("\n").filter(line => line.trim().length > 0).slice(0, 10);
+      console.error("Robust Parse Fail. Raw text:", text);
+      // Clean up common list markers if we fall back to split
+      return text
+        .split("\n")
+        .map(line => line.replace(/^\d+\.\s*|^-\s*|^\[\d+\]\s*/, "").replace(/^"|"$/g, "").trim())
+        .filter(line => line.length > 5 && !line.includes("JSON") && !line.includes("["))
+        .slice(0, 15);
     }
   }
 }
