@@ -14,10 +14,11 @@ interface GameCardProps {
   gameType?: string;
   onEdit?: (card: any) => void;
   onDelete?: (card: any) => void;
+  onPromote?: (card: any) => void;
   showStatusBadge?: boolean;
 }
 
-export const GameCard = ({ card, gameType = "standard", onEdit, onDelete, showStatusBadge }: GameCardProps) => {
+export const GameCard = ({ card, gameType = "standard", onEdit, onDelete, onPromote, showStatusBadge }: GameCardProps) => {
   // We can add more layouts here based on gameType
   if (gameType === "standard") {
     const isChaos = (card as any).isChaos;
@@ -124,8 +125,22 @@ export const GameCard = ({ card, gameType = "standard", onEdit, onDelete, showSt
         </div>
 
         {/* Card Actions (Hover Overlay) */}
-        {(onEdit || onDelete) && !isChaos && (
+        {(onEdit || onDelete || onPromote) && !isChaos && (
           <div className="absolute inset-0 bg-brand-brown/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4 z-20 backdrop-blur-[1px] pointer-events-auto">
+            {onPromote && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onPromote(card);
+                }}
+                className="p-4 bg-white rounded-full text-emerald-600 shadow-xl hover:bg-emerald-600 hover:text-white transition-all transform hover:scale-110"
+                title="Add to Deck"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 5v14M5 12h14" />
+                </svg>
+              </button>
+            )}
             {onEdit && (
               <button
                 onClick={(e) => {

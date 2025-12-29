@@ -54,8 +54,8 @@ export class GameCardsController {
   static async update(req: NextRequest, { params }: { params: { id: string } }) {
     try {
       const { id } = await params;
-      const { ruleText } = await req.json();
-      const card = await GameCardsService.updateCard(Number(id), { ruleText });
+      const { ruleText, isDraft } = await req.json();
+      const card = await GameCardsService.updateCard(Number(id), { ruleText, isDraft });
       return NextResponse.json(card);
     } catch (error: any) {
       return NextResponse.json({ error: error.message }, { status: 500 });

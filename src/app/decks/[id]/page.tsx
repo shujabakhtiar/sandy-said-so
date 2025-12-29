@@ -84,6 +84,22 @@ export default function DeckViewPage() {
       setIsProcessing(false);
     }
   };
+  const handlePromoteCard = async (card: any) => {
+    setIsProcessing(true);
+    try {
+      await gameCardsResource.update(card.id, { isDraft: false });
+      setDeck({
+        ...deck,
+        gameCards: deck.gameCards.map((c: any) => 
+          c.id === card.id ? { ...c, isDraft: false } : c
+        )
+      });
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
 
   const handleDeleteDeck = async () => {
     if (confirmDeckName !== deck.title) return;
@@ -205,6 +221,7 @@ export default function DeckViewPage() {
                 setNewCardText(card.ruleText);
               }}
               onDelete={card.isChaos ? undefined : (card) => setDeletingCard(card)}
+              onPromote={activeTab === "drafts" && !card.isChaos ? handlePromoteCard : undefined}
               showStatusBadge={activeTab === "drafts"}
             />
           ))}

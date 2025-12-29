@@ -77,10 +77,13 @@ export class GameCardsService {
     return { count: cards.length };
   }
 
-  static async updateCard(id: number, data: { ruleText?: string }) {
+  static async updateCard(id: number, data: { ruleText?: string; isDraft?: boolean }) {
     return await prisma.gameCard.update({
       where: { id },
-      data: { ruleText: data.ruleText },
+      data: { 
+        ruleText: data.ruleText,
+        isDraft: data.isDraft
+      },
     });
   }
 
