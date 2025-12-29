@@ -176,29 +176,77 @@ export default function DeckViewPage() {
 
       {/* Edit Card Modal */}
       {editingCard && (
-        <div className="fixed inset-0 z-100 flex items-center justify-center p-6">
+        <div className="fixed inset-0 z-100 flex items-center justify-center p-4 md:p-6">
           <div className="absolute inset-0 bg-brand-brown/40 backdrop-blur-sm" onClick={() => setEditingCard(null)} />
-          <div className="bg-white rounded-[40px] p-10 max-w-xl w-full relative shadow-espresso animate-in zoom-in-95 duration-300">
-            <h2 className="text-3xl font-serif font-bold text-brand-brown mb-6">Edit Card</h2>
-            <textarea
-              autoFocus
-              value={newCardText}
-              onChange={(e) => setNewCardText(e.target.value)}
-              className="w-full h-40 px-6 py-4 rounded-2xl bg-brand-cream/50 border border-brand-tan/30 focus:border-brand-brown focus:ring-0 outline-none text-brand-brown font-medium transition-all mb-8 resize-none text-xl leading-relaxed"
-            />
-            <div className="flex gap-4">
-              <Button variant="outline" size="lg" className="flex-1" onClick={() => setEditingCard(null)}>
-                Cancel
-              </Button>
-              <Button 
-                variant="primary" 
-                size="lg" 
-                className="flex-1" 
-                onClick={handleUpdateCard}
-                disabled={isProcessing}
-              >
-                {isProcessing ? "Saving..." : "Save Card"}
-              </Button>
+          
+          <div className="relative group animate-in zoom-in-95 duration-300 w-full max-w-md">
+            <div className="bg-[#faf9f6] border-2 border-brand-tan/20 rounded-[32px] md:rounded-[40px] shadow-espresso relative overflow-hidden flex flex-col p-8 md:p-10 aspect-2/3">
+              
+              {/* Top Action Buttons */}
+              <div className="absolute top-6 right-6 md:top-8 md:right-8 flex gap-4 md:gap-6 items-center z-30">
+                <button 
+                  className="text-xs md:text-sm font-bold text-brand-red hover:opacity-70 transition-all uppercase tracking-widest"
+                  onClick={() => setEditingCard(null)}
+                >
+                  Cancel
+                </button>
+                <button 
+                  className="text-xs md:text-sm font-bold text-emerald-600 hover:opacity-70 transition-all uppercase tracking-widest disabled:opacity-50"
+                  onClick={handleUpdateCard}
+                  disabled={isProcessing}
+                >
+                  {isProcessing ? "Saving..." : "Save"}
+                </button>
+              </div>
+
+              {/* Corner Indicator (Left Only) */}
+              <div className="absolute top-6 left-6 md:top-8 md:left-8 flex flex-col items-center opacity-80 text-brand-red">
+                <span className="text-[10px] md:text-[12px] font-bold tracking-tighter mb-1 uppercase">SANDY</span>
+                <svg width="14" height="14" md-width="18" md-height="18" viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5 md:w-[18px] md:h-[18px]">
+                  <path d="M12 2s-5 7-5 10c0 3 2.5 5 5 5s5-2 5-5c0-3-5-10-5-10z" />
+                </svg>
+              </div>
+
+              {/* Card Header */}
+              <div className="text-center mt-12 md:mt-16 mb-4 md:mb-8">
+                <h3 className="text-2xl md:text-4xl font-serif font-black italic leading-none underline decoration-offset-4 text-brand-red underline-brand-red/20">
+                  Sandy says...
+                </h3>
+              </div>
+
+              {/* Main Content Area */}
+              <div className="flex-1 flex flex-col items-start justify-center px-4 md:px-6 relative">
+                <div className="absolute inset-x-8 md:inset-x-12 top-1/2 -translate-y-1/2 opacity-[0.02] pointer-events-none select-none">
+                  <svg width="100%" height="auto" viewBox="0 0 24 24" fill="currentColor" className="text-brand-brown">
+                    <path d="M12 2s-5 7-5 10c0 3 2.5 5 5 5s5-2 5-5c0-3-5-10-5-10z" />
+                  </svg>
+                </div>
+
+                <textarea
+                  autoFocus
+                  value={newCardText}
+                  onChange={(e) => setNewCardText(e.target.value)}
+                  className="w-full h-full bg-transparent border-none focus:ring-0 outline-none text-xl md:text-3xl font-serif font-black text-left leading-relaxed text-brand-brown resize-none z-10 scrollbar-hide"
+                  placeholder="What's the rule?"
+                />
+              </div>
+
+              {/* Bottom Decoration */}
+              <div className="absolute bottom-6 left-6 right-6 md:bottom-10 md:left-10 md:right-10 flex items-end justify-between pointer-events-none">
+                <div className="flex flex-col items-start gap-1">
+                  <div className="h-px w-6 md:w-8 rounded-full bg-brand-red/30" />
+                  <p className="text-[8px] md:text-[10px] font-serif italic font-bold text-brand-red tracking-[0.2em] uppercase">
+                    Drink if you dare
+                  </p>
+                </div>
+                
+                <div className="flex flex-col items-center opacity-80 text-brand-red rotate-180">
+                  <span className="text-[10px] md:text-[12px] font-bold tracking-tighter mb-1 uppercase">SANDY</span>
+                  <svg width="14" height="14" md-width="18" md-height="18" viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5 md:w-[18px] md:h-[18px]">
+                    <path d="M12 2s-5 7-5 10c0 3 2.5 5 5 5s5-2 5-5c0-3-5-10-5-10z" />
+                  </svg>
+                </div>
+              </div>
             </div>
           </div>
         </div>
