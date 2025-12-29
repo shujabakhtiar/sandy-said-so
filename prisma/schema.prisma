@@ -77,7 +77,8 @@ model GameMode {
   id   Int    @id @default(autoincrement())
   name String @unique
 
-  gameDecks GameDeck[]
+  gameDecks       GameDeck[]
+  sandyChaosCards SandyChaosCard[]
 }
 
 model GameDeck {
@@ -105,15 +106,26 @@ model GameDeck {
 }
 
 model GameCard {
-  id         Int    @id @default(autoincrement())
-  deckId     Int    @map("deck_id")
+  id         Int      @id @default(autoincrement())
+  deckId     Int      @map("deck_id")
   deck       GameDeck @relation(fields: [deckId], references: [id], onDelete: Cascade)
-  photoId    Int?   @map("photo_id")
-  photo      Photo? @relation(fields: [photoId], references: [id])
-  ruleText   String @map("rule_text")
-  orderIndex Int    @map("order_index")
+  photoId    Int?     @map("photo_id")
+  photo      Photo?   @relation(fields: [photoId], references: [id])
+  ruleText   String   @map("rule_text")
+  orderIndex Int      @map("order_index")
 
   @@index([deckId])
+}
+
+model SandyChaosCard {
+  id         Int      @id @default(autoincrement())
+  gameModeId Int      @map("game_mode_id")
+  gameMode   GameMode @relation(fields: [gameModeId], references: [id])
+  ruleText   String   @map("rule_text")
+  chaosLevel Int      @map("chaos_level")
+
+  @@index([gameModeId])
+  @@map("sandy_chaos_cards")
 }
 
 model AiGeneration {

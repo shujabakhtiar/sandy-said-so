@@ -28,8 +28,14 @@ export const GameEngine = ({ deck, isExample, onBack }: GameEngineProps) => {
 
   useEffect(() => {
     if (deck?.gameCards) {
+      // Collect both types of cards
+      const regularCards = deck.gameCards || [];
+      const chaosCards = (deck as any).sandyChaosCards || [];
+      
+      const allCards = [...regularCards, ...chaosCards];
+      
       // Shuffle the cards on mount
-      const shuffled = [...deck.gameCards].sort(() => Math.random() - 0.5);
+      const shuffled = allCards.sort(() => Math.random() - 0.5);
       setShuffledCards(shuffled);
     }
   }, [deck]);

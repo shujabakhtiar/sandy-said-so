@@ -12,7 +12,7 @@ export class GameDecksService {
     chaosLevel?: number;
     useImages?: boolean;
   }) {
-    return await prisma.gameDeck.create({
+    const deck = await prisma.gameDeck.create({
       data: {
         userId: data.userId,
         gameModeId: data.gameModeId,
@@ -26,6 +26,8 @@ export class GameDecksService {
         isSaved: false,
       },
     });
+
+    return deck;
   }
 
   static async listDecks(userId: number) {
@@ -49,7 +51,7 @@ export class GameDecksService {
   }
 
   static async getDeckWithCards(id: number) {
-    return await prisma.gameDeck.findUnique({
+    const deck = await prisma.gameDeck.findUnique({
       where: { id },
       include: {
         gameMode: true,
@@ -60,6 +62,17 @@ export class GameDecksService {
         },
       },
     });
+
+    if (deck) {
+      const { SandyChaosService } = await import("../sandy-chaos/sandy-chaos.service");
+      const chaosCards = await SandyChaosService.getDeckChaosCards(deck.id);
+      return {
+        ...deck,
+        sandyChaosCards: chaosCards
+      };
+    }
+
+    return null;
   }
   static async updateDeck(id: number, data: { title?: string }) {
     return await prisma.gameDeck.update({
