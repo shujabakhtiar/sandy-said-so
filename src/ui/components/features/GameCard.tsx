@@ -23,6 +23,31 @@ export const GameCard = ({ card, gameType = "standard", onEdit, onDelete, onProm
   if (gameType === "standard") {
     const isChaos = (card as any).isChaos;
 
+    const renderText = (text: string) => {
+      if (!text) return null;
+      
+      // 1. Handle double newlines for paragraph breaks
+      const paragraphs = text.split(/\n\n/);
+      
+      return paragraphs.map((para, pIdx) => (
+        <React.Fragment key={pIdx}>
+          <span className="block mb-2 last:mb-0">
+            {para.split(/\n/).map((line, lIdx) => (
+              <React.Fragment key={lIdx}>
+                {line.split(/(\*\*.*?\*\*)/g).map((part, i) => {
+                  if (part.startsWith('**') && part.endsWith('**')) {
+                    return <strong key={i} className="font-black text-brand-red decoration-brand-red/10">{part.slice(2, -2)}</strong>;
+                  }
+                  return part;
+                })}
+                {lIdx < para.split(/\n/).length - 1 && <br />}
+              </React.Fragment>
+            ))}
+          </span>
+        </React.Fragment>
+      ));
+    };
+
     return (
       <div 
         className={cn(
@@ -33,7 +58,7 @@ export const GameCard = ({ card, gameType = "standard", onEdit, onDelete, onProm
           card.isDraft && "opacity-90"
         )}
       >
-        {/* Draft Badge */}
+        {/* ... existing badge code ... */}
         {showStatusBadge && card.isDraft && (
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-12 pointer-events-none z-0">
             <div className="border-4 border-brand-red/10 px-6 py-2 rounded-xl">
@@ -64,7 +89,7 @@ export const GameCard = ({ card, gameType = "standard", onEdit, onDelete, onProm
         </div>
 
         {/* Card Header */}
-        <div className="text-center mt-6 mb-4">
+        <div className="text-center mt-6 mb-4 shrink-0">
           <h3 
             className={cn(
               "text-2xl font-serif font-black italic leading-none underline decoration-offset-4",
@@ -78,21 +103,21 @@ export const GameCard = ({ card, gameType = "standard", onEdit, onDelete, onProm
         </div>
 
         {/* Main Card Graphic / Content Area */}
-        <div className="flex-1 flex flex-col items-start justify-center px-8 pb-12 pt-4 relative">
+        <div className="flex-1 flex flex-col items-start justify-center px-8 pb-12 pt-4 relative overflow-y-auto scrollbar-hide">
           <div className="absolute inset-x-12 top-1/2 -translate-y-1/2 opacity-[0.02] pointer-events-none select-none">
             <svg width="100%" height="auto" viewBox="0 0 24 24" fill="currentColor" className={isChaos ? "text-white" : "text-brand-brown"}>
               <path d="M12 2s-5 7-5 10c0 3 2.5 5 5 5s5-2 5-5c0-3-5-10-5-10z" />
             </svg>
           </div>
 
-          <p 
+          <div 
             className={cn(
-              "text-sm md:text-lg font-serif font-black text-left leading-relaxed relative z-10 w-full",
+              "text-sm md:text-lg font-serif font-bold text-left leading-relaxed relative z-10 w-full",
               isChaos ? "text-white" : "text-brand-brown"
             )}
           >
-            {card.ruleText}
-          </p>
+            {renderText(card.ruleText)}
+          </div>
         </div>
 
         {/* Bottom Decoration & Actions Layer */}
