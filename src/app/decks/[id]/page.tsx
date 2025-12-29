@@ -9,6 +9,7 @@ import Image from "next/image";
 import { GameCard } from "@/ui/components/features/GameCard";
 import { gameDecksResource } from "@/ui/resources/game-decks.resource";
 import { gameCardsResource } from "@/ui/resources/game-cards.resource";
+import { cn } from "@/ui/lib/utils";
 
 export default function DeckViewPage() {
   const { id } = useParams();
@@ -21,6 +22,7 @@ export default function DeckViewPage() {
   const [isDeletingDeck, setIsDeletingDeck] = useState(false);
   const [confirmDeckName, setConfirmDeckName] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [activeTab, setActiveTab] = useState<"live" | "drafts">("live");
   const router = useRouter();
 
   useEffect(() => {
@@ -146,10 +148,54 @@ export default function DeckViewPage() {
           </div>
         </header>
 
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 mb-10 border-b border-brand-tan/20 pb-6">
+          <div className="flex items-center gap-8">
+            <button 
+              onClick={() => setActiveTab("live")}
+              className={cn(
+                "relative pb-2 text-sm font-black uppercase tracking-widest transition-all",
+                activeTab === "live" ? "text-brand-brown" : "text-brand-brown/40 hover:text-brand-brown/60"
+              )}
+            >
+              Active Cards
+              <span className="ml-2 px-1.5 py-0.5 rounded-md bg-brand-brown/5 text-[10px]">
+                {deck.gameCards?.filter((c: any) => !c.isDraft).length || 0}
+              </span>
+              {activeTab === "live" && (
+                <div className="absolute bottom-0 left-0 right-0 h-1 bg-brand-brown rounded-full" />
+              )}
+            </button>
+            <button 
+              onClick={() => setActiveTab("drafts")}
+              className={cn(
+                "relative pb-2 text-sm font-black uppercase tracking-widest transition-all",
+                activeTab === "drafts" ? "text-brand-brown" : "text-brand-brown/40 hover:text-brand-brown/60"
+              )}
+            >
+              Sandy&apos;s Drafts
+              <span className="ml-2 px-1.5 py-0.5 rounded-md bg-brand-red/5 text-brand-red text-[10px]">
+                {deck.gameCards?.filter((c: any) => c.isDraft).length || 0}
+              </span>
+              {activeTab === "drafts" && (
+                <div className="absolute bottom-0 left-0 right-0 h-1 bg-brand-red rounded-full" />
+              )}
+            </button>
+          </div>
+
+          {activeTab === "drafts" && (
+            <p className="text-xs text-brand-text-muted italic flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-brand-red animate-pulse" />
+              These cards are in Sandy&apos;s notebook and won&apos;t appear in games.
+            </p>
+          )}
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
           {[
-            ...(deck.gameCards || []).map((c: any) => ({ ...c, isChaos: false })),
-            ...(deck.sandyChaosCards || []).map((c: any) => ({ ...c, isChaos: true }))
+            ...(deck.gameCards || [])
+              .filter((c: any) => activeTab === "live" ? !c.isDraft : c.isDraft)
+              .map((c: any) => ({ ...c, isChaos: false })),
+            ...(activeTab === "live" ? (deck.sandyChaosCards || []).map((c: any) => ({ ...c, isChaos: true })) : [])
           ].map((card: any, idx: number) => (
             <GameCard 
               key={card.isChaos ? `chaos-${card.id}` : `reg-${card.id}`} 
@@ -159,8 +205,15 @@ export default function DeckViewPage() {
                 setNewCardText(card.ruleText);
               }}
               onDelete={card.isChaos ? undefined : (card) => setDeletingCard(card)}
+              showStatusBadge={activeTab === "drafts"}
             />
           ))}
+          
+          {activeTab === "live" && (deck.gameCards?.filter((c: any) => !c.isDraft).length || 0) === 0 && (
+            <div className="col-span-full py-20 text-center bg-white/50 rounded-[40px] border-2 border-dashed border-brand-tan/30">
+              <p className="text-brand-text-muted italic text-lg">No active cards. Pull some from drafts or let Sandy generate more.</p>
+            </div>
+          )}
         </div>
       </main>
 
@@ -252,8 +305,14 @@ export default function DeckViewPage() {
             <div className="w-20 h-20 bg-brand-red/10 rounded-full flex items-center justify-center mx-auto mb-6 text-brand-red">
               <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
             </div>
-            <h2 className="text-3xl font-serif font-bold text-brand-brown mb-4">Delete this card?</h2>
-            <p className="text-brand-text-muted mb-10 italic">This card will be gone forever. Sandy won&apos;t be able to suggest it again.</p>
+            <h2 className="text-3xl font-serif font-bold text-brand-brown mb-4">
+              {activeTab === "live" ? "Move to drafts?" : "Permanently remove?"}
+            </h2>
+            <p className="text-brand-text-muted mb-10 italic">
+              {activeTab === "live" 
+                ? "This card will be moved to your drafts. Sandy will remember it, but it won't appear in games."
+                : "This draft will be permanently removed from Sandy's notebook."}
+            </p>
             <div className="flex gap-4">
               <Button variant="outline" size="lg" className="flex-1" onClick={() => setDeletingCard(null)}>
                 No, Keep it
@@ -261,11 +320,14 @@ export default function DeckViewPage() {
               <Button 
                 variant="primary" 
                 size="lg" 
-                className="flex-1 bg-brand-red border-brand-red hover:bg-brand-red/90" 
+                className={cn(
+                  "flex-1 border-none hover:opacity-90",
+                  activeTab === "live" ? "bg-brand-brown" : "bg-brand-red"
+                )} 
                 onClick={handleDeleteCard}
                 disabled={isProcessing}
               >
-                {isProcessing ? "Deleting..." : "Delete it"}
+                {isProcessing ? "Processing..." : activeTab === "live" ? "Move to Draft" : "Remove forever"}
               </Button>
             </div>
           </div>

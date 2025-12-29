@@ -113,6 +113,7 @@ model GameCard {
   photo      Photo?   @relation(fields: [photoId], references: [id])
   ruleText   String   @map("rule_text")
   orderIndex Int      @map("order_index")
+  isDraft    Boolean  @default(true) @map("is_draft")
 
   @@index([deckId])
 }

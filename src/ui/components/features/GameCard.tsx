@@ -6,6 +6,7 @@ interface GameCardProps {
   card: {
     id: number;
     ruleText: string;
+    isDraft?: boolean;
     photo?: {
       url: string;
     };
@@ -13,9 +14,10 @@ interface GameCardProps {
   gameType?: string;
   onEdit?: (card: any) => void;
   onDelete?: (card: any) => void;
+  showStatusBadge?: boolean;
 }
 
-export const GameCard = ({ card, gameType = "standard", onEdit, onDelete }: GameCardProps) => {
+export const GameCard = ({ card, gameType = "standard", onEdit, onDelete, showStatusBadge }: GameCardProps) => {
   // We can add more layouts here based on gameType
   if (gameType === "standard") {
     const isChaos = (card as any).isChaos;
@@ -26,9 +28,20 @@ export const GameCard = ({ card, gameType = "standard", onEdit, onDelete }: Game
           "aspect-2/3 rounded-[24px] shadow-2xl border relative overflow-hidden group hover:scale-[1.05] hover:-rotate-1 transition-all duration-500 cursor-default flex flex-col p-6",
           isChaos 
             ? "bg-[#811331] border-white/20 shadow-[#811331]/30" 
-            : "bg-[#faf9f6] border-brand-tan/20"
+            : "bg-[#faf9f6] border-brand-tan/20",
+          card.isDraft && "opacity-90"
         )}
       >
+        {/* Draft Badge */}
+        {showStatusBadge && card.isDraft && (
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-12 pointer-events-none z-0">
+            <div className="border-4 border-brand-red/10 px-6 py-2 rounded-xl">
+              <span className="text-4xl font-serif font-black text-brand-red/5 uppercase tracking-tighter">
+                Draft suggestion
+              </span>
+            </div>
+          </div>
+        )}
         {/* Chaos Glow Effect */}
         {isChaos && (
           <div className="absolute inset-0 bg-linear-to-br from-white/10 to-transparent pointer-events-none" />

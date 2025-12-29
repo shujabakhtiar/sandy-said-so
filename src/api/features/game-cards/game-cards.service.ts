@@ -14,7 +14,10 @@ export class GameCardsService {
 
   static async listCards(deckId: number) {
     return await prisma.gameCard.findMany({
-      where: { deckId },
+      where: { 
+        deckId,
+        isDraft: false
+      },
       orderBy: { orderIndex: "asc" },
       include: {
         photo: true,
@@ -23,20 +26,55 @@ export class GameCardsService {
   }
 
   static async bulkAddCards(deckId: number, cards: { ruleText: string; orderIndex: number; photoId?: number }[]) {
-    // First, delete any existing cards for this deck
-    await prisma.gameCard.deleteMany({
-      where: { deckId },
+    const ruleTextsToSave = cards.map(c => c.ruleText);
+
+    // 1. Mark selected cards as live (isDraft: false)
+    await prisma.gameCard.updateMany({
+      where: {
+        deckId,
+        ruleText: { in: ruleTextsToSave },
+      },
+      data: { isDraft: false }
     });
 
-    // Then create all the new cards
-    return await prisma.gameCard.createMany({
-      data: cards.map(card => ({
+    // 2. Ensure cards NOT in this selection are marked as drafts
+    await prisma.gameCard.updateMany({
+      where: {
         deckId,
-        ruleText: card.ruleText,
-        orderIndex: card.orderIndex,
-        photoId: card.photoId,
-      })),
+        ruleText: { notIn: ruleTextsToSave },
+      },
+      data: { isDraft: true }
     });
+
+    // 3. Handle any completely new cards that might have been added
+    const currentCards = await prisma.gameCard.findMany({
+      where: { deckId, ruleText: { in: ruleTextsToSave } }
+    });
+    
+    const currentTexts = new Set(currentCards.map(c => c.ruleText));
+    const missingCards = cards.filter(c => !currentTexts.has(c.ruleText));
+
+    if (missingCards.length > 0) {
+      await prisma.gameCard.createMany({
+        data: missingCards.map(card => ({
+          deckId,
+          ruleText: card.ruleText,
+          orderIndex: card.orderIndex,
+          photoId: card.photoId,
+          isDraft: false
+        })),
+      });
+    }
+
+    // 4. Update order indices for the live cards
+    for (const card of cards) {
+      await prisma.gameCard.updateMany({
+        where: { deckId, ruleText: card.ruleText },
+        data: { orderIndex: card.orderIndex }
+      });
+    }
+
+    return { count: cards.length };
   }
 
   static async updateCard(id: number, data: { ruleText?: string }) {
@@ -47,8 +85,10 @@ export class GameCardsService {
   }
 
   static async deleteCard(id: number) {
-    return await prisma.gameCard.delete({
+    // Instead of deleting, we mark as draft
+    return await prisma.gameCard.update({
       where: { id },
+      data: { isDraft: true },
     });
   }
 }

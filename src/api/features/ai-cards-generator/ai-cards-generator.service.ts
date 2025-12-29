@@ -37,6 +37,7 @@ export class AICardsGeneratorService {
             deckId: deck.id,
             ruleText: cardText,
             orderIndex: index,
+            isDraft: false, // Core generated deck is not a draft
           },
         })
       )
@@ -58,16 +59,37 @@ export class AICardsGeneratorService {
     // 1. Fetch deck details
     const deck = await prisma.gameDeck.findUnique({
       where: { id: deckId },
-      include: { gameMode: true },
+      include: { 
+        gameMode: true,
+        gameCards: {
+          where: { isDraft: true }
+        }
+      },
     });
 
     if (!deck) throw new Error("Deck not found");
 
-    // 2. Generate 2 different variations based on game mode
+    // 2. Check if we already have drafts for this deck
+    if (deck.gameCards && deck.gameCards.length >= 40) {
+      console.log("Returning existing draft cards for deck", deckId);
+      // Group them into the expected theme structure for the UI
+      return [
+        { 
+          theme: "Bold & Daring", 
+          cards: deck.gameCards.slice(0, 20).map(c => c.ruleText) 
+        },
+        { 
+          theme: "Wild & Chaotic", 
+          cards: deck.gameCards.slice(20, 40).map(c => c.ruleText) 
+        }
+      ];
+    }
+
+    // 3. Generate 2 different variations based on game mode
     // These variations stay within the game mode but offer different styles
     const variations = [
       { 
-        name: "Deck 1", 
+        name: "Bold & Daring", 
         instruction: "Create cards that are bold and push boundaries. Make them memorable and daring within the game mode." 
       },
       { 
@@ -87,6 +109,20 @@ export class AICardsGeneratorService {
 
         const text = response.text || "";
         const cards = this.parseGeneratedCards(text);
+
+        // Save suggested cards as drafts
+        await Promise.all(
+          cards.map((cardText, cardIndex) =>
+            prisma.gameCard.create({
+              data: {
+                deckId: deck.id,
+                ruleText: cardText,
+                orderIndex: cardIndex + (index * 20),
+                isDraft: true
+              }
+            })
+          )
+        );
 
         return {
           theme: variation.name,

@@ -50,7 +50,12 @@ export default function GamePlayPage() {
     <div className="relative min-h-screen bg-brand-cream flex flex-col pt-32 pb-20">
       <Navbar />
       
-      <GameEngine deck={deck} />
+      <GameEngine 
+        deck={{
+          ...deck,
+          gameCards: deck.gameCards?.filter((c: any) => !c.isDraft) || []
+        }} 
+      />
 
       {/* Decorative Branding */}
       <div className="fixed bottom-10 right-10 pointer-events-none opacity-10 select-none rotate-12">
