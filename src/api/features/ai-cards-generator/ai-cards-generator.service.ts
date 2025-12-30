@@ -7,22 +7,21 @@ export class AICardsGeneratorService {
   });
 
   static async generateDeckSuggestions(deckId: number) {
-    // 1. Fetch deck details
+    // 1. Fetch deck details - including ALL cards to avoid duplication
     const deck = await prisma.gameDeck.findUnique({
       where: { id: deckId },
       include: { 
         gameMode: true,
-        gameCards: {
-          where: { isDraft: true }
-        }
+        gameCards: true // Fetch all, not just drafts
       },
     });
 
     if (!deck) throw new Error("Deck not found");
 
-    // 2. Check if we already have drafts for this deck
+    // 2. Check if we already have a complete set of cards (live or drafts)
+    // This prevents generating 20 more every time you revisit the selection page
     if (deck.gameCards && deck.gameCards.length >= 20) {
-      console.log("Returning existing draft cards for deck", deckId);
+      console.log("Returning existing cards for deck", deckId);
       // Group them into the expected theme structure for the UI
       return [
         { 
@@ -36,16 +35,21 @@ export class AICardsGeneratorService {
       ];
     }
 
-    // 3. Generate 2 different variations based on game mode
-    // These variations stay within the game mode but offer different styles
+    // 3. Complete Cleanup: Remove ANY existing cards if we are re-generating
+    // This ensures we never cross the 20-card total limit.
+    await prisma.gameCard.deleteMany({
+      where: { deckId }
+    });
+
+    // 4. Generate 2 different variations
     const variations = [
       { 
         name: "Bold & Daring", 
-        instruction: "Create cards that are bold and push boundaries. Make them memorable and daring within the game mode." 
+        instruction: "Create cards that are bold and push boundaries." 
       },
       { 
-        name: "Deck 2", 
-        instruction: "Create cards that maximize chaos and unpredictability. Make them wild and hilarious within the game mode." 
+        name: "Wild & Chaotic", 
+        instruction: "Create cards that maximize chaos and unpredictability." 
       }
     ];
 
@@ -149,22 +153,27 @@ Example: ["Sandy says: Categories! Types of shots. [Name] starts.", "Thumb Maste
 Game: The Verdict (Intimate & Spicy).
 Persona: Sultry, demanding, and sophisticated. You speak in a sexy, teasing tone.
 
-TASK: Generate adult intimacy prompt cards for couples.
+TASK: Generate exactly 10 cards for couples.
 Variation: ${variation.instruction}
 Chaos Level: ${deck.chaosLevel}/5
 
 Instructions: Each card should include:
-Title (2–3 words, bold/punchy, e.g., **Hands Behind**)
-Description (1–2 sentences, clear intent, kinky or playful)
-Themes: bondage, role-playing, power exchange, toys, anticipation, control, denial, positions.
+Title (2–3 words, bold/punchy, e.g., “Hands Behind,” “Dominatrix”)
+Description (1–2 sentences, clear, sexual intent, kinky or playful, but non-explicit about body acts)
+Themes to include: bondage, role-playing, power exchange, toys, sexual tension, anticipation, control, denial, and positions.
+The tone should be erotic, seductive, and consent-focused.
+Cards should be usable in a choose 3–5 style, where couples pick a few and incorporate them in their play.
+Avoid explicit pornographic detail. Focus on mood, power, and rules.
+Give the output as a numbered list of cards with title and description.
 
 Rules:
 1. Focus on intimate activities: neck kisses, strip-tease, teasing and sex positions.
 2. If context mentions items (ice, blindfolds), use them.
 3. Tone: Sultry Mistress. 
 4. ${context.peopleList ? "Focus on the chemistry between: " + context.peopleList : ""}
+5. Limits: Max 30 words and 160 chars per card.
+6. Format: Valid JSON array of 10 strings.
 ${this.getTechnicalConstraints()}
-
 Context: ${context.summary}
 Example: ["**Whisper Secrets**: Whisper your dirtiest fantasy into [Name]'s ear.", "**Master's Command**: Remove one piece of clothing. Slowly."]`;
   }
@@ -235,7 +244,7 @@ TECHNICAL CONSTRAINTS:
       if (Array.isArray(parsed)) {
         // Flatten if AI returned [[...]]
         const flat = parsed.flat(2);
-        return flat.filter(item => typeof item === 'string').slice(0, 15);
+        return flat.filter(item => typeof item === 'string').slice(0, 10);
       }
 
       // 3. Fallback to line splitting if it's not an array
@@ -247,7 +256,7 @@ TECHNICAL CONSTRAINTS:
         .split("\n")
         .map(line => line.replace(/^\d+\.\s*|^-\s*|^\[\d+\]\s*/, "").replace(/^"|"$/g, "").trim())
         .filter(line => line.length > 5 && !line.includes("JSON") && !line.includes("["))
-        .slice(0, 15);
+        .slice(0, 10);
     }
   }
 }

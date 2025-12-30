@@ -75,8 +75,8 @@ export default function SelectCardsPage() {
   };
 
   const saveFinalDeck = async () => {
-    if (selectedCards.size < 20) {
-      alert("Please select at least 20 cards before saving.");
+    if (selectedCards.size === 0) {
+      alert("Please select at least one card to save your deck.");
       return;
     }
 
@@ -123,7 +123,7 @@ export default function SelectCardsPage() {
         </div>
         <h1 className="text-5xl font-serif font-bold text-brand-brown mb-4 animate-pulse">Sandy&apos;s cooking...</h1>
         <p className="text-xl text-brand-text-muted italic max-w-sm mx-auto">
-          Sandy is crafting three unique decks just for you. This might take a moment...
+          Sandy is crafting two unique variations just for you. This might take a moment...
         </p>
       </div>
     );
@@ -137,32 +137,29 @@ export default function SelectCardsPage() {
         <div className="mb-12">
           <h1 className="text-5xl font-serif font-bold text-brand-brown mb-4">Pick your poison.</h1>
           <p className="text-xl text-brand-text-muted italic font-medium mb-6">
-            Sandy has prepared two variations of your chosen game mode. Select individual cards or entire decks.
+            Sandy has prepared two variations of your chosen game mode. Selected cards will be active, others will stay in your drafts.
           </p>
-          <div className="flex items-center gap-4 bg-white rounded-3xl p-6 shadow-sm">
+          <div className="flex items-center gap-4 bg-white rounded-3xl p-6 shadow-sm border border-brand-tan/10">
             <div className="flex-1">
-              <div className="flex items-center gap-3 mb-2">
-                <div className={cn(
-                  "h-2 flex-1 rounded-full transition-all duration-500",
-                  selectedCards.size >= 20 ? "bg-brand-brown" : "bg-brand-tan/30"
-                )} />
-                <span className="text-sm font-bold text-brand-brown">
-                  {selectedCards.size} / 20 minimum
+              <div className="flex items-center gap-3">
+                <span className="text-2xl font-serif font-black text-brand-brown">
+                  {selectedCards.size}
+                </span>
+                <span className="text-sm font-bold text-brand-text-muted uppercase tracking-widest pt-1">
+                  Cards selected for active deck
                 </span>
               </div>
-              <p className="text-xs text-brand-text-muted uppercase tracking-widest font-bold">
-                {selectedCards.size < 20 
-                  ? `Select ${20 - selectedCards.size} more cards to continue`
-                  : "Ready to save your deck!"}
+              <p className="text-xs text-brand-text-muted italic mt-1 font-medium">
+                The remaining {20 - selectedCards.size} cards will be saved in Sandy&apos;s Drafts for later.
               </p>
             </div>
             <Button
               variant="primary"
               size="lg"
-              disabled={selectedCards.size < 20 || saving}
+              disabled={selectedCards.size === 0 || saving}
               onClick={saveFinalDeck}
             >
-              {saving ? "Saving..." : "Save Final Deck"}
+              {saving ? "Creating Deck..." : "Finalize & Start Playing"}
             </Button>
           </div>
         </div>
