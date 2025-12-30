@@ -31,8 +31,8 @@ export default function DecksPage() {
     if (user) {
       try {
         const [decksData, modesData] = await Promise.all([
-          gameDecksResource.getAll(selectedModeId || undefined),
-          gameModesResource.getAll()
+          gameDecksResource.getAll<any[]>(selectedModeId || undefined),
+          gameModesResource.getAll<any[]>()
         ]);
         setDecks(decksData);
         setModes(modesData);
