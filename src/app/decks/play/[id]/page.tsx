@@ -38,8 +38,15 @@ export default function GamePlayPage() {
 
   if (authLoading || loading) {
     return (
-      <div className="min-h-screen bg-brand-cream flex items-center justify-center">
-        <div className="w-12 h-12 border-4 border-brand-red border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen bg-brand-cream flex flex-col items-center justify-center p-6 text-center">
+        <div className="relative w-24 h-24 mb-8">
+          <div className="absolute inset-0 border-4 border-brand-tan/20 rounded-full" />
+          <div className="absolute inset-0 border-4 border-brand-red rounded-full border-t-transparent animate-spin" />
+          <div className="absolute inset-3 bg-brand-brown/5 rounded-full flex items-center justify-center">
+            <span className="font-script text-3xl text-brand-red">S</span>
+          </div>
+        </div>
+        <h2 className="text-3xl font-serif font-bold text-brand-brown animate-pulse">Sandy is shuffling the secrets...</h2>
       </div>
     );
   }
