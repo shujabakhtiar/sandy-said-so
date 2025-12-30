@@ -12,16 +12,16 @@ export class AICardsGeneratorService {
       where: { id: deckId },
       include: { 
         gameMode: true,
-        gameCards: true // Fetch all, not just drafts
+        gameCards: true 
       },
     });
 
     if (!deck) throw new Error("Deck not found");
 
+    const existingCount = deck.gameCards?.length || 0;
+
     // 2. Check if we already have a complete set of cards (live or drafts)
-    // This prevents generating 20 more every time you revisit the selection page
-    if (deck.gameCards && deck.gameCards.length >= 20) {
-      console.log("Returning existing cards for deck", deckId);
+    if (existingCount >= 20) {
       // Group them into the expected theme structure for the UI
       return [
         { 
@@ -36,7 +36,6 @@ export class AICardsGeneratorService {
     }
 
     // 3. Complete Cleanup: Remove ANY existing cards if we are re-generating
-    // This ensures we never cross the 20-card total limit.
     await prisma.gameCard.deleteMany({
       where: { deckId }
     });
@@ -64,7 +63,7 @@ export class AICardsGeneratorService {
 
         const text = response.text || "";
         const cards = this.parseGeneratedCards(text);
-
+        
         // Save suggested cards as drafts
         await Promise.all(
           cards.map((cardText, cardIndex) =>
@@ -86,6 +85,7 @@ export class AICardsGeneratorService {
       })
     );
 
+    const totalGenerated = deckSuggestions.reduce((acc, curr) => acc + curr.cards.length, 0);
     return deckSuggestions;
   }
 

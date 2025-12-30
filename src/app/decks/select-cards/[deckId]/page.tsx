@@ -1,6 +1,5 @@
 "use client";
-
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { Navbar } from "@/ui/components/layout/Navbar";
 import { Button } from "@/ui/components/ui/Button";
@@ -21,11 +20,18 @@ export default function SelectCardsPage() {
   const [selectedCards, setSelectedCards] = useState<Set<string>>(new Set());
   const [saving, setSaving] = useState(false);
 
+  const hasFetched = useRef(false);
+
   useEffect(() => {
-    fetchSuggestions();
+    if (deckId && !hasFetched.current) {
+      fetchSuggestions();
+    }
   }, [deckId]);
 
   const fetchSuggestions = async () => {
+    if (!deckId || hasFetched.current) return;
+    hasFetched.current = true;
+    
     try {
       setLoading(true);
       const response = await fetch("/api/ai-cards-generator", {
@@ -42,9 +48,11 @@ export default function SelectCardsPage() {
         setSuggestions(data.suggestions);
       } else {
         console.error("Failed to fetch suggestions");
+        hasFetched.current = false; // Allow retry if failed
       }
     } catch (error) {
       console.error("Error fetching suggestions:", error);
+      hasFetched.current = false; // Allow retry if error
     } finally {
       setLoading(false);
     }
