@@ -173,6 +173,7 @@ function BuildDeckContent() {
 
         {step === 3 && (
           <ContextDetailsStep
+            selectedModeId={selectedMode}
             title={title}
             setTitle={setTitle}
             personInput={personInput}

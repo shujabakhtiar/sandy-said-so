@@ -29,6 +29,7 @@ interface ContextDetailsStepProps {
   loading: boolean;
   chaosLevel: number;
   setChaosLevel: (level: number) => void;
+  selectedModeId: number | null;
 }
 
 export const ContextDetailsStep = ({
@@ -52,7 +53,10 @@ export const ContextDetailsStep = ({
   loading,
   chaosLevel,
   setChaosLevel,
+  selectedModeId,
 }: ContextDetailsStepProps) => {
+  const isVerdict = selectedModeId === 3;
+
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex items-start gap-1 mb-12">
@@ -167,120 +171,126 @@ export const ContextDetailsStep = ({
         </div>
 
         {/* Chaos Level */}
-        <div className="bg-white rounded-[40px] p-10 border border-brand-tan/10 shadow-espresso/5 mb-2">
-          <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-brand-text-muted mb-8 ml-1">
-            Chaos Level: How much trouble do you want?
-          </label>
-          
-          <div className="px-2">
-            <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest text-brand-text-muted mb-6">
-              <span>Total Chill</span>
-              <span>Pure Chaos</span>
-            </div>
-            <input 
-              type="range" 
-              min="1" 
-              max="5" 
-              step="1"
-              value={chaosLevel}
-              onChange={(e) => setChaosLevel(parseInt(e.target.value))}
-              className="w-full h-2 bg-brand-tan/20 rounded-lg appearance-none cursor-pointer accent-brand-red mb-6"
-            />
-            <div className="flex justify-between px-1 mb-10">
-              {[1, 2, 3, 4, 5].map((i) => (
-                <div 
-                  key={i} 
-                  className={cn(
-                    "w-2.5 h-2.5 rounded-full transition-all duration-300",
-                    chaosLevel >= i ? "bg-brand-red scale-110" : "bg-brand-tan/20 scale-100"
-                  )} 
-                />
-              ))}
-            </div>
+        {!isVerdict && (
+          <div className="bg-white rounded-[40px] p-10 border border-brand-tan/10 shadow-espresso/5 mb-2">
+            <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-brand-text-muted mb-8 ml-1">
+              Chaos Level: How much trouble do you want?
+            </label>
             
-            <div className="text-center bg-brand-cream/50 py-5 rounded-3xl border border-brand-tan/10">
-              <span className="text-sm font-bold text-brand-brown uppercase tracking-[0.2em]">
-                {chaosLevel === 1 && "Level 1: Just talking"}
-                {chaosLevel === 2 && "Level 2: Mild discomfort"}
-                {chaosLevel === 3 && "Level 3: The standard secret"}
-                {chaosLevel === 4 && "Level 4: High alert"}
-                {chaosLevel === 5 && "Level 5: Sandy's Revenge"}
-              </span>
+            <div className="px-2">
+              <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest text-brand-text-muted mb-6">
+                <span>Total Chill</span>
+                <span>Pure Chaos</span>
+              </div>
+              <input 
+                type="range" 
+                min="1" 
+                max="5" 
+                step="1"
+                value={chaosLevel}
+                onChange={(e) => setChaosLevel(parseInt(e.target.value))}
+                className="w-full h-2 bg-brand-tan/20 rounded-lg appearance-none cursor-pointer accent-brand-red mb-6"
+              />
+              <div className="flex justify-between px-1 mb-10">
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <div 
+                    key={i} 
+                    className={cn(
+                      "w-2.5 h-2.5 rounded-full transition-all duration-300",
+                      chaosLevel >= i ? "bg-brand-red scale-110" : "bg-brand-tan/20 scale-100"
+                    )} 
+                  />
+                ))}
+              </div>
+              
+              <div className="text-center bg-brand-cream/50 py-5 rounded-3xl border border-brand-tan/10">
+                <span className="text-sm font-bold text-brand-brown uppercase tracking-[0.2em]">
+                  {chaosLevel === 1 && "Level 1: Just talking"}
+                  {chaosLevel === 2 && "Level 2: Mild discomfort"}
+                  {chaosLevel === 3 && "Level 3: The standard secret"}
+                  {chaosLevel === 4 && "Level 4: High alert"}
+                  {chaosLevel === 5 && "Level 5: Sandy's Revenge"}
+                </span>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Goal */}
-        <div>
-          <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-brand-text-muted mb-3 ml-1">
-            Tell Sandy how you want to have a good time? (Optional)
-          </label>
-          <textarea
-            rows={2}
-            value={goal}
-            onChange={(e) => setGoal(e.target.value)}
-            className="w-full px-8 py-5 rounded-3xl bg-white border border-brand-tan/30 focus:border-brand-brown focus:ring-0 outline-none text-brand-brown font-medium shadow-sm transition-all resize-none mb-3"
-            placeholder="What's the goal for the night?"
-          />
-          <div className="flex flex-wrap gap-2">
-            {[
-              "Help us get drunk really fast.",
-              "Make us laugh our asses off.",
-              "Keep it chill and conversational.",
-              "Absolute chaos and bad decisions.",
-            ].map((ex) => (
-              <button
-                key={ex}
-                onClick={() => setGoal(ex)}
-                className="text-[10px] font-bold px-3 py-1.5 rounded-full bg-brand-tan/10 text-brand-brown border border-brand-tan/20 hover:bg-brand-tan/20 transition-colors"
-              >
-                {ex}
-              </button>
-            ))}
+        {!isVerdict && (
+          <div>
+            <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-brand-text-muted mb-3 ml-1">
+              Tell Sandy how you want to have a good time? (Optional)
+            </label>
+            <textarea
+              rows={2}
+              value={goal}
+              onChange={(e) => setGoal(e.target.value)}
+              className="w-full px-8 py-5 rounded-3xl bg-white border border-brand-tan/30 focus:border-brand-brown focus:ring-0 outline-none text-brand-brown font-medium shadow-sm transition-all resize-none mb-3"
+              placeholder="What's the goal for the night?"
+            />
+            <div className="flex flex-wrap gap-2">
+              {[
+                "Help us get drunk really fast.",
+                "Make us laugh our asses off.",
+                "Keep it chill and conversational.",
+                "Absolute chaos and bad decisions.",
+              ].map((ex) => (
+                <button
+                  key={ex}
+                  onClick={() => setGoal(ex)}
+                  className="text-[10px] font-bold px-3 py-1.5 rounded-full bg-brand-tan/10 text-brand-brown border border-brand-tan/20 hover:bg-brand-tan/20 transition-colors"
+                >
+                  {ex}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Secrets */}
-        <div>
-          <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-brand-text-muted mb-3 ml-1">
-            Any secrets or running jokes for Sandy? (Optional)
-          </label>
-          <textarea
-            rows={2}
-            value={secrets}
-            onChange={(e) => setSecrets(e.target.value)}
-            className="w-full px-8 py-5 rounded-3xl bg-white border border-brand-tan/30 focus:border-brand-brown focus:ring-0 outline-none text-brand-brown font-medium shadow-sm transition-all resize-none mb-3"
-            placeholder="Sandy won't tell... probably."
-          />
-          <div className="flex flex-wrap gap-2">
-            {[
-              "The incident in Paris 2023.",
-              "David is secretly a cat person.",
-              "Mention the 'accounting' mishap.",
-              "Someone here has a crush on X.",
-            ].map((ex) => (
-              <button
-                key={ex}
-                onClick={() => setSecrets(ex)}
-                className="text-[10px] font-bold px-3 py-1.5 rounded-full bg-brand-red/5 text-brand-red border border-brand-red/10 hover:bg-brand-red/10 transition-colors"
-              >
-                {ex}
-              </button>
-            ))}
+        {!isVerdict && (
+          <div>
+            <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-brand-text-muted mb-3 ml-1">
+              Any secrets or running jokes for Sandy? (Optional)
+            </label>
+            <textarea
+              rows={2}
+              value={secrets}
+              onChange={(e) => setSecrets(e.target.value)}
+              className="w-full px-8 py-5 rounded-3xl bg-white border border-brand-tan/30 focus:border-brand-brown focus:ring-0 outline-none text-brand-brown font-medium shadow-sm transition-all resize-none mb-3"
+              placeholder="Sandy won't tell... probably."
+            />
+            <div className="flex flex-wrap gap-2">
+              {[
+                "The incident in Paris 2023.",
+                "David is secretly a cat person.",
+                "Mention the 'accounting' mishap.",
+                "Someone here has a crush on X.",
+              ].map((ex) => (
+                <button
+                  key={ex}
+                  onClick={() => setSecrets(ex)}
+                  className="text-[10px] font-bold px-3 py-1.5 rounded-full bg-brand-red/5 text-brand-red border border-brand-red/10 hover:bg-brand-red/10 transition-colors"
+                >
+                  {ex}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Extra */}
         <div>
           <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-brand-text-muted mb-3 ml-1">
-            Help Sandy make the game? (Optional)
+            {isVerdict ? "Anything you'd like Sandy to know? (Optional)" : "Help Sandy make the game? (Optional)"}
           </label>
           <textarea
             rows={3}
             value={extra}
             onChange={(e) => setExtra(e.target.value)}
             className="w-full px-8 py-6 rounded-[32px] bg-white border border-brand-tan/30 focus:border-brand-brown focus:ring-0 outline-none text-brand-brown font-medium shadow-sm transition-all resize-none mb-3"
-            placeholder="Occasion, specific rules, or vibes..."
+            placeholder={isVerdict ? "Occasion, specific items you have, or spicy vibes..." : "Occasion, specific rules, or vibes..."}
           />
           <div className="flex flex-wrap gap-2">
             {[
