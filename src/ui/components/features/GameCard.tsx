@@ -1,6 +1,6 @@
 import React from "react";
-import Image from "next/image";
 import { cn } from "@/ui/lib/utils";
+import { formatCardText } from "@/ui/lib/text-utils";
 
 interface GameCardProps {
   card: {
@@ -23,31 +23,6 @@ export const GameCard = ({ card, gameType = "standard", onEdit, onDelete, onProm
   if (gameType === "standard") {
     const isChaos = (card as any).isChaos;
 
-    const renderText = (text: string) => {
-      if (!text) return null;
-      
-      // 1. Handle double newlines for paragraph breaks
-      const paragraphs = text.split(/\n\n/);
-      
-      return paragraphs.map((para, pIdx) => (
-        <React.Fragment key={pIdx}>
-          <span className="block mb-2 last:mb-0">
-            {para.split(/\n/).map((line, lIdx) => (
-              <React.Fragment key={lIdx}>
-                {line.split(/(\*\*.*?\*\*)/g).map((part, i) => {
-                  if (part.startsWith('**') && part.endsWith('**')) {
-                    return <strong key={i} className="font-black text-brand-red decoration-brand-red/10">{part.slice(2, -2)}</strong>;
-                  }
-                  return part;
-                })}
-                {lIdx < para.split(/\n/).length - 1 && <br />}
-              </React.Fragment>
-            ))}
-          </span>
-        </React.Fragment>
-      ));
-    };
-
     return (
       <div 
         className={cn(
@@ -58,7 +33,7 @@ export const GameCard = ({ card, gameType = "standard", onEdit, onDelete, onProm
           card.isDraft && "opacity-90"
         )}
       >
-        {/* ... existing badge code ... */}
+        {/* Draft Suggestion Badge */}
         {showStatusBadge && card.isDraft && (
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-12 pointer-events-none z-0">
             <div className="border-4 border-brand-red/10 px-6 py-2 rounded-xl">
@@ -68,6 +43,7 @@ export const GameCard = ({ card, gameType = "standard", onEdit, onDelete, onProm
             </div>
           </div>
         )}
+        
         {/* Chaos Glow Effect */}
         {isChaos && (
           <div className="absolute inset-0 bg-linear-to-br from-white/10 to-transparent pointer-events-none" />
@@ -116,7 +92,7 @@ export const GameCard = ({ card, gameType = "standard", onEdit, onDelete, onProm
               isChaos ? "text-white" : "text-brand-brown"
             )}
           >
-            {renderText(card.ruleText)}
+            {formatCardText(card.ruleText, isChaos)}
           </div>
         </div>
 

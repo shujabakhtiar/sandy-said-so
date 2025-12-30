@@ -4,6 +4,7 @@ import { useRouter, useParams } from "next/navigation";
 import { Navbar } from "@/ui/components/layout/Navbar";
 import { Button } from "@/ui/components/ui/Button";
 import { cn } from "@/ui/lib/utils";
+import { formatCardText } from "@/ui/lib/text-utils";
 
 type DeckSuggestion = {
   theme: string;
@@ -236,9 +237,9 @@ export default function SelectCardsPage() {
                               </svg>
                             )}
                           </div>
-                          <p className="text-brand-brown font-medium leading-relaxed flex-1">
-                            {card}
-                          </p>
+                          <div className="text-brand-brown font-medium leading-relaxed flex-1">
+                            {formatCardText(card)}
+                          </div>
                         </div>
                       </div>
                     );

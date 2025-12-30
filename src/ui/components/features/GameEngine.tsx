@@ -6,6 +6,7 @@ import { cn } from "@/ui/lib/utils";
 import { Button } from "@/ui/components/ui/Button";
 import { GameCard } from "@/ui/components/features/GameCard";
 import { getRulesForMode } from "@/lib/game-rules";
+import { formatCardText } from "@/ui/lib/text-utils";
 
 interface GameEngineProps {
   deck: {
@@ -268,9 +269,9 @@ export const GameEngine = ({ deck, isExample, onBack }: GameEngineProps) => {
 
             {/* Modal Content */}
             <div className="flex-1 overflow-y-auto p-8 md:p-10">
-              <p className="text-lg text-brand-text-muted font-medium italic mb-10 text-center leading-relaxed">
-                &quot;{rules.description}&quot;
-              </p>
+              <div className="text-lg text-brand-text-muted font-medium italic mb-10 text-center leading-relaxed">
+                {formatCardText(rules.description)}
+              </div>
 
               <div className="space-y-8">
                 {rules.rules.map((rule) => (

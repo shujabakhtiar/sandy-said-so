@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { cn } from "@/ui/lib/utils";
 import { gameDecksResource } from "@/ui/resources/game-decks.resource";
+import { formatCardText } from "@/ui/lib/text-utils";
 import { gameModesResource } from "@/ui/resources/game-modes.resource";
 
 export default function DecksPage() {
