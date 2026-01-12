@@ -7,7 +7,7 @@ export class DeckService {
   static async createDeck(data: {
     title?: string;
     gameModeId: number;
-    userId: number;
+    userId: string;
   }) {
     return await prisma.gameDeck.create({
       data: {

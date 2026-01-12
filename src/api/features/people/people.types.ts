@@ -1,7 +1,7 @@
 export interface CreatePersonDto {
   name: string;
   note?: string;
-  userId: number;
+  userId: string;
 }
 
 export interface UpdatePersonDto {

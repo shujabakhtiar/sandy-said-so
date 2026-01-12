@@ -2,7 +2,7 @@ import { prisma } from "../../../lib/prisma";
 
 export class GameDecksService {
   static async createDeck(data: { 
-    userId: number; 
+    userId: string; 
     gameModeId: number; 
     title?: string;
     notes?: string;
@@ -30,7 +30,7 @@ export class GameDecksService {
     return deck;
   }
 
-  static async listDecks(userId: number, gameModeId?: number) {
+  static async listDecks(userId: string, gameModeId?: number) {
     return await prisma.gameDeck.findMany({
       where: { 
         userId,

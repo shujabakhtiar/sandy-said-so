@@ -12,7 +12,7 @@ export class PeopleService {
     });
   }
 
-  static async listPeople(userId: number) {
+  static async listPeople(userId: string) {
     return await prisma.person.findMany({
       where: { userId },
       include: {
