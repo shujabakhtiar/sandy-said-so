@@ -33,16 +33,48 @@ function LoginContent() {
     }
   };
 
+  const [needsConfirmation, setNeedsConfirmation] = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
+  const [resendSuccess, setResendSuccess] = useState(false);
+
+  // ... (handleGoogleLogin remains unchanged)
+
+  const handleResendConfirmation = async () => {
+    setResendLoading(true);
+    setError("");
+    try {
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email: email,
+      });
+      if (error) throw error;
+      setResendSuccess(true);
+      setError(""); // Clear error on success
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setResendLoading(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setNeedsConfirmation(false);
+    setResendSuccess(false);
     setLoading(true);
     try {
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
-      if (error) throw error;
+      if (error) {
+        if (error.message === "Email not confirmed") {
+            setNeedsConfirmation(true);
+            throw new Error("You haven't confirmed your email yet. Please check your inbox.");
+        }
+        throw error;
+      }
       window.location.href = redirectTo;
     } catch (err: any) {
       setError(err.message);
@@ -66,9 +98,24 @@ function LoginContent() {
                 <p className="text-brand-text-muted font-medium italic">Sandy has been waiting for you.</p>
               </div>
 
-              {error && (
-                <div className="mb-6 p-4 bg-brand-red/10 border border-brand-red/20 rounded-xl text-brand-red text-sm font-bold text-center">
-                  {error}
+              {(error || resendSuccess) && (
+                <div className={`mb-6 p-4 rounded-xl text-sm font-bold text-center border ${resendSuccess ? 'bg-green-100 border-green-200 text-green-700' : 'bg-brand-red/10 border-brand-red/20 text-brand-red'}`}>
+                  {resendSuccess ? "Confirmation email resent! Check your inbox." : error}
+                  
+                  {needsConfirmation && !resendSuccess && (
+                    <div className="mt-3">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="bg-white border-brand-red/30 text-brand-red hover:bg-brand-red/5"
+                        onClick={handleResendConfirmation}
+                        disabled={resendLoading}
+                        type="button"
+                      >
+                        {resendLoading ? "Sending..." : "Resend Confirmation Email"}
+                      </Button>
+                    </div>
+                  )}
                 </div>
               )}
 

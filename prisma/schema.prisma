@@ -26,7 +26,7 @@ model User {
 model Photo {
   id         Int      @id @default(autoincrement())
   userId     String   @map("user_id")
-  user       User     @relation(fields: [userId], references: [id])
+  user       User     @relation(fields: [userId], references: [id], onUpdate: Cascade)
   imageUrl   String   @map("image_url")
   uploadedAt DateTime @default(now()) @map("uploaded_at")
 
@@ -51,7 +51,7 @@ model Face {
 model Person {
   id        Int      @id @default(autoincrement())
   userId    String   @map("user_id")
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onUpdate: Cascade)
   name      String
   note      String?
   createdAt DateTime @default(now()) @map("created_at")
@@ -83,7 +83,7 @@ model GameMode {
 model GameDeck {
   id         Int      @id @default(autoincrement())
   userId     String   @map("user_id")
-  user       User     @relation(fields: [userId], references: [id])
+  user       User     @relation(fields: [userId], references: [id], onUpdate: Cascade)
   gameModeId Int      @map("game_mode_id")
   gameMode   GameMode @relation(fields: [gameModeId], references: [id])
   title      String?

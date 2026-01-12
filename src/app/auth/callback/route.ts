@@ -10,21 +10,39 @@ export async function GET(request: Request) {
 
   if (code) {
     const supabase = await createClient()
+    
+    console.log(`[Auth Callback] Exchanging code for session... Code length: ${code.length}`)
+    
     const { error } = await supabase.auth.exchangeCodeForSession(code)
+    
     if (!error) {
+      console.log("[Auth Callback] Session exchange successful")
       const forwardedHost = request.headers.get('x-forwarded-host') // Hello, Cloudflare/Vercel
       const isLocalEnv = process.env.NODE_ENV === 'development'
-      if (isLocalEnv) {
-        // we can be sure that origin is localhost
-        return NextResponse.redirect(`${origin}${next}`)
-      } else if (forwardedHost) {
-        return NextResponse.redirect(`https://${forwardedHost}${next}`)
-      } else {
-        return NextResponse.redirect(`${origin}${next}`)
-      }
+      
+      const baseUrl = isLocalEnv 
+        ? origin 
+        : forwardedHost 
+          ? `https://${forwardedHost}` 
+          : origin
+
+      return NextResponse.redirect(`${baseUrl}${next}`)
+    } else {
+      console.error("[Auth Callback] Session exchange failed:", error)
+      console.error("[Auth Callback] Error Message:", error.message)
+      
+      // Redirect with error details
+      const errorParams = new URLSearchParams({
+        error: "access_denied",
+        error_code: error.code || "unknown",
+        error_description: error.message
+      })
+      return NextResponse.redirect(`${origin}/auth/auth-code-error?${errorParams.toString()}`)
     }
+  } else {
+    console.warn("[Auth Callback] No code provided in request")
   }
 
   // return the user to an error page with instructions
-  return NextResponse.redirect(`${origin}/auth/auth-code-error`)
+  return NextResponse.redirect(`${origin}/auth/auth-code-error?error=no_code`)
 }
