@@ -4,7 +4,6 @@ import Image from "next/image";
 import { Button } from "@/ui/components/ui/Button";
 import { useAuth } from "@/ui/providers/AuthContext";
 import { useRouter } from "next/navigation";
-import { SocialProofBlock } from "../../../ui/promotional/SocialProofBlock";
 
 export const Hero = () => {
   const { user } = useAuth();
@@ -45,8 +44,6 @@ export const Hero = () => {
               See Examples
             </Button>
           </div>
-
-          {/* <SocialProofBlock /> */}
         </div>
 
         <div className="relative group scroll-mt-32" id="the-deck">
