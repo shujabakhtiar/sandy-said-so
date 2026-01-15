@@ -10,6 +10,7 @@ import { GameCard } from "@/ui/components/features/GameCard";
 import { gameDecksResource } from "@/ui/resources/game-decks.resource";
 import { gameCardsResource } from "@/ui/resources/game-cards.resource";
 import { cn } from "@/ui/lib/utils";
+import { DeckDelete } from "@/ui/components/features/decks/DeckDelete";
 
 export default function DeckViewPage() {
   const { id } = useParams();
@@ -19,8 +20,6 @@ export default function DeckViewPage() {
   const [editingCard, setEditingCard] = useState<any>(null);
   const [newCardText, setNewCardText] = useState("");
   const [deletingCard, setDeletingCard] = useState<any>(null);
-  const [isDeletingDeck, setIsDeletingDeck] = useState(false);
-  const [confirmDeckName, setConfirmDeckName] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [activeTab, setActiveTab] = useState<"live" | "drafts">("live");
   const router = useRouter();
@@ -101,18 +100,7 @@ export default function DeckViewPage() {
     }
   };
 
-  const handleDeleteDeck = async () => {
-    if (confirmDeckName !== deck.title) return;
-    setIsProcessing(true);
-    try {
-      await gameDecksResource.delete(id as string);
-      router.push("/decks");
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setIsProcessing(false);
-    }
-  };
+
 
   if (authLoading || loading) {
     return (
@@ -158,14 +146,7 @@ export default function DeckViewPage() {
           </div>
           
           <div className="grid grid-cols-1 sm:flex sm:flex-wrap gap-3 md:gap-4 w-full sm:w-auto">
-            <Button 
-              variant="outline" 
-              size="lg" 
-              className="w-full sm:w-auto justify-center px-6 border-brand-red/30 text-brand-red hover:bg-brand-red/5"
-              onClick={() => setIsDeletingDeck(true)}
-            >
-              Delete Deck
-            </Button>
+            <DeckDelete deck={deck} />
             <Button 
               variant="primary" 
               size="lg" 
@@ -364,50 +345,7 @@ export default function DeckViewPage() {
         </div>
       )}
 
-      {/* Delete Deck Confirmation */}
-      {isDeletingDeck && (
-        <div className="fixed inset-0 z-100 flex items-center justify-center p-6">
-          <div className="absolute inset-0 bg-brand-brown/40 backdrop-blur-sm" onClick={() => setIsDeletingDeck(false)} />
-          <div className="bg-white rounded-[40px] p-10 max-w-md w-full relative shadow-espresso animate-in zoom-in-95 duration-300">
-            <div className="text-center mb-8">
-              <div className="w-20 h-20 bg-brand-red/10 rounded-full flex items-center justify-center mx-auto mb-6 text-brand-red font-serif text-4xl italic">S</div>
-              <h2 className="text-3xl font-serif font-bold text-brand-brown mb-2">Destroy this deck?</h2>
-              <p className="text-sm text-brand-text-muted italic px-4">
-                This action cannot be undone. All cards and rules will be permanently erased from Sandy&apos;s memory.
-              </p>
-            </div>
 
-            <div className="mb-8">
-              <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-brand-text-muted mb-4 text-center">
-                Type <span className="text-brand-brown font-black select-none">&quot;{deck.title}&quot;</span> to confirm
-              </label>
-              <input
-                type="text"
-                autoFocus
-                value={confirmDeckName}
-                onChange={(e) => setConfirmDeckName(e.target.value)}
-                className="w-full px-6 py-4 rounded-2xl bg-brand-cream/50 border border-brand-tan/30 focus:border-brand-brown focus:ring-0 outline-none text-brand-brown font-medium transition-all text-center"
-                placeholder="Type deck name..."
-              />
-            </div>
-
-            <div className="flex gap-4">
-              <Button variant="outline" size="lg" className="flex-1" onClick={() => setIsDeletingDeck(false)}>
-                Cancel
-              </Button>
-              <Button 
-                variant="primary" 
-                size="lg" 
-                className="flex-1 bg-brand-red border-brand-red hover:bg-brand-red/90" 
-                onClick={handleDeleteDeck}
-                disabled={confirmDeckName !== deck.title || isProcessing}
-              >
-                {isProcessing ? "Destroying..." : "Destroy Deck"}
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Decorative Branding */}
       <div className="fixed bottom-10 left-10 pointer-events-none opacity-10 select-none -rotate-12">
