@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/ui/providers/AuthContext";
 import { Navbar } from "@/ui/components/layout/Navbar";
 import { Button } from "@/ui/components/ui/Button";
-import { DeckCover } from "@/ui/components/ui/DeckCover";
+import { DeckCover } from "@/ui/components/features/decks/DeckCover";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { cn } from "@/ui/lib/utils";
