@@ -1,9 +1,9 @@
 import { Navbar } from "@/ui/components/layout/Navbar";
 import { Footer } from "@/ui/components/layout/Footer";
-import { Hero } from "@/ui/components/features/Hero";
-import { FeaturesGrid } from "@/ui/components/features/FeaturesGrid";
-import { GameModes } from "@/ui/components/features/GameModes";
-import { CTA } from "@/ui/components/features/CTA";
+import { Hero } from "@/ui/components/features/sections/home/Hero";
+import { FeaturesGrid } from "@/ui/components/features/sections/home/FeaturesGrid";
+import { GameModes } from "@/ui/components/features/sections/home/GameModes";
+import { CTA } from "@/ui/components/features/sections/home/CTA";
 
 export default function Home() {
   return (

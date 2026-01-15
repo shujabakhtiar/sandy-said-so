@@ -4,6 +4,7 @@ import Image from "next/image";
 import { Button } from "@/ui/components/ui/Button";
 import { useAuth } from "@/ui/providers/AuthContext";
 import { useRouter } from "next/navigation";
+import { SocialProofBlock } from "../../../ui/promotional/SocialProofBlock";
 
 export const Hero = () => {
   const { user } = useAuth();
@@ -45,24 +46,7 @@ export const Hero = () => {
             </Button>
           </div>
 
-          <div className="mt-16 flex items-center justify-center lg:justify-start gap-4">
-            <div className="flex -space-x-4">
-              {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="w-12 h-12 rounded-full border-4 border-white bg-brand-tan flex items-center justify-center overflow-hidden">
-                  <Image 
-                    src={`https://i.pravatar.cc/150?u=${i+10}`} 
-                    alt="user" 
-                    width={48} 
-                    height={48} 
-                  />
-                </div>
-              ))}
-            </div>
-            <div className="text-left">
-              <div className="font-bold text-brand-brown text-sm">Join 15,000+ culprits</div>
-              <div className="text-brand-text-muted text-xs font-semibold uppercase italic tracking-tighter">Doing what they&apos;re told since &apos;24</div>
-            </div>
-          </div>
+          {/* <SocialProofBlock /> */}
         </div>
 
         <div className="relative group scroll-mt-32" id="the-deck">
@@ -78,9 +62,6 @@ export const Hero = () => {
               <div className="font-script text-2xl text-brand-red mb-1">Sandy sees everything.</div>
               <div className="font-serif text-lg text-brand-brown uppercase font-bold tracking-widest">THE DECK OF DARES.</div>
             </div>
-          </div>
-          <div className="absolute -top-10 -right-10 w-28 h-28 bg-brand-red rounded-full flex items-center justify-center text-white text-[10px] font-bold uppercase tracking-widest text-center leading-tight rotate-12 shadow-xl animate-pulse">
-            Worldwide <br /> Shipping <br /> Available
           </div>
         </div>
       </div>
