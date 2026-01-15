@@ -5,7 +5,6 @@ import { useAuth } from "@/ui/providers/AuthContext";
 import { Navbar } from "@/ui/components/layout/Navbar";
 import { Button } from "@/ui/components/ui/Button";
 import { useParams, useRouter } from "next/navigation";
-import { GameCard } from "@/ui/components/features/GameCard";
 import { gameDecksResource } from "@/ui/resources/game-decks.resource";
 import { gameCardsResource } from "@/ui/resources/game-cards.resource";
 import { cn } from "@/ui/lib/utils";
@@ -18,6 +17,7 @@ export default function DeckViewPage() {
   const [deck, setDeck] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"live" | "drafts">("live");
+  const [page, setPage] = useState(1);
   const router = useRouter();
 
   useEffect(() => {
@@ -26,11 +26,15 @@ export default function DeckViewPage() {
     }
   }, [user, authLoading, router]);
 
-  const fetchDeck = async () => {
+  const fetchDeck = async (targetPage = page, targetTab = activeTab) => {
     if (user && id) {
       setLoading(true);
       try {
-        const data = await gameDecksResource.getById(id as string);
+        const data = await gameDecksResource.getById(id as string, {
+          page: targetPage,
+          limit: 50,
+          isDraft: targetTab === "drafts"
+        });
         setDeck(data);
       } catch (err) {
         console.error(err);
@@ -41,18 +45,22 @@ export default function DeckViewPage() {
   };
 
   useEffect(() => {
-    fetchDeck();
-  }, [user, id]);
+    if (user && id) {
+      fetchDeck(1, activeTab);
+      setPage(1);
+    }
+  }, [user, id, activeTab]);
+
+  useEffect(() => {
+    if (user && id && page > 1) {
+      fetchDeck(page, activeTab);
+    }
+  }, [page, user, id]);
 
   const handlePromoteCard = async (card: any) => {
     try {
       await gameCardsResource.update(card.id, { isDraft: false });
-      setDeck({
-        ...deck,
-        gameCards: deck.gameCards.map((c: any) => 
-          c.id === card.id ? { ...c, isDraft: false } : c
-        )
-      });
+      await fetchDeck(); // Refetch to sync counts and pagination
     } catch (err) {
       console.error(err);
     }
@@ -128,7 +136,7 @@ export default function DeckViewPage() {
             >
               Active Cards
               <span className="ml-2 px-1.5 py-0.5 rounded-md bg-brand-brown/5 text-[10px]">
-                {deck.gameCards?.filter((c: any) => !c.isDraft).length || 0}
+                {deck.gameCards?.meta?.counts?.live || 0}
               </span>
               {activeTab === "live" && (
                 <div className="absolute bottom-0 left-0 right-0 h-1 bg-brand-brown rounded-full" />
@@ -143,7 +151,7 @@ export default function DeckViewPage() {
             >
               Sandy&apos;s Drafts
               <span className="ml-2 px-1.5 py-0.5 rounded-md bg-brand-red/5 text-brand-red text-[10px]">
-                {deck.gameCards?.filter((c: any) => c.isDraft).length || 0}
+                {deck.gameCards?.meta?.counts?.drafts || 0}
               </span>
               {activeTab === "drafts" && (
                 <div className="absolute bottom-0 left-0 right-0 h-1 bg-brand-red rounded-full" />
@@ -161,8 +169,7 @@ export default function DeckViewPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
           {[
-            ...(deck.gameCards || [])
-              .filter((c: any) => activeTab === "live" ? !c.isDraft : c.isDraft)
+            ...(deck.gameCards?.data || [])
               .map((c: any) => ({ ...c, isChaos: false })),
             ...(activeTab === "live" ? (deck.sandyChaosCards || []).map((c: any) => ({ ...c, isChaos: true })) : [])
           ].map((card: any, idx: number) => (
@@ -171,36 +178,53 @@ export default function DeckViewPage() {
               card={card}
               activeTab={activeTab}
               onUpdate={(updatedCard) => {
-                setDeck({
-                  ...deck,
-                  gameCards: deck.gameCards.map((c: any) => 
-                    c.id === updatedCard.id ? updatedCard : c
-                  )
-                });
+                fetchDeck(); // Refetch to stay in sync
               }}
               onDelete={(cardId) => {
-                setDeck({
-                  ...deck,
-                  gameCards: deck.gameCards.filter((c: any) => c.id !== cardId)
-                });
+                fetchDeck(); // Refetch to stay in sync
               }}
               onPromote={activeTab === "drafts" && !card.isChaos ? handlePromoteCard : undefined}
               showStatusBadge={activeTab === "drafts"}
             />
           ))}
           
-          {activeTab === "live" && (deck.gameCards?.filter((c: any) => !c.isDraft).length || 0) === 0 && (
+          {activeTab === "live" && (deck.gameCards?.meta?.counts?.live || 0) === 0 && (
             <div className="col-span-full py-20 text-center bg-white/50 rounded-[40px] border-2 border-dashed border-brand-tan/30">
               <p className="text-brand-text-muted italic text-lg">No active cards. Pull some from drafts or let Sandy generate more.</p>
             </div>
           )}
         </div>
+
+        {deck.gameCards?.meta?.totalPages > 1 && (
+          <div className="mt-12 flex justify-center items-center gap-6">
+            <button
+              disabled={page <= 1}
+              onClick={() => setPage(p => p - 1)}
+              className="w-12 h-12 rounded-full bg-white border-2 border-brand-tan/20 text-brand-brown flex items-center justify-center disabled:opacity-30 hover:bg-brand-brown hover:text-white transition-all duration-300 shadow-sm"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M15 18l-6-6 6-6"/>
+              </svg>
+            </button>
+            <div className="flex items-center gap-2">
+              <span className="font-serif font-bold text-brand-brown text-lg">Page</span>
+              <div className="w-10 h-10 rounded-xl bg-brand-brown text-white flex items-center justify-center font-bold shadow-espresso">
+                {page}
+              </div>
+              <span className="font-serif font-bold text-brand-brown text-lg">of {deck.gameCards.meta.totalPages}</span>
+            </div>
+            <button
+              disabled={page >= deck.gameCards.meta.totalPages}
+              onClick={() => setPage(p => p + 1)}
+              className="w-12 h-12 rounded-full bg-white border-2 border-brand-tan/20 text-brand-brown flex items-center justify-center disabled:opacity-30 hover:bg-brand-brown hover:text-white transition-all duration-300 shadow-sm"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M9 18l6-6-6-6"/>
+              </svg>
+            </button>
+          </div>
+        )}
       </main>
-
-
-
-
-
       {/* Decorative Branding */}
       <div className="fixed bottom-10 left-10 pointer-events-none opacity-10 select-none -rotate-12">
         <div className="font-script text-8xl text-brand-brown">No secrets safe.</div>

@@ -6,7 +6,13 @@ export async function GET(req: NextRequest, context: { params: Promise<{ id: str
   try {
     await requireAuth();
     const params = await context.params;
-    const deck = await GameDecksService.getDeckWithCards(Number(params.id));
+    const { searchParams } = new URL(req.url);
+    const page = Number(searchParams.get("page")) || 1;
+    const limit = Number(searchParams.get("limit")) || 50;
+    const isDraftStr = searchParams.get("isDraft");
+    const isDraft = isDraftStr === "true" ? true : isDraftStr === "false" ? false : undefined;
+
+    const deck = await GameDecksService.getDeckWithCards(Number(params.id), page, limit, isDraft);
     
     if (!deck) {
       return NextResponse.json({ error: "Deck not found" }, { status: 404 });

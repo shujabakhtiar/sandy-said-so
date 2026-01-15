@@ -24,7 +24,7 @@ export default function GamePlayPage() {
     const fetchDeck = async () => {
       if (user && id) {
         try {
-          const data = await gameDecksResource.getById(id as string);
+          const data = await gameDecksResource.getById(id as string, { limit: 1000, isDraft: false });
           setDeck(data);
         } catch (err) {
           console.error(err);
@@ -60,7 +60,7 @@ export default function GamePlayPage() {
       <GameEngine 
         deck={{
           ...deck,
-          gameCards: deck.gameCards?.filter((c: any) => !c.isDraft) || []
+          gameCards: deck.gameCards?.data || []
         }} 
       />
 

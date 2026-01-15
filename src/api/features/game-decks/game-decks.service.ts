@@ -73,29 +73,56 @@ export class GameDecksService {
     });
   }
 
-  static async getDeckWithCards(id: number) {
+  static async getDeckWithCards(id: number, page: number = 1, limit: number = 50, isDraft?: boolean) {
+    const skip = (page - 1) * limit;
+
     const deck = await prisma.gameDeck.findUnique({
       where: { id },
       include: {
         gameMode: true,
-        gameCards: {
-          include: {
-            photo: true
-          }
-        },
       },
     });
 
-    if (deck) {
-      const { SandyChaosService } = await import("../sandy-chaos/sandy-chaos.service");
-      const chaosCards = await SandyChaosService.getDeckChaosCards(deck.id);
-      return {
-        ...deck,
-        sandyChaosCards: chaosCards
-      };
-    }
+    if (!deck) return null;
 
-    return null;
+    const cardWhere = { 
+      deckId: id,
+      ...(isDraft !== undefined ? { isDraft } : {})
+    };
+
+    const [cards, totalFiltered, totalLive, totalDrafts] = await prisma.$transaction([
+      prisma.gameCard.findMany({
+        where: cardWhere,
+        include: { photo: true },
+        orderBy: { orderIndex: 'asc' },
+        skip,
+        take: limit,
+      }),
+      prisma.gameCard.count({ where: cardWhere }),
+      prisma.gameCard.count({ where: { deckId: id, isDraft: false } }),
+      prisma.gameCard.count({ where: { deckId: id, isDraft: true } })
+    ]);
+
+    const { SandyChaosService } = await import("../sandy-chaos/sandy-chaos.service");
+    const chaosCards = await SandyChaosService.getDeckChaosCards(deck.id);
+
+    return {
+      ...deck,
+      gameCards: {
+        data: cards,
+        meta: {
+          total: totalFiltered,
+          page,
+          limit,
+          totalPages: Math.ceil(totalFiltered / limit),
+          counts: {
+            live: totalLive,
+            drafts: totalDrafts
+          }
+        }
+      },
+      sandyChaosCards: chaosCards
+    };
   }
   static async updateDeck(id: number, data: { title?: string }) {
     return await prisma.gameDeck.update({
