@@ -7,23 +7,18 @@ export const ToastProvider = () => {
     <Toaster
       position="top-right"
       toastOptions={{
-        style: {
-          background: "#FFFBF5", // brand-cream
-          border: "1px solid rgba(139, 69, 19, 0.1)", // brand-brown/10
-          color: "#5C3D2E", // brand-brown
-          fontFamily: "var(--font-serif)",
-          borderRadius: "16px",
-          boxShadow: "0 10px 30px -10px rgba(92, 61, 46, 0.1)", // shadow-espresso
-        },
-        className: "group",
-        descriptionClassName: "text-brand-text-muted text-xs",
-        actionButtonStyle: {
-          background: "#8B4513", // brand-brown
-          color: "white",
-        },
-        cancelButtonStyle: {
-          background: "#F5F5F0", // brand-tan/10
-          color: "#5C3D2E",
+        unstyled: true,
+        classNames: {
+          toast: "group w-full rounded-2xl p-4 shadow-lg border flex items-start gap-3 font-sans",
+          title: "font-serif font-bold text-base",
+          description: "text-sm mt-1 opacity-80",
+          success: "bg-gradient-to-br from-green-50 to-emerald-50 border-green-200 text-green-900",
+          error: "bg-gradient-to-br from-red-50 to-rose-50 border-red-200 text-red-900",
+          info: "bg-gradient-to-br from-blue-50 to-sky-50 border-blue-200 text-blue-900",
+          warning: "bg-gradient-to-br from-amber-50 to-yellow-50 border-amber-200 text-amber-900",
+          default: "bg-gradient-to-br from-brand-cream to-brand-tan/20 border-brand-tan/30 text-brand-brown",
+          actionButton: "!bg-brand-brown !text-white !px-4 !py-2 !rounded-lg !font-bold !text-sm hover:!bg-brand-text transition-colors",
+          cancelButton: "!bg-brand-tan/20 !text-brand-brown !px-4 !py-2 !rounded-lg !font-medium !text-sm hover:!bg-brand-tan/30 transition-colors",
         },
       }}
     />

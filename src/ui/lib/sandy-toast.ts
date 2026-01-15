@@ -25,6 +25,7 @@ export const sandyToast = {
     toast.success(randomTitle, {
       description: message,
       duration: 4000,
+      position: "top-right",
     });
   },
 
@@ -33,12 +34,14 @@ export const sandyToast = {
     toast.error(randomTitle, {
       description: message,
       duration: 5000,
+      position: "top-center",
     });
   },
 
   info: (message: string) => {
     toast.message("Sandy noticed something.", {
       description: message,
+      position: "top-right",
     });
   },
 };
