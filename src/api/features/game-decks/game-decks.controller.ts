@@ -41,8 +41,16 @@ export class GameDecksController {
       const { searchParams } = new URL(req.url);
       const gameModeId = searchParams.get("gameModeId");
       
-      const decks = await GameDecksService.listDecks(userId, gameModeId ? Number(gameModeId) : undefined);
-      return NextResponse.json(decks);
+      const page = Number(searchParams.get("page")) || 1;
+      const limit = Number(searchParams.get("limit")) || 10;
+      
+      const result = await GameDecksService.listDecks(
+        userId, 
+        gameModeId ? Number(gameModeId) : undefined,
+        page,
+        limit
+      );
+      return NextResponse.json(result);
     } catch (error: any) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }

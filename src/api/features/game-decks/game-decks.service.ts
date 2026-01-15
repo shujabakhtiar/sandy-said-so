@@ -30,20 +30,40 @@ export class GameDecksService {
     return deck;
   }
 
-  static async listDecks(userId: string, gameModeId?: number) {
-    return await prisma.gameDeck.findMany({
-      where: { 
-        userId,
-        ...(gameModeId ? { gameModeId } : {})
-      },
-      include: {
-        gameMode: true,
-        gameCards: true,
-        _count: {
-          select: { gameCards: true }
-        }
-      },
-    });
+  static async listDecks(userId: string, gameModeId?: number, page: number = 1, limit: number = 10) {
+    const skip = (page - 1) * limit;
+
+    const where = {
+      userId,
+      ...(gameModeId ? { gameModeId } : {})
+    };
+
+    const [total, data] = await prisma.$transaction([
+      prisma.gameDeck.count({ where }),
+      prisma.gameDeck.findMany({
+        where,
+        include: {
+          gameMode: true,
+          gameCards: true,
+          _count: {
+            select: { gameCards: true }
+          }
+        },
+        skip,
+        take: limit,
+        orderBy: { id: 'desc' } // Safe fallback
+      })
+    ]);
+
+    return {
+      data,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit)
+      }
+    };
   }
 
   static async markDeckAsSaved(id: number) {

@@ -34,6 +34,7 @@ export const metadata: Metadata = {
 };
 
 import { AuthProvider } from "@/ui/providers/AuthContext";
+import { ToastProvider } from "@/ui/providers/ToastProvider";
 
 export default function RootLayout({
   children,
@@ -46,6 +47,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${serifFont.variable} ${sansFont.variable} ${scriptFont.variable} antialiased`}
       >
         <AuthProvider>
+          <ToastProvider />
           {children}
         </AuthProvider>
       </body>

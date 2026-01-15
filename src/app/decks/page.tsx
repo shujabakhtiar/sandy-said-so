@@ -11,46 +11,51 @@ import { cn } from "@/ui/lib/utils";
 import { gameDecksResource } from "@/ui/resources/game-decks.resource";
 import { formatCardText } from "@/ui/lib/text-utils";
 import { gameModesResource } from "@/ui/resources/game-modes.resource";
+import { useApi } from "@/ui/hooks/use-api";
+import { PaginatedResponse } from "@/api/types";
 
 export default function DecksPage() {
-  const { user, loading } = useAuth();
-  const [decks, setDecks] = useState<any[]>([]);
-  const [modes, setModes] = useState<any[]>([]);
+  const { user, loading: authLoading } = useAuth();
   const [selectedModeId, setSelectedModeId] = useState<number | null>(null);
-
-  const [isInitialLoading, setIsInitialLoading] = useState(true);
   const router = useRouter();
 
+  const {
+    data: decksResponse,
+    loading: decksLoading,
+    execute: fetchDecks
+  } = useApi<PaginatedResponse<any>>(gameDecksResource.getAll);
+
+  const {
+    data: modesData,
+    loading: modesLoading,
+    execute: fetchModes
+  } = useApi<any[]>(gameModesResource.getAll);
+
   useEffect(() => {
-    if (!loading && !user) {
+    if (!authLoading && !user) {
       router.push("/login");
     }
-  }, [user, loading, router]);
-
-  const fetchData = async () => {
-    if (user) {
-      try {
-        const [decksData, modesData] = await Promise.all([
-          gameDecksResource.getAll<any[]>(selectedModeId || undefined),
-          gameModesResource.getAll<any[]>()
-        ]);
-        setDecks(decksData);
-        setModes(modesData);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setIsInitialLoading(false);
-      }
-    }
-  };
+  }, [user, authLoading, router]);
 
   useEffect(() => {
-    fetchData();
+    if (user) {
+      fetchModes();
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (user) {
+      fetchDecks(selectedModeId || undefined);
+    }
   }, [user, selectedModeId]);
 
+  const decks = decksResponse?.data || [];
+  const modes = modesData || [];
+  const isLoading = authLoading || (decksLoading && !decks.length) || (modesLoading && !modes.length);
 
 
-  if (loading || isInitialLoading) {
+
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-brand-cream flex flex-col items-center justify-center p-6 text-center">
         <div className="relative w-24 h-24 mb-8">
@@ -153,7 +158,7 @@ export default function DecksPage() {
                   key={deck.id}
                   deck={deck}
                   onClick={() => router.push(`/decks/${deck.id}`)}
-                  onUpdate={fetchData}
+                  onUpdate={() => fetchDecks(selectedModeId || undefined)}
                 />
               );
             })}
