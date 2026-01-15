@@ -1,14 +1,15 @@
 "use client";
 
 import { cn } from "@/ui/lib/utils";
+import { DeckEditTitle } from "@/ui/components/features/decks/DeckEditTitle";
 
 interface DeckCoverProps {
   deck: any;
   onClick: () => void;
-  onRename: (deck: any) => void;
+  onUpdate?: () => void;
 }
 
-export const DeckCover = ({ deck, onClick, onRename }: DeckCoverProps) => {
+export const DeckCover = ({ deck, onClick, onUpdate }: DeckCoverProps) => {
   const isChaos = deck.gameMode?.name?.toLowerCase().includes("chaos");
 
   return (
@@ -64,17 +65,9 @@ export const DeckCover = ({ deck, onClick, onRename }: DeckCoverProps) => {
         </div>
 
         {/* Rename Anchor Tool */}
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onRename(deck);
-          }}
-          className="absolute top-4 right-4 z-20 w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-300"
-        >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
-          </svg>
-        </button>
+        <div className="absolute top-4 right-4 z-20">
+             <DeckEditTitle deck={deck} onUpdate={onUpdate} />
+        </div>
       </div>
     </div>
   );

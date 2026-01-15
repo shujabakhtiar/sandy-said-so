@@ -17,9 +17,7 @@ export default function DecksPage() {
   const [decks, setDecks] = useState<any[]>([]);
   const [modes, setModes] = useState<any[]>([]);
   const [selectedModeId, setSelectedModeId] = useState<number | null>(null);
-  const [editingDeck, setEditingDeck] = useState<any>(null);
-  const [newTitle, setNewTitle] = useState("");
-  const [isUpdating, setIsUpdating] = useState(false);
+
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const router = useRouter();
 
@@ -50,19 +48,7 @@ export default function DecksPage() {
     fetchData();
   }, [user, selectedModeId]);
 
-  const handleUpdateTitle = async () => {
-    if (!editingDeck) return;
-    setIsUpdating(true);
-    try {
-      await gameDecksResource.update(editingDeck.id, { title: newTitle });
-      setDecks(decks.map(d => d.id === editingDeck.id ? { ...d, title: newTitle } : d));
-      setEditingDeck(null);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setIsUpdating(false);
-    }
-  };
+
 
   if (loading || isInitialLoading) {
     return (
@@ -167,10 +153,7 @@ export default function DecksPage() {
                   key={deck.id}
                   deck={deck}
                   onClick={() => router.push(`/decks/${deck.id}`)}
-                  onRename={(d) => {
-                    setEditingDeck(d);
-                    setNewTitle(d.title || "");
-                  }}
+                  onUpdate={fetchData}
                 />
               );
             })}
@@ -178,56 +161,7 @@ export default function DecksPage() {
         )}
       </main>
 
-      {/* Edit Title Modal */}
-      {editingDeck && (
-        <div className="fixed inset-0 z-100 flex items-center justify-center p-6">
-          <div className="absolute inset-0 bg-brand-brown/40 backdrop-blur-sm" onClick={() => setEditingDeck(null)} />
-          <div className="bg-white rounded-[40px] p-10 max-w-md w-full relative shadow-espresso animate-in zoom-in-95 duration-300">
-            <div className="text-center mb-8">
-              <h2 className="text-3xl font-serif font-bold text-brand-brown mb-2">Change the secret.</h2>
-              <p className="text-sm text-brand-text-muted italic">Sandy is listening...</p>
-            </div>
-            
-            <div className="mb-8">
-              <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-brand-text-muted mb-3 ml-1">
-                Deck Title
-              </label>
-              <input
-                type="text"
-                autoFocus
-                value={newTitle}
-                onChange={(e) => setNewTitle(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") handleUpdateTitle();
-                  if (e.key === "Escape") setEditingDeck(null);
-                }}
-                className="w-full px-6 py-4 rounded-2xl bg-brand-cream/50 border border-brand-tan/30 focus:border-brand-brown focus:ring-0 outline-none text-brand-brown font-medium transition-all"
-                placeholder="New deck..."
-              />
-            </div>
 
-            <div className="flex gap-4">
-              <Button 
-                variant="outline" 
-                size="lg" 
-                className="flex-1"
-                onClick={() => setEditingDeck(null)}
-              >
-                Cancel
-              </Button>
-              <Button 
-                variant="primary" 
-                size="lg" 
-                className="flex-1 shadow-md"
-                disabled={isUpdating}
-                onClick={handleUpdateTitle}
-              >
-                {isUpdating ? "Saving..." : "Save Title"}
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Decorative Overlays */}
       <div className="absolute top-[20%] right-0 w-[500px] h-[500px] bg-brand-red/5 rounded-full blur-[120px] pointer-events-none -z-10" />
