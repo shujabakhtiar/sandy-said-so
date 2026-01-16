@@ -19,10 +19,10 @@ export const DeckCardEdit = ({ card, onUpdate, onClose }: DeckCardEditProps) => 
     try {
       await gameCardsResource.update(card.id, { ruleText: newCardText });
       onUpdate({ ...card, ruleText: newCardText });
-      sandyToast.success("Card updated successfully!");
+      sandyToast.success("Fixed your card, darling.");
       onClose();
     } catch (err: any) {
-      const errorMessage = err.message || "Failed to update card";
+      const errorMessage = err.message || "Sorry honey, something went wrong.";
       sandyToast.error(errorMessage);
     } finally {
       setIsProcessing(false);

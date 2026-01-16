@@ -11,6 +11,7 @@ import { cn } from "@/ui/lib/utils";
 import { DeckDelete } from "@/ui/components/features/decks/DeckDelete";
 import { DeckCard } from "@/ui/components/features/deck-cards/DeckCard";
 import { LoadingModeShuffle } from "@/ui/components/ui/LoadingModeShuffle";
+import { sandyToast } from "@/ui/lib/sandy-toast";
 
 export default function DeckViewPage() {
   const { id } = useParams();
@@ -65,8 +66,10 @@ export default function DeckViewPage() {
   const handlePromoteCard = async (card: any) => {
     try {
       await gameCardsResource.update(card.id, { isDraft: false });
+      sandyToast.success("Sandy brought this card to life. Prepare yourself.");
       await fetchDeck(); // Refetch to sync counts and pagination
     } catch (err) {
+      sandyToast.error("Sandy decided this card should stay in the notebook for now.");
       console.error(err);
     }
   };

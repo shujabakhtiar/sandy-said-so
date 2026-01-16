@@ -5,6 +5,7 @@ import { Navbar } from "@/ui/components/layout/Navbar";
 import { Button } from "@/ui/components/ui/Button";
 import { cn } from "@/ui/lib/utils";
 import { formatCardText } from "@/ui/lib/text-utils";
+import { sandyToast } from "@/ui/lib/sandy-toast";
 
 type DeckSuggestion = {
   theme: string;
@@ -49,10 +50,12 @@ export default function SelectCardsPage() {
         setSuggestions(data.suggestions);
       } else {
         console.error("Failed to fetch suggestions");
+        sandyToast.error("Sandy's recipes failed to load. Something is wrong in the kitchen.");
         hasFetched.current = false; // Allow retry if failed
       }
     } catch (error) {
       console.error("Error fetching suggestions:", error);
+      sandyToast.error("Sandy is having a headache. Try again later.");
       hasFetched.current = false; // Allow retry if error
     } finally {
       setLoading(false);
@@ -85,7 +88,7 @@ export default function SelectCardsPage() {
 
   const saveFinalDeck = async () => {
     if (selectedCards.size === 0) {
-      alert("Please select at least one card to save your deck.");
+      sandyToast.info("Sandy needs at least one card to start the fire. Pick one.");
       return;
     }
 
@@ -107,14 +110,15 @@ export default function SelectCardsPage() {
 
       if (response.ok) {
         // Redirect to the deck page
+        sandyToast.success("Sandy has sealed the deck. Let the games begin.");
         router.push(`/decks/${deckId}`);
       } else {
         console.error("Failed to save cards");
-        alert("Failed to save cards. Please try again.");
+        sandyToast.error("Sandy's notebook is full or broken. Try saving again.");
       }
     } catch (error) {
       console.error("Error saving cards:", error);
-      alert("An error occurred. Please try again.");
+      sandyToast.error("Sandy lost her pen. Something went wrong.");
     } finally {
       setSaving(false);
     }

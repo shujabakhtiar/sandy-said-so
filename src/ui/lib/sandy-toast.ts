@@ -1,22 +1,22 @@
 import { toast } from "sonner";
 
 const sandyErrors = [
+  "Sandy didn't like that.",
   "Sandy says no.",
-  "Sandy rolled her eyes.",
-  "Not cool, darling.",
-  "Try again, sweetie.",
-  "Sandy is unimpressed.",
-  "Chaos rejected this.",
-  "Sandy yawns.",
+  "Sandy rolled her eyes. Try again.",
+  "Not cool, darling. Something broke.",
+  "Sandy is unimpressed with this error.",
+  "Chaos rejected this. Try later.",
+  "Sandy yawns... fix it yourself.",
 ];
 
 const sandySuccesses = [
-  "Sandy approves.",
-  "Cheers, darling!",
-  "You're on fire.",
-  "Sandy winks.",
-  "Pure chaos. Perfect.",
-  "A toast to you!",
+  "Sandy approves of this change.",
+  "Cheers, darling! It's done.",
+  "Pure chaos. Sandy winks.",
+  "Sandy shuffled the secrets.",
+  "A toast to your success!",
+  "Sandy has recorded your move.",
 ];
 
 export const sandyToast = {

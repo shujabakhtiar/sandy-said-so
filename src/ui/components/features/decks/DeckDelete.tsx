@@ -24,12 +24,11 @@ export const DeckDelete = ({ deck, trigger }: DeckDeleteProps) => {
     setIsProcessing(true);
     try {
       await gameDecksResource.delete(deck.id);
-      sandyToast.success(`"${deck.title}" has been destroyed.`);
+      sandyToast.success(`Sandy has erased "${deck.title}" from her memory. It's like it never existed.`);
       setOpen(false);
       router.push("/decks");
     } catch (err: any) {
-      const errorMessage = err.message || "Failed to delete deck";
-      sandyToast.error(errorMessage);
+      sandyToast.error("Sandy is clinging to this deck. She's not ready to let go of these secrets yet.");
     } finally {
       setIsProcessing(false);
     }
