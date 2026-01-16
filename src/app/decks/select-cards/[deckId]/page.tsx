@@ -49,13 +49,11 @@ export default function SelectCardsPage() {
         const data = await response.json();
         setSuggestions(data.suggestions);
       } else {
-        console.error("Failed to fetch suggestions");
-        sandyToast.error("Sandy's recipes failed to load. Something is wrong in the kitchen.");
+        sandyToast.error("Failed to fetch suggestions from Sandy's kitchen.");
         hasFetched.current = false; // Allow retry if failed
       }
     } catch (error) {
-      console.error("Error fetching suggestions:", error);
-      sandyToast.error("Sandy is having a headache. Try again later.");
+      sandyToast.error(error instanceof Error ? error.message : "Sandy is having a headache.");
       hasFetched.current = false; // Allow retry if error
     } finally {
       setLoading(false);
@@ -110,15 +108,14 @@ export default function SelectCardsPage() {
 
       if (response.ok) {
         // Redirect to the deck page
-        sandyToast.success("Sandy has sealed the deck. Let the games begin.");
+        sandyToast.success("Deck finalized.", "Sandy has sealed the deck.");
         router.push(`/decks/${deckId}`);
       } else {
         console.error("Failed to save cards");
         sandyToast.error("Sandy's notebook is full or broken. Try saving again.");
       }
     } catch (error) {
-      console.error("Error saving cards:", error);
-      sandyToast.error("Sandy lost her pen. Something went wrong.");
+      sandyToast.error(error instanceof Error ? error.message : "Sandy lost her pen.");
     } finally {
       setSaving(false);
     }

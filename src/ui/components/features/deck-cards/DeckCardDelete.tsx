@@ -22,13 +22,12 @@ export const DeckCardDelete = ({ card, activeTab, onDelete, onClose }: DeckCardD
       await gameCardsResource.delete(card.id);
       onDelete(card.id);
       sandyToast.success(
-        activeTab === "live" 
-          ? "Sandy hid that secret in her notebook. It's safe... for now." 
-          : "Sandy burned that page. It's gone forever."
+        activeTab === "live" ? "Card moved to drafts." : "Card permanently deleted.",
+        activeTab === "live" ? "Sandy hid that gossip in her notebook." : "Sandy burned that page forever."
       );
       onClose();
     } catch (err: any) {
-      sandyToast.error("Sandy is still holding onto that card. Remind her in a minute.");
+      sandyToast.error(err.message || "Sandy's notebook is stuck.");
     } finally {
       setIsProcessing(false);
     }

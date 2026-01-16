@@ -66,11 +66,10 @@ export default function DeckViewPage() {
   const handlePromoteCard = async (card: any) => {
     try {
       await gameCardsResource.update(card.id, { isDraft: false });
-      sandyToast.success("Sandy brought this card to life. Prepare yourself.");
+      sandyToast.success("Card added to deck.", "Sandy brought this card to life.");
       await fetchDeck(); // Refetch to sync counts and pagination
-    } catch (err) {
-      sandyToast.error("Sandy decided this card should stay in the notebook for now.");
-      console.error(err);
+    } catch (err: any) {
+      sandyToast.error(err.message || "Sandy decided this card should stay in the notebook.");
     }
   };
 
