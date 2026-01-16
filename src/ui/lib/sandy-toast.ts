@@ -14,6 +14,9 @@ const sandySuccesses = [
   "Cheers, darling!",
   "Sandy noticed.",
   "Sandy shuffled the secrets.",
+  "Oh, Sandy loves this!",
+  "Pure magic.",
+  "Sandy is smiling.",
 ];
 
 export const sandyToast = {
@@ -21,6 +24,7 @@ export const sandyToast = {
     const title = sandyMessage || sandySuccesses[Math.floor(Math.random() * sandySuccesses.length)];
     toast.success(title, {
       description: message,
+      icon: "✨",
       duration: 4000,
       position: "top-right",
     });
