@@ -10,12 +10,14 @@ import { gameCardsResource } from "@/ui/resources/game-cards.resource";
 import { cn } from "@/ui/lib/utils";
 import { DeckDelete } from "@/ui/components/features/decks/DeckDelete";
 import { DeckCard } from "@/ui/components/features/deck-cards/DeckCard";
+import { LoadingModeShuffle } from "@/ui/components/ui/LoadingModeShuffle";
 
 export default function DeckViewPage() {
   const { id } = useParams();
   const { user, loading: authLoading } = useAuth();
   const [deck, setDeck] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [partialLoading, setPartialLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<"live" | "drafts">("live");
   const [page, setPage] = useState(1);
   const router = useRouter();
@@ -26,9 +28,11 @@ export default function DeckViewPage() {
     }
   }, [user, authLoading, router]);
 
-  const fetchDeck = async (targetPage = page, targetTab = activeTab) => {
+  const fetchDeck = async (targetPage = page, targetTab = activeTab, isInitial = false) => {
     if (user && id) {
-      setLoading(true);
+      if (isInitial) setLoading(true);
+      else setPartialLoading(true);
+      
       try {
         const data = await gameDecksResource.getById(id as string, {
           page: targetPage,
@@ -40,13 +44,14 @@ export default function DeckViewPage() {
         console.error(err);
       } finally {
         setLoading(false);
+        setPartialLoading(false);
       }
     }
   };
 
   useEffect(() => {
     if (user && id) {
-      fetchDeck(1, activeTab);
+      fetchDeck(1, activeTab, !deck);
       setPage(1);
     }
   }, [user, id, activeTab]);
@@ -167,32 +172,43 @@ export default function DeckViewPage() {
           )}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-          {[
-            ...(deck.gameCards?.data || [])
-              .map((c: any) => ({ ...c, isChaos: false })),
-            ...(activeTab === "live" ? (deck.sandyChaosCards || []).map((c: any) => ({ ...c, isChaos: true })) : [])
-          ].map((card: any, idx: number) => (
-            <DeckCard
-              key={card.isChaos ? `chaos-${card.id}` : `reg-${card.id}`}
-              card={card}
-              activeTab={activeTab}
-              onUpdate={(updatedCard) => {
-                fetchDeck(); // Refetch to stay in sync
-              }}
-              onDelete={(cardId) => {
-                fetchDeck(); // Refetch to stay in sync
-              }}
-              onPromote={activeTab === "drafts" && !card.isChaos ? handlePromoteCard : undefined}
-              showStatusBadge={activeTab === "drafts"}
-            />
-          ))}
-          
-          {activeTab === "live" && (deck.gameCards?.meta?.counts?.live || 0) === 0 && (
-            <div className="col-span-full py-20 text-center bg-white/50 rounded-[40px] border-2 border-dashed border-brand-tan/30">
-              <p className="text-brand-text-muted italic text-lg">No active cards. Pull some from drafts or let Sandy generate more.</p>
+        <div className="relative min-h-[400px]">
+          {partialLoading && (
+            <div className="absolute inset-0 z-50 bg-brand-cream/80 backdrop-blur-[2px] rounded-[40px] flex items-start justify-center pt-32">
+              <LoadingModeShuffle />
             </div>
           )}
+
+          <div className={cn(
+            "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 transition-all duration-500",
+            partialLoading ? "opacity-30 grayscale-[0.5] blur-[1px]" : "opacity-100"
+          )}>
+            {[
+              ...(deck.gameCards?.data || [])
+                .map((c: any) => ({ ...c, isChaos: false })),
+              ...(activeTab === "live" ? (deck.sandyChaosCards || []).map((c: any) => ({ ...c, isChaos: true })) : [])
+            ].map((card: any, idx: number) => (
+              <DeckCard
+                key={card.isChaos ? `chaos-${card.id}` : `reg-${card.id}`}
+                card={card}
+                activeTab={activeTab}
+                onUpdate={(updatedCard) => {
+                  fetchDeck(); // Refetch to stay in sync
+                }}
+                onDelete={(cardId) => {
+                  fetchDeck(); // Refetch to stay in sync
+                }}
+                onPromote={activeTab === "drafts" && !card.isChaos ? handlePromoteCard : undefined}
+                showStatusBadge={activeTab === "drafts"}
+              />
+            ))}
+            
+            {activeTab === "live" && (deck.gameCards?.meta?.counts?.live || 0) === 0 && (
+              <div className="col-span-full py-20 text-center bg-white/50 rounded-[40px] border-2 border-dashed border-brand-tan/30">
+                <p className="text-brand-text-muted italic text-lg">No active cards. Pull some from drafts or let Sandy generate more.</p>
+              </div>
+            )}
+          </div>
         </div>
 
         {deck.gameCards?.meta?.totalPages > 1 && (
