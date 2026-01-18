@@ -7,7 +7,7 @@ import { CTA } from "@/ui/components/features/sections/home/CTA";
 
 export default function Home() {
   return (
-    <div className="relative bg-brand-cream selection:bg-brand-tan/30 selection:text-brand-brown">
+    <div className="relative min-h-screen overflow-x-hidden bg-brand-cream selection:bg-brand-tan/30 selection:text-brand-brown">
       {/* Visual Overlays */}
       <div className="sunkissed" />
       
@@ -19,9 +19,9 @@ export default function Home() {
       
       <main>
         <Hero />
-        <FeaturesGrid />
+       {/* <FeaturesGrid />
         <GameModes />
-        <CTA />
+        <CTA />*/}
       </main>
 
       <Footer />

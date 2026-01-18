@@ -44,7 +44,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${serifFont.variable} ${sansFont.variable} ${scriptFont.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${serifFont.variable} ${sansFont.variable} ${scriptFont.variable} antialiased overflow-x-hidden`}
       >
         <AuthProvider>
           <ToastProvider />

@@ -19,7 +19,7 @@ export const Hero = () => {
   };
 
   return (
-    <section className="relative pt-32 pb-24 px-6 lg:pt-48 lg:pb-40 container mx-auto">
+    <section className="relative pt-32 pb-24 px-6 lg:pt-48 overflow-hidden lg:pb-40 container mx-auto">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
         <div className="text-center lg:text-left">
           <div className="inline-block mb-6 px-4 py-1.5 rounded-full bg-brand-tan/20 text-brand-brown font-bold text-[10px] tracking-[0.2em] uppercase">
