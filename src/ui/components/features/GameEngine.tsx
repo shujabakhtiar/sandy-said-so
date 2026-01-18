@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/ui/lib/utils";
 import { Button } from "@/ui/components/ui/Button";
+import { Modal } from "@/ui/components/ui/Modal";
 import { GameCard } from "@/ui/components/features/GameCard";
 import { getRulesForMode } from "@/lib/game-rules";
 import { formatCardText } from "@/ui/lib/text-utils";
@@ -27,7 +28,6 @@ export const GameEngine = ({ deck, isExample, onBack }: GameEngineProps) => {
   const [currentCardIndex, setCurrentCardIndex] = useState<number | null>(null);
   const [revealedCards, setRevealedCards] = useState<number[]>([]);
   const [isRevealing, setIsRevealing] = useState(false);
-  const [showRules, setShowRules] = useState(false);
 
   const modeName = deck.gameMode?.name || "Standard Mode";
   const rules = getRulesForMode(modeName);
@@ -89,13 +89,44 @@ export const GameEngine = ({ deck, isExample, onBack }: GameEngineProps) => {
 
           <div className="w-px h-4 bg-brand-tan/30" />
 
-          <button 
-            onClick={() => setShowRules(true)}
-            className="flex items-center gap-2 text-[10px] font-black tracking-[0.2em] text-brand-brown/40 hover:text-brand-red transition-colors uppercase group"
+          <Modal
+            variant="letter"
+            title="The Rules of the Game."
+            description={`Sandy's guide to ${modeName}.`}
+            trigger={
+              <button className="flex items-center gap-2 text-[10px] font-black tracking-[0.2em] text-brand-brown/40 hover:text-brand-red transition-colors uppercase group">
+                <span className="w-4 h-4 rounded-full border border-current flex items-center justify-center text-[8px] font-bold group-hover:scale-110 transition-transform">?</span>
+                How to play
+              </button>
+            }
           >
-            <span className="w-4 h-4 rounded-full border border-current flex items-center justify-center text-[8px] font-bold group-hover:scale-110 transition-transform">?</span>
-            How to play
-          </button>
+            <div className="space-y-8 text-brand-brown font-serif">
+              <div className="text-lg text-brand-text-muted font-medium italic mb-10 text-center leading-relaxed">
+                {formatCardText(rules.description)}
+              </div>
+
+              <div className="space-y-6">
+                {rules.rules.map((rule: any) => (
+                  <div key={rule.step} className="flex gap-4">
+                    <span className="font-script text-3xl text-brand-red/40 shrink-0">
+                      {rule.step.toString().padStart(2, '0')}
+                    </span>
+                    <div className="pt-1">
+                      <h4 className="font-serif font-black text-brand-brown uppercase tracking-tight mb-1">
+                        {rule.title}
+                      </h4>
+                      <p className="text-lg italic text-brand-text-muted leading-snug">
+                        {rule.description}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <p className="font-medium italic text-brand-red/80 pt-4 border-t border-brand-tan/10">
+                Rule zero: What happens with Sandy, stays with Sandy.
+              </p>
+            </div>
+          </Modal>
         </div>
       </header>
 
@@ -242,70 +273,6 @@ export const GameEngine = ({ deck, isExample, onBack }: GameEngineProps) => {
         </div>
       )}
 
-      {/* Rules Modal */}
-      {showRules && (
-        <div className="fixed inset-0 z-100 flex items-center justify-center p-6">
-          <div 
-            className="absolute inset-0 bg-brand-brown/60 backdrop-blur-md animate-in fade-in duration-300" 
-            onClick={() => setShowRules(false)}
-          />
-          
-          <div className="relative w-full max-w-xl bg-[#faf9f6] rounded-[24px] shadow- espresso overflow-hidden animate-in zoom-in-95 duration-300 border-2 border-brand-tan/20 flex flex-col max-h-[85vh]">
-            {/* Modal Header */}
-            <div className="bg-brand-brown p-8 text-center relative">
-              <div className="inline-block px-3 py-1 rounded-full bg-white/10 text-brand-tan font-bold text-[9px] tracking-widest uppercase mb-4">
-                Rulebook
-              </div>
-              <h2 className="text-3xl font-serif font-black text-white italic">How to play {modeName}</h2>
-              <button 
-                onClick={() => setShowRules(false)}
-                className="absolute top-6 right-6 text-brand-tan/40 hover:text-white transition-colors"
-              >
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
-                </svg>
-              </button>
-            </div>
-
-            {/* Modal Content */}
-            <div className="flex-1 overflow-y-auto p-8 md:p-10">
-              <div className="text-lg text-brand-text-muted font-medium italic mb-10 text-center leading-relaxed">
-                {formatCardText(rules.description)}
-              </div>
-
-              <div className="space-y-8">
-                {rules.rules.map((rule) => (
-                  <div key={rule.step} className="flex gap-6 group">
-                    <div className="shrink-0 w-10 h-10 rounded-xl bg-brand-red/10 flex items-center justify-center text-brand-red font-serif font-black text-xl group-hover:bg-brand-red group-hover:text-white transition-all">
-                      {rule.step}
-                    </div>
-                    <div className="flex-1 pt-1">
-                      <h4 className="font-serif font-black text-brand-brown text-xl mb-1 uppercase tracking-tight">
-                        {rule.title}
-                      </h4>
-                      <p className="text-brand-text-muted leading-relaxed font-medium">
-                        {rule.description}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Modal Footer */}
-            <div className="p-8 border-t border-brand-tan/10 bg-brand-cream/30 text-center">
-              <Button 
-                variant="primary" 
-                size="lg" 
-                className="w-full sm:w-auto px-12"
-                onClick={() => setShowRules(false)}
-              >
-                Understood, Sandy.
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
     </main>
   );
 };

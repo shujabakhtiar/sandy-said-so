@@ -87,7 +87,7 @@ export const Modal = ({
             />
             <div 
                 className={cn(
-                    "bg-brand-cream rounded-[10px] p-12 w-full relative shadow-2xl animate-in zoom-in-95 duration-500 flex flex-col max-h-[90vh] border border-brand-tan/20",
+                    "bg-brand-cream rounded-[5px] p-8 w-full relative shadow-2xl animate-in zoom-in-95 duration-500 flex flex-col max-h-[90vh] border border-brand-tan/20",
                     isLetter && "rotate-[-0.5deg] before:absolute before:inset-0 before:bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')] before:opacity-20 before:pointer-events-none before:rounded-[10px]",
                     sizeClasses[size]
                 )}
@@ -99,7 +99,7 @@ export const Modal = ({
                 {(title || description) && (
                     <div className={cn(
                         "relative shrink-0 border-b border-brand-tan/10",
-                        isLetter ? "text-left mb-10 pb-6" : "text-center mb-8 pb-4"
+                        isLetter ? "text-left mb-8 pb-6" : "text-center mb-8 pb-4"
                     )}>
                       {isLetter && <div className="absolute -top-4 -left-6 w-12 h-12 bg-brand-red/5 rounded-full blur-xl pointer-events-none" />}
                       {title && <h2 className="text-4xl font-serif font-black text-brand-brown mb-3 tracking-tight">{title}</h2>}
@@ -113,7 +113,7 @@ export const Modal = ({
 
                 {/* Sandy's Signature */}
                 {isLetter && (
-                    <div className="mt-10 pt-6 border-t border-brand-tan/10 flex justify-end shrink-0">
+                    <div className="mt-6 pt-4 border-t border-brand-tan/10 flex justify-end shrink-0">
                         <div className="text-right">
                             <span className="block text-[10px] font-bold uppercase tracking-[0.2em] text-brand-tan mb-1">From the desk of</span>
                             <span className="font-script text-4xl text-brand-red lowercase leading-none">Sandy xx</span>
