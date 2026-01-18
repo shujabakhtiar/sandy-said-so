@@ -201,7 +201,7 @@ function BuildDeckContent() {
 
 
       {/* Decorative Branding */}
-      <div className="fixed bottom-10 right-10 pointer-events-none opacity-20 select-none">
+      <div className="hidden lg:fixed bottom-10 right-10 pointer-events-none opacity-20 select-none">
         <div className="font-script text-6xl text-brand-red rotate-12">Listen to Sandy.</div>
       </div>
     </div>
