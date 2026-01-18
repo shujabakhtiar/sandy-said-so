@@ -69,8 +69,8 @@ export const DeckEditTitle = ({ deck, onUpdate, trigger }: DeckEditTitleProps) =
         description="Sandy is listening..."
         size="md"
       >
-        <div className="mb-8">
-          <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-brand-text-muted mb-3 ml-1">
+        <div className="mb-8 mt-2">
+          <label className="block text-xs font-bold uppercase tracking-widest text-brand-text-muted mb-4 ml-1">
             Deck Title
           </label>
           <input

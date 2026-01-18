@@ -53,6 +53,7 @@ You play the game.          </p>
                 But who is
               </span>
               <Modal
+                variant="letter"
                 title="Meet Sandy xx"
                 description="The Vault of the Group"
                 trigger={
@@ -64,23 +65,20 @@ You play the game.          </p>
                   </span>
                 }
               >
-                <div className="space-y-6 text-brand-brown leading-relaxed">
-                  <p>
+                <div className="space-y-6 text-brand-brown leading-relaxed font-serif">
+                  <p className="text-lg">
                     Sandy is that friend who knows everything about the group—and keeps it there.
                     The stories, the inside jokes, the “you had to be there” moments. 
                     She listens, remembers, and never leaks… unless it’s for the game.
                   </p>
-                  <p>
+                  <p className="text-lg">
                     She makes custom decks just for your people, built from your jokes, your chaos,
                     and your shared lore. Nothing leaves the group. Just games that make everyone laugh, confess, 
                     and say, “wait, how do you remember that?”
                   </p>
-                  <p className="font-medium italic">
+                  <p className="font-medium italic text-brand-red/80">
                     Because some stories are only meant to be played with the people who lived them.
                   </p>
-                  <div className="pt-4 border-t border-brand-tan/10 font-script text-2xl text-brand-red text-center">
-                    Sandy xx
-                  </div>
                 </div>
               </Modal>
               <span className="text-brand-text-muted/60 ml-0.5 group-hover/sandy:translate-x-1 transition-transform duration-300 font-bold">?</span>

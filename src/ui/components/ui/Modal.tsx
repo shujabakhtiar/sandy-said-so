@@ -12,6 +12,7 @@ interface ModalProps {
   children: ReactNode;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  variant?: 'default' | 'letter';
 }
 
 export const Modal = ({
@@ -22,6 +23,7 @@ export const Modal = ({
   children,
   open: controlledOpen,
   onOpenChange: setControlledOpen,
+  variant = 'default',
 }: ModalProps) => {
   const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
   const isControlled = controlledOpen !== undefined;
@@ -66,6 +68,8 @@ export const Modal = ({
     lg: "max-w-2xl",
   };
 
+  const isLetter = variant === 'letter';
+
   return (
     <>
       {trigger && (
@@ -83,21 +87,39 @@ export const Modal = ({
             />
             <div 
                 className={cn(
-                    "bg-white rounded-[40px] p-10 w-full relative shadow-espresso animate-in zoom-in-95 duration-300 flex flex-col max-h-[90vh]",
+                    "bg-brand-cream rounded-[10px] p-12 w-full relative shadow-2xl animate-in zoom-in-95 duration-500 flex flex-col max-h-[90vh] border border-brand-tan/20",
+                    isLetter && "rotate-[-0.5deg] before:absolute before:inset-0 before:bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')] before:opacity-20 before:pointer-events-none before:rounded-[10px]",
                     sizeClasses[size]
                 )}
                 onClick={(e) => e.stopPropagation()}
             >
+                {/* Decorative Fold-like element */}
+                {isLetter && <div className="absolute top-0 right-0 w-16 h-16 bg-brand-tan/5 rounded-bl-[40px] border-l border-b border-brand-tan/10 pointer-events-none" />}
+
                 {(title || description) && (
-                    <div className="text-center mb-8 shrink-0">
-                    {title && <h2 className="text-3xl font-serif font-bold text-brand-brown mb-2">{title}</h2>}
-                    {description && <p className="text-sm text-brand-text-muted italic">{description}</p>}
+                    <div className={cn(
+                        "relative shrink-0 border-b border-brand-tan/10",
+                        isLetter ? "text-left mb-10 pb-6" : "text-center mb-8 pb-4"
+                    )}>
+                      {isLetter && <div className="absolute -top-4 -left-6 w-12 h-12 bg-brand-red/5 rounded-full blur-xl pointer-events-none" />}
+                      {title && <h2 className="text-4xl font-serif font-black text-brand-brown mb-3 tracking-tight">{title}</h2>}
+                      {description && <p className="text-md text-brand-text-muted italic font-medium">{description}</p>}
                     </div>
                 )}
                 
-                <div className="overflow-y-auto custom-scrollbar">
+                <div className="overflow-y-auto custom-scrollbar flex-1 pr-2">
                     {children}
                 </div>
+
+                {/* Sandy's Signature */}
+                {isLetter && (
+                    <div className="mt-10 pt-6 border-t border-brand-tan/10 flex justify-end shrink-0">
+                        <div className="text-right">
+                            <span className="block text-[10px] font-bold uppercase tracking-[0.2em] text-brand-tan mb-1">From the desk of</span>
+                            <span className="font-script text-4xl text-brand-red lowercase leading-none">Sandy xx</span>
+                        </div>
+                    </div>
+                )}
             </div>
             </div>,
             document.body

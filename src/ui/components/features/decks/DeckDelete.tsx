@@ -54,22 +54,12 @@ export const DeckDelete = ({ deck, trigger }: DeckDeleteProps) => {
           setConfirmDeckName("");
         }
       }}
+      title="Destroy this deck?"
+      description="This action cannot be undone. All gossip and memories will be permanently erased."
       size="md"
     >
-      <div className="text-center mb-8">
-        <div className="w-20 h-20 bg-brand-red/10 rounded-full flex items-center justify-center mx-auto mb-6 text-brand-red font-serif text-4xl italic">
-          S
-        </div>
-        <h2 className="text-3xl font-serif font-bold text-brand-brown mb-2">
-          Destroy this deck?
-        </h2>
-        <p className="text-sm text-brand-text-muted italic px-4">
-          This action cannot be undone. All cards and rules will be permanently erased from Sandy&apos;s memory.
-        </p>
-      </div>
-
-      <div className="mb-8">
-        <label className="block text-[10px] font-bold tracking-[0.2em] text-brand-text-muted mb-4 text-center">
+      <div className="mb-8 mt-2">
+        <label className="block text-xs font-bold tracking-widest text-brand-text-muted mb-4 text-center">
           Type <span className="text-brand-brown font-black select-none">&quot;{deck.title}&quot;</span> to confirm
         </label>
         <input
