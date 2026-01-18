@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Button } from "@/ui/components/ui/Button";
 import { Modal } from "@/ui/components/ui/Modal";
@@ -17,9 +18,48 @@ export const Hero = () => {
       router.push("/login");
     }
   };
+  const [showWelcomeModal, setShowWelcomeModal] = useState(false);
+
+  useEffect(() => {
+    const hasSeenWelcome = localStorage.getItem("sandy_has_seen_welcome");
+    if (!hasSeenWelcome) {
+      const timer = setTimeout(() => {
+        setShowWelcomeModal(true);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
+  const handleWelcomeOpenChange = (open: boolean) => {
+    if (!open) {
+      localStorage.setItem("sandy_has_seen_welcome", "true");
+    }
+    setShowWelcomeModal(open);
+  };
 
   return (
     <section className="relative pt-32 pb-24 px-6 lg:pt-48 overflow-hidden lg:pb-40 container mx-auto">
+      <Modal
+        open={showWelcomeModal}
+        onOpenChange={handleWelcomeOpenChange}
+        variant="letter"
+        description="Oh, hi there..."
+      >
+        <div className="space-y-6 text-brand-brown font-script text-2xl leading-tight">
+          <p>
+            I haven&apos;t seen you around here before. You must be looking for trouble.
+          </p>
+          <p>
+This isn’t your average party game. Sandy listens to your stories, your inside jokes, and who’s in the room—then turns all that tea into a <span className="font-bold text-brand-brown">custom card game</span> made just for your group.          </p>
+          <p>
+            Buckle up, darling. It&apos;s going to be a bumpy ride and everyone’s got something at stake. You know why?
+          </p>
+          <p className="font-medium text-brand-red/90 pt-4 border-t border-brand-tan/10 text-3xl">
+          cause <span className="font-bold text-brand-red">Sandy said so</span>.
+          </p>
+        </div>
+      </Modal>
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
         <div className="text-left">
           <div className="inline-block mb-6 px-4 py-1.5 rounded-full bg-brand-tan/20 text-brand-brown font-bold text-[10px] tracking-[0.2em] uppercase">
