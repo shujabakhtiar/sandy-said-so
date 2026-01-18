@@ -99,15 +99,24 @@ export const Modal = ({
                 {(title || description) && (
                     <div className={cn(
                         "relative shrink-0 border-b border-brand-tan/10",
-                        isLetter ? "text-left mb-8 pb-6" : "text-center mb-8 pb-4"
+                        isLetter ? "text-left mb-6 pb-6" : "text-center mb-8 pb-4"
                     )}>
                       {isLetter && <div className="absolute -top-4 -left-6 w-12 h-12 bg-brand-red/5 rounded-full blur-xl pointer-events-none" />}
-                      {title && <h2 className="text-4xl font-serif font-black text-brand-brown mb-3 tracking-tight">{title}</h2>}
-                      {description && <p className="text-md text-brand-text-muted italic font-medium">{description}</p>}
+                      {title && <h2 className={cn(
+                          "font-serif font-black text-brand-brown tracking-tight relative inline-block",
+                          isLetter ? "text-3xl mb-4 after:absolute after:bottom-[-4px] after:left-0 after:w-full after:h-[2px] after:bg-brand-tan/30" : "text-4xl mb-3"
+                      )}>{title}</h2>}
+                      {description && <p className={cn(
+                          "text-md text-brand-text-muted italic font-medium",
+                          isLetter && "text-4xl text-brand-brown font-script italic-none leading-tight"
+                      )}>{description}</p>}
                     </div>
                 )}
                 
-                <div className="overflow-y-auto custom-scrollbar flex-1 pr-2">
+                <div className={cn(
+                    "overflow-y-auto custom-scrollbar flex-1 pr-2",
+                    isLetter && "font-script text-2xl leading-tight text-brand-brown/90"
+                )}>
                     {children}
                 </div>
 

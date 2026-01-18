@@ -91,8 +91,7 @@ export const GameEngine = ({ deck, isExample, onBack }: GameEngineProps) => {
 
           <Modal
             variant="letter"
-            title="The Rules of the Game."
-            description={`Sandy's guide to ${modeName}.`}
+            description="Sandy's guide to Pure Provocation."
             trigger={
               <button className="flex items-center gap-2 text-[10px] font-black tracking-[0.2em] text-brand-brown/40 hover:text-brand-red transition-colors uppercase group">
                 <span className="w-4 h-4 rounded-full border border-current flex items-center justify-center text-[8px] font-bold group-hover:scale-110 transition-transform">?</span>
@@ -100,29 +99,29 @@ export const GameEngine = ({ deck, isExample, onBack }: GameEngineProps) => {
               </button>
             }
           >
-            <div className="space-y-8 text-brand-brown font-serif">
-              <div className="text-lg text-brand-text-muted font-medium italic mb-10 text-center leading-relaxed">
+            <div className="space-y-8 text-brand-brown">
+              <div className="text-2xl text-brand-brown/80 font-script mb-10 text-center leading-tight">
                 {formatCardText(rules.description)}
               </div>
 
-              <div className="space-y-6">
+              <div className="space-y-8">
                 {rules.rules.map((rule: any) => (
-                  <div key={rule.step} className="flex gap-4">
-                    <span className="font-script text-3xl text-brand-red/40 shrink-0">
+                  <div key={rule.step} className="flex gap-4 group">
+                    <span className="font-script text-4xl text-brand-tan/40 shrink-0 group-hover:text-brand-brown/40 transition-colors duration-300">
                       {rule.step.toString().padStart(2, '0')}
                     </span>
-                    <div className="pt-1">
-                      <h4 className="font-serif font-black text-brand-brown uppercase tracking-tight mb-1">
+                    <div className="pt-2">
+                      <h4 className="font-script text-3xl text-brand-brown tracking-tight mb-2 relative inline-block after:absolute after:bottom-[-2px] after:left-0 after:w-full after:h-px after:bg-brand-tan/40">
                         {rule.title}
                       </h4>
-                      <p className="text-lg italic text-brand-text-muted leading-snug">
+                      <p className="text-xl font-script text-brand-brown/80 leading-none">
                         {rule.description}
                       </p>
                     </div>
                   </div>
                 ))}
               </div>
-              <p className="font-medium italic text-brand-red/80 pt-4 border-t border-brand-tan/10">
+              <p className="font-script text-3xl text-brand-brown/90 pt-6 border-t border-brand-tan/10 text-center">
                 Rule zero: What happens with Sandy, stays with Sandy.
               </p>
             </div>
