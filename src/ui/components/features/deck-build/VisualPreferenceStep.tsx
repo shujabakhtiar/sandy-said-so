@@ -18,10 +18,22 @@ export const VisualPreferenceStep = ({
 }: VisualPreferenceStepProps) => {
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="flex items-start gap-1 mb-12">
+      {/* Header Container */}
+      <div className="flex flex-col md:flex-row md:items-start gap-1 mb-8 md:mb-8">
+        
+        {/* Mobile Back Button (Text) */}
         <button 
           onClick={onPrev}
-          className="group shrink-0 pt-1"
+          className="md:hidden group shrink-0 pt-2 text-brand-brown/60 hover:text-brand-brown transition-colors font-bold text-sm uppercase tracking-widest self-start"
+          title="Go Back"
+        >
+          &lt; back
+        </button>
+
+        {/* Desktop Back Button (Icon) */}
+        <button 
+          onClick={onPrev}
+          className="hidden md:block group shrink-0 pt-1"
           title="Go Back"
         >
           <div className="w-10 h-10 rounded-full text-brand-brown flex items-center justify-center group-hover:bg-brand-brown/10 transition-all duration-300">
@@ -30,9 +42,10 @@ export const VisualPreferenceStep = ({
             </svg>
           </div>
         </button>
-        <div>
-          <h1 className="text-5xl font-serif font-bold text-brand-brown mb-4 tracking-tight">The visual element.</h1>
-          <p className="text-xl text-brand-text-muted italic font-medium leading-relaxed">
+
+        <div className="mt-4 md:mt-0 md:ml-4">
+          <h1 className="text-4xl md:text-5xl font-serif font-bold text-brand-brown mb-4 tracking-tight">The visual element.</h1>
+          <p className="text-lg md:text-xl text-brand-text-muted italic font-medium leading-relaxed">
             Do you want Sandy to analyze photos of your friends for specific dares?
           </p>
         </div>
@@ -43,7 +56,7 @@ export const VisualPreferenceStep = ({
         {/* Use Images - Disabled for V1 */}
         <div
           className={cn(
-            "p-10 bg-white/50 rounded-[32px] border-2 text-center transition-all cursor-not-allowed relative overflow-hidden group",
+            "p-10 bg-white/50 rounded-[32px] border-2 text-center transition-all cursor-not-allowed relative overflow-hidden group order-last sm:order-none",
             "border-transparent opacity-60"
           )}
         >
