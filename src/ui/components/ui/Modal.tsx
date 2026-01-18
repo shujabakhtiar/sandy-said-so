@@ -88,13 +88,27 @@ export const Modal = ({
             <div 
                 className={cn(
                     "bg-brand-cream rounded-[5px] p-8 w-full relative shadow-2xl animate-in zoom-in-95 duration-500 flex flex-col max-h-[90vh] border border-brand-tan/20",
-                    isLetter && "rotate-[-0.5deg] before:absolute before:inset-0 before:bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')] before:opacity-20 before:pointer-events-none before:rounded-[10px]",
+                    isLetter && "rotate-[-0.5deg] before:absolute before:inset-0 before:bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')] before:opacity-20 before:pointer-events-none before:rounded-[10px] max-h-[85vh]",
                     sizeClasses[size]
                 )}
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Decorative Fold-like element */}
                 {isLetter && <div className="absolute top-0 right-0 w-16 h-16 bg-brand-tan/5 rounded-bl-[40px] border-l border-b border-brand-tan/10 pointer-events-none" />}
+                
+                {/* Close Button for Letter Variant */}
+                {isLetter && (
+                    <button 
+                        onClick={() => setOpen(false)}
+                        className="absolute top-4 right-4 z-50 p-2 text-brand-red opacity-60 hover:opacity-100 transition-opacity"
+                        aria-label="Close modal"
+                    >
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                )}
 
                 {(title || description) && (
                     <div className={cn(
