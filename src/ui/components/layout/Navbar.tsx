@@ -239,7 +239,7 @@ export const Navbar = () => {
               )}
             </div>
             
-            <div className="mt-8 pt-10 border-t border-brand-tan/10 pointer-events-none text-center">
+            <div className="hidden md:block mt-8 pt-10 border-t border-brand-tan/10 pointer-events-none text-center">
               <div className="font-script text-4xl text-brand-red rotate-3 opacity-60">Sandy said it.</div>
             </div>
 
