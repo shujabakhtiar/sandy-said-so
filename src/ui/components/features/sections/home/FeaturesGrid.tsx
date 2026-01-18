@@ -27,7 +27,7 @@ export const FeaturesGrid = () => {
       <div className="container mx-auto max-w-6xl">
         <SectionHeader 
           title={<>Sandy knows your group <br /><span className="text-brand-blue italic">better than you do.</span></>}
-          subtitle="It's not just a card game. it's an intervention guided by an imaginary instigator."
+          subtitle="It's not just a card game. it's an intervention guided by Sandy xx."
           className="mb-24"
         />
 

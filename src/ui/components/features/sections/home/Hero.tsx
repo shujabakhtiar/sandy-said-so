@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { Button } from "@/ui/components/ui/Button";
+import { Modal } from "@/ui/components/ui/Modal";
 import { useAuth } from "@/ui/providers/AuthContext";
 import { useRouter } from "next/navigation";
 
@@ -32,8 +33,8 @@ export const Hero = () => {
           </h1>
           
           <p className="text-xl md:text-2xl text-brand-text-muted mb-12 max-w-lg mx-auto lg:mx-0 leading-relaxed font-medium">
-            Sandy is the imaginary friend who knows all your real secrets. She builds custom decks around your friends to ensure no one leaves sober.
-          </p>
+Sandy knows the stories.
+You play the game.          </p>
 
           <div className="flex flex-col sm:flex-row gap-6 justify-center lg:justify-start">
             <Button variant="primary" size="xl" className="shadow-xl" onClick={handleCTA}>
@@ -43,6 +44,47 @@ export const Hero = () => {
             <Button variant="outline" size="xl" onClick={() => router.push("/examples")}>
               See Examples
             </Button>
+          </div>
+
+          <div className="mt-16 text-center lg:text-left animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-700 fill-mode-both">
+            <div className="inline-flex items-center group/sandy cursor-pointer">
+              <div className="h-px w-0 opacity-0 bg-brand-tan/30 group-hover/sandy:w-12 group-hover/sandy:opacity-100 group-hover/sandy:mr-4 transition-all duration-500 ease-out" />
+              <span className="text-brand-text-muted font-medium tracking-wide uppercase text-[11px]">
+                But who is
+              </span>
+              <Modal
+                title="Meet Sandy xx"
+                description="The Vault of the Group"
+                trigger={
+                  <span className="relative inline-block ml-1">
+                    <span className="font-script text-4xl text-brand-red lowercase leading-none block hover:scale-110 transition-transform duration-300">
+                      Sandy
+                    </span>
+                    <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-brand-red/30 group-hover/sandy:w-full transition-all duration-500 rounded-full" />
+                  </span>
+                }
+              >
+                <div className="space-y-6 text-brand-brown leading-relaxed">
+                  <p>
+                    Sandy is that friend who knows everything about the group—and keeps it there.
+                    The stories, the inside jokes, the “you had to be there” moments. 
+                    She listens, remembers, and never leaks… unless it’s for the game.
+                  </p>
+                  <p>
+                    She makes custom decks just for your people, built from your jokes, your chaos,
+                    and your shared lore. Nothing leaves the group. Just games that make everyone laugh, confess, 
+                    and say, “wait, how do you remember that?”
+                  </p>
+                  <p className="font-medium italic">
+                    Because some stories are only meant to be played with the people who lived them.
+                  </p>
+                  <div className="pt-4 border-t border-brand-tan/10 font-script text-2xl text-brand-red text-center">
+                    Sandy xx
+                  </div>
+                </div>
+              </Modal>
+              <span className="text-brand-text-muted/60 ml-0.5 group-hover/sandy:translate-x-1 transition-transform duration-300 font-bold">?</span>
+            </div>
           </div>
         </div>
 
