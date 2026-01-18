@@ -14,9 +14,6 @@ const sandySuccesses = [
   "Cheers, darling!",
   "Sandy noticed.",
   "Sandy shuffled the secrets.",
-  "Oh, Sandy loves this!",
-  "Pure magic.",
-  "Sandy is smiling.",
 ];
 
 export const sandyToast = {
