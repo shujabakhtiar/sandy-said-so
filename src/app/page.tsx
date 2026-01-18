@@ -19,9 +19,9 @@ export default function Home() {
       
       <main>
         <Hero />
-       {/* <FeaturesGrid />
+        <FeaturesGrid />
         <GameModes />
-        <CTA />*/}
+        <CTA />
       </main>
 
       <Footer />

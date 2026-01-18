@@ -102,7 +102,7 @@ export default function QuickPlayInitPage() {
             </div>
 
             <div className="bg-white p-8 rounded-[32px] border-2 border-brand-tan/20 shadow-sm mb-8">
-              <div className="flex gap-4 mb-8">
+              <div className="flex flex-col md:flex-row gap-4 mb-8">
                 <input
                   type="text"
                   value={inputValue}
@@ -112,7 +112,11 @@ export default function QuickPlayInitPage() {
                   placeholder="Enter player name..."
                   autoFocus
                 />
-                <Button onClick={() => addPlayer(inputValue)} disabled={!inputValue.trim()}>
+                <Button 
+                  onClick={() => addPlayer(inputValue)} 
+                  disabled={!inputValue.trim()}
+                  className="w-full md:w-auto"
+                >
                   Add
                 </Button>
               </div>

@@ -26,7 +26,7 @@ export default function QuickPlayPage() {
           Back to Home
         </button>
 
-        <div className="mb-12">
+        <div className="mb-12 mt-32 md:mt-0">
           <div className="inline-block mb-4 px-4 py-1 bg-brand-red/10 text-brand-red rounded-full text-[10px] font-bold uppercase tracking-widest">
             Choose Your Path
           </div>
