@@ -16,13 +16,13 @@ export const SectionHeader = ({
   className = ""
 }: SectionHeaderProps) => {
   return (
-    <div className={`flex flex-col ${align === 'center' ? 'items-center text-center' : 'items-start text-left'} ${className}`}>
+    <div className={`flex flex-col ${align === 'center' ? 'items-start text-left md:items-center md:text-center' : 'items-start text-left'} ${className}`}>
       {accent && (
         <div className="inline-block mb-6 px-4 py-1.5 rounded-full bg-brand-tan/20 text-brand-brown font-bold text-[10px] tracking-[0.2em] uppercase">
           {accent}
         </div>
       )}
-      <h2 className="text-5xl md:text-7xl font-serif font-bold text-brand-brown mb-6 leading-[1.1]">
+      <h2 className="text-4xl md:text-7xl font-serif font-bold text-brand-brown mb-6 leading-[1.1]">
         {title}
       </h2>
       {subtitle && (

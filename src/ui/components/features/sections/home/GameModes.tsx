@@ -39,8 +39,8 @@ export const GameModes = () => {
           </div>
 
           <div>
-            <h2 className="text-5xl md:text-6xl text-brand-brown mb-8 leading-tight font-bold font-serif">Three ways to <br />lose your dignity.</h2>
-            <p className="text-xl text-brand-text-muted mb-12 font-medium">Sandy has many moods. Choose the one that matches how much you&apos;re willing to regret tomorrow morning.</p>
+            <h2 className="text-4xl md:text-6xl text-brand-brown mb-8 leading-tight font-bold font-serif text-left">Three ways to <br />lose your dignity.</h2>
+            <p className="text-xl text-brand-text-muted mb-12 font-medium text-left">Sandy has many moods. Choose the one that matches how much you&apos;re willing to regret tomorrow morning.</p>
             
             <div className="space-y-6">
               {modes.map((mode, i) => (

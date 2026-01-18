@@ -17,9 +17,9 @@ export const CTA = () => {
   };
 
   return (
-    <section className="py-40 px-6 text-center">
+    <section className="py-20 md:py-40 px-6 text-center">
       <div className="container mx-auto max-w-4xl relative">
-        <div className="absolute -top-20 left-1/2 -translate-x-1/2 font-script text-5xl text-brand-red pointer-events-none opacity-20 select-none">
+        <div className="hidden md:block absolute -top-20 left-1/2 -translate-x-1/2 font-script text-5xl text-brand-red pointer-events-none opacity-20 select-none">
           Sandy never forgets.
         </div>
         <h2 className="text-6xl md:text-[6rem] text-brand-brown mb-12 font-bold leading-none tracking-tight font-serif">

@@ -23,7 +23,7 @@ export const FeaturesGrid = () => {
   ];
 
   return (
-    <section id="how-it-works" className="py-32 px-6 bg-white relative overflow-hidden scroll-mt-32">
+    <section id="how-it-works" className="py-20 md:py-32 px-6 bg-white relative overflow-hidden scroll-mt-32">
       <div className="container mx-auto max-w-6xl">
         <SectionHeader 
           title={<>Sandy knows your group <br /><span className="text-brand-blue italic">better than you do.</span></>}
