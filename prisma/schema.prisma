@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -9,54 +6,53 @@ datasource db {
   provider = "postgresql"
 }
 
-
 model User {
-  id        String   @id
-  email     String   @unique
-  name      String?
-  createdAt DateTime @default(now()) @map("created_at")
-
-  photos    Photo[]
-  people    Person[]
-  gameDecks GameDeck[]
+  id            String         @id
+  email         String         @unique
+  name          String?
+  createdAt     DateTime       @default(now()) @map("created_at")
+  affiliates    Affiliate[]
+  gameDecks     GameDeck[]
+  orders        Order[]
+  people        Person[]
+  photos        Photo[]
+  subscriptions Subscription[]
+  userCredits   UserCredit[]
 
   @@index([email])
 }
 
 model Photo {
-  id         Int      @id @default(autoincrement())
-  userId     String   @map("user_id")
-  user       User     @relation(fields: [userId], references: [id], onUpdate: Cascade)
-  imageUrl   String   @map("image_url")
-  uploadedAt DateTime @default(now()) @map("uploaded_at")
-
-  faces     Face[]
-  gameCards GameCard[]
+  id         Int        @id @default(autoincrement())
+  userId     String     @map("user_id")
+  imageUrl   String     @map("image_url")
+  uploadedAt DateTime   @default(now()) @map("uploaded_at")
+  faces      Face[]
+  gameCards  GameCard[]
+  user       User       @relation(fields: [userId], references: [id])
 
   @@index([userId])
 }
 
 model Face {
-  id            Int     @id @default(autoincrement())
-  photoId       Int     @map("photo_id")
-  photo         Photo   @relation(fields: [photoId], references: [id], onDelete: Cascade)
-  boundingBox   Json    @map("bounding_box")
-  faceEmbedding String? @map("face_embedding")
-
+  id             Int             @id @default(autoincrement())
+  photoId        Int             @map("photo_id")
+  boundingBox    Json            @map("bounding_box")
+  faceEmbedding  String?         @map("face_embedding")
+  photo          Photo           @relation(fields: [photoId], references: [id], onDelete: Cascade)
   facePersonMaps FacePersonMap[]
 
   @@index([photoId])
 }
 
 model Person {
-  id        Int      @id @default(autoincrement())
-  userId    String   @map("user_id")
-  user      User     @relation(fields: [userId], references: [id], onUpdate: Cascade)
-  name      String
-  note      String?
-  createdAt DateTime @default(now()) @map("created_at")
-
+  id             Int             @id @default(autoincrement())
+  userId         String          @map("user_id")
+  name           String
+  note           String?
+  createdAt      DateTime        @default(now()) @map("created_at")
   facePersonMaps FacePersonMap[]
+  user           User            @relation(fields: [userId], references: [id])
 
   @@index([userId])
 }
@@ -64,8 +60,8 @@ model Person {
 model FacePersonMap {
   id       Int    @id @default(autoincrement())
   faceId   Int    @map("face_id")
-  face     Face   @relation(fields: [faceId], references: [id], onDelete: Cascade)
   personId Int    @map("person_id")
+  face     Face   @relation(fields: [faceId], references: [id], onDelete: Cascade)
   person   Person @relation(fields: [personId], references: [id], onDelete: Cascade)
 
   @@index([faceId])
@@ -73,32 +69,34 @@ model FacePersonMap {
 }
 
 model GameMode {
-  id   Int    @id @default(autoincrement())
-  name String @unique
-
+  id              Int              @id @default(autoincrement())
+  name            String           @unique
+  currency        String           @default("INR")
+  isActive        Boolean          @default(true)
+  price           Int              @default(0)
   gameDecks       GameDeck[]
+  orderItems      OrderItem[]
   sandyChaosCards SandyChaosCard[]
 }
 
 model GameDeck {
-  id         Int      @id @default(autoincrement())
-  userId     String   @map("user_id")
-  user       User     @relation(fields: [userId], references: [id], onUpdate: Cascade)
-  gameModeId Int      @map("game_mode_id")
-  gameMode   GameMode @relation(fields: [gameModeId], references: [id])
-  title      String?
-  notes      String?
-  goal       String?
-  secrets    String?
-  extra      String?
-  chaosLevel Int      @default(3) @map("chaos_level")
-  useImages  Boolean  @default(false) @map("use_images")
-  isSaved    Boolean  @default(false) @map("is_saved")
-  createdAt  DateTime @default(now()) @map("created_at")
-
-  gameCards     GameCard[]
+  id            Int            @id @default(autoincrement())
+  userId        String         @map("user_id")
+  gameModeId    Int            @map("game_mode_id")
+  title         String?
+  notes         String?
+  goal          String?
+  secrets       String?
+  extra         String?
+  chaosLevel    Int            @default(3) @map("chaos_level")
+  useImages     Boolean        @default(false) @map("use_images")
+  isSaved       Boolean        @default(false) @map("is_saved")
+  createdAt     DateTime       @default(now()) @map("created_at")
   aiGenerations AiGeneration[]
-  orders        Order[]
+  gameCards     GameCard[]
+  gameMode      GameMode       @relation(fields: [gameModeId], references: [id])
+  user          User           @relation(fields: [userId], references: [id])
+  orderItems    OrderItem[]
 
   @@index([userId])
   @@index([gameModeId])
@@ -107,12 +105,12 @@ model GameDeck {
 model GameCard {
   id         Int      @id @default(autoincrement())
   deckId     Int      @map("deck_id")
-  deck       GameDeck @relation(fields: [deckId], references: [id], onDelete: Cascade)
   photoId    Int?     @map("photo_id")
-  photo      Photo?   @relation(fields: [photoId], references: [id])
   ruleText   String   @map("rule_text")
   orderIndex Int      @map("order_index")
   isDraft    Boolean  @default(true) @map("is_draft")
+  deck       GameDeck @relation(fields: [deckId], references: [id], onDelete: Cascade)
+  photo      Photo?   @relation(fields: [photoId], references: [id])
 
   @@index([deckId])
 }
@@ -120,9 +118,9 @@ model GameCard {
 model SandyChaosCard {
   id         Int      @id @default(autoincrement())
   gameModeId Int      @map("game_mode_id")
-  gameMode   GameMode @relation(fields: [gameModeId], references: [id])
   ruleText   String   @map("rule_text")
   chaosLevel Int      @map("chaos_level")
+  gameMode   GameMode @relation(fields: [gameModeId], references: [id])
 
   @@index([gameModeId])
   @@map("sandy_chaos_cards")
@@ -131,23 +129,147 @@ model SandyChaosCard {
 model AiGeneration {
   id        Int      @id @default(autoincrement())
   deckId    Int      @map("deck_id")
-  deck      GameDeck @relation(fields: [deckId], references: [id], onDelete: Cascade)
   prompt    String
   model     String?
   createdAt DateTime @default(now()) @map("created_at")
+  deck      GameDeck @relation(fields: [deckId], references: [id], onDelete: Cascade)
 
   @@index([deckId])
 }
 
 model Order {
-  id            Int      @id @default(autoincrement())
-  deckId        Int      @map("deck_id")
-  deck          GameDeck @relation(fields: [deckId], references: [id])
-  customerEmail String   @map("customer_email")
-  address       String
-  status        String   @default("PENDING")
-  createdAt     DateTime @default(now()) @map("created_at")
+  id                Int               @id @default(autoincrement())
+  deckId            Int?              @map("deck_id")
+  customerEmail     String?           @map("customer_email")
+  address           String?           @map("address")
+  status            String            @default("PENDING")
+  createdAt         DateTime          @default(now()) @map("created_at")
+  affiliateCode     String?           @map("affiliate_code")
+  amount            Int?
+  currency          String            @default("INR")
+  status_new        PaymentStatus?    @map("payment_status")
+  productId         Int?              @map("product_id")
+  provider          PaymentProvider   @default(RAZORPAY)
+  providerOrderId   String?           @unique @map("provider_order_id")
+  providerPaymentId String?           @map("provider_payment_id")
+  updatedAt         DateTime          @updatedAt @map("updated_at")
+  userId            String?           @map("user_id")
+  affiliateEarning  AffiliateEarning?
+  affiliate         Affiliate?        @relation(fields: [affiliateCode], references: [code])
+  product           Product?          @relation(fields: [productId], references: [id])
+  user              User?             @relation(fields: [userId], references: [id])
+  items             OrderItem[]
+  subscription      Subscription?
 
-  @@index([deckId])
-  @@index([customerEmail])
+  @@index([userId])
+  @@index([productId])
+  @@index([providerOrderId])
+}
+
+model OrderItem {
+  id         Int       @id @default(autoincrement())
+  orderId    Int       @map("order_id")
+  gameModeId Int?      @map("game_mode_id")
+  deckId     Int?      @map("deck_id")
+  price      Int
+  currency   String    @default("INR")
+  deck       GameDeck? @relation(fields: [deckId], references: [id])
+  gameMode   GameMode? @relation(fields: [gameModeId], references: [id])
+  order      Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+}
+
+model Product {
+  id          Int         @id @default(autoincrement())
+  name        String      @unique
+  description String?
+  type        ProductType
+  price       Int
+  currency    String      @default("INR")
+  isActive    Boolean     @default(true)
+  metadata    Json?
+  orders      Order[]
+}
+
+model Subscription {
+  id        Int                @id @default(autoincrement())
+  userId    String             @map("user_id")
+  orderId   Int                @unique @map("order_id")
+  status    SubscriptionStatus @default(ACTIVE)
+  startDate DateTime           @default(now()) @map("start_date")
+  endDate   DateTime           @map("end_date")
+  createdAt DateTime           @default(now()) @map("created_at")
+  updatedAt DateTime           @updatedAt @map("updated_at")
+  order     Order              @relation(fields: [orderId], references: [id])
+  user      User               @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+}
+
+model UserCredit {
+  id        Int      @id @default(autoincrement())
+  userId    String   @map("user_id")
+  type      String   @default("DECK_CREDIT")
+  balance   Int      @default(0)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+}
+
+model Affiliate {
+  id        Int                @id @default(autoincrement())
+  code      String             @unique
+  userId    String?            @map("user_id")
+  createdAt DateTime           @default(now()) @map("created_at")
+  user      User?              @relation(fields: [userId], references: [id])
+  earnings  AffiliateEarning[]
+  orders    Order[]
+
+  @@index([userId])
+}
+
+model AffiliateEarning {
+  id          Int                   @id @default(autoincrement())
+  orderId     Int                   @unique @map("order_id")
+  affiliateId Int                   @map("affiliate_id")
+  amount      Int
+  status      AffiliatePayoutStatus @default(PENDING)
+  createdAt   DateTime              @default(now()) @map("created_at")
+  affiliate   Affiliate             @relation(fields: [affiliateId], references: [id])
+  order       Order                 @relation(fields: [orderId], references: [id])
+
+  @@index([affiliateId])
+}
+
+enum ProductType {
+  SINGLE_DECK
+  BUNDLE
+  SUBSCRIPTION
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum PaymentProvider {
+  RAZORPAY
+  STRIPE
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELED
+  EXPIRED
+  PAST_DUE
+}
+
+enum AffiliatePayoutStatus {
+  PENDING
+  PAID
 }

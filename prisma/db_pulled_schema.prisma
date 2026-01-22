@@ -1,0 +1,142 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model AiGeneration {
+  id         Int      @id @default(autoincrement())
+  deck_id    Int
+  prompt     String
+  model      String?
+  created_at DateTime @default(now())
+  GameDeck   GameDeck @relation(fields: [deck_id], references: [id], onDelete: Cascade)
+
+  @@index([deck_id])
+}
+
+model Face {
+  id             Int             @id @default(autoincrement())
+  photo_id       Int
+  bounding_box   Json
+  face_embedding String?
+  Photo          Photo           @relation(fields: [photo_id], references: [id], onDelete: Cascade)
+  FacePersonMap  FacePersonMap[]
+
+  @@index([photo_id])
+}
+
+model FacePersonMap {
+  id        Int    @id @default(autoincrement())
+  face_id   Int
+  person_id Int
+  Face      Face   @relation(fields: [face_id], references: [id], onDelete: Cascade)
+  Person    Person @relation(fields: [person_id], references: [id], onDelete: Cascade)
+
+  @@index([face_id])
+  @@index([person_id])
+}
+
+model GameCard {
+  id          Int      @id @default(autoincrement())
+  deck_id     Int
+  photo_id    Int?
+  rule_text   String
+  order_index Int
+  is_draft    Boolean  @default(true)
+  GameDeck    GameDeck @relation(fields: [deck_id], references: [id], onDelete: Cascade)
+  Photo       Photo?   @relation(fields: [photo_id], references: [id])
+
+  @@index([deck_id])
+}
+
+model GameDeck {
+  id           Int            @id @default(autoincrement())
+  user_id      String
+  game_mode_id Int
+  title        String?
+  notes        String?
+  goal         String?
+  secrets      String?
+  extra        String?
+  chaos_level  Int            @default(3)
+  use_images   Boolean        @default(false)
+  is_saved     Boolean        @default(false)
+  created_at   DateTime       @default(now())
+  AiGeneration AiGeneration[]
+  GameCard     GameCard[]
+  GameMode     GameMode       @relation(fields: [game_mode_id], references: [id])
+  User         User           @relation(fields: [user_id], references: [id])
+  Order        Order[]
+
+  @@index([game_mode_id])
+  @@index([user_id])
+}
+
+model GameMode {
+  id                Int                 @id @default(autoincrement())
+  name              String              @unique
+  GameDeck          GameDeck[]
+  sandy_chaos_cards sandy_chaos_cards[]
+}
+
+model Order {
+  id             Int      @id @default(autoincrement())
+  deck_id        Int
+  customer_email String
+  address        String
+  status         String   @default("PENDING")
+  created_at     DateTime @default(now())
+  GameDeck       GameDeck @relation(fields: [deck_id], references: [id])
+
+  @@index([customer_email])
+  @@index([deck_id])
+}
+
+model Person {
+  id            Int             @id @default(autoincrement())
+  user_id       String
+  name          String
+  note          String?
+  created_at    DateTime        @default(now())
+  FacePersonMap FacePersonMap[]
+  User          User            @relation(fields: [user_id], references: [id])
+
+  @@index([user_id])
+}
+
+model Photo {
+  id          Int        @id @default(autoincrement())
+  user_id     String
+  image_url   String
+  uploaded_at DateTime   @default(now())
+  Face        Face[]
+  GameCard    GameCard[]
+  User        User       @relation(fields: [user_id], references: [id])
+
+  @@index([user_id])
+}
+
+model User {
+  id         String     @id
+  email      String     @unique
+  name       String?
+  created_at DateTime   @default(now())
+  GameDeck   GameDeck[]
+  Person     Person[]
+  Photo      Photo[]
+
+  @@index([email])
+}
+
+model sandy_chaos_cards {
+  id           Int      @id @default(autoincrement())
+  game_mode_id Int
+  rule_text    String
+  chaos_level  Int
+  GameMode     GameMode @relation(fields: [game_mode_id], references: [id])
+
+  @@index([game_mode_id])
+}
