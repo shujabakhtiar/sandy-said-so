@@ -11,7 +11,7 @@ export const GameModes = () => {
   const modes = [
     { id: 1, title: "Sandy's Confession", tag: "Truth or Dare", color: "bg-brand-tan" },
     { id: 2, title: "Pure Provocation", tag: "Drinking Rituals", color: "bg-brand-blue" },
-    { id: 3, title: "The Verdict", tag: "Naughty & Spicy • Couples only", color: "bg-brand-red" }
+    { id: 3, title: "Dimmed Lights", tag: "Naughty & Spicy • Couples only", color: "bg-brand-red" }
   ];
 
   const handleModeClick = (modeId: number) => {

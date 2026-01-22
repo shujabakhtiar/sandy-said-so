@@ -30,7 +30,7 @@ export const GAME_MODE_RULES: GameModeRules = {
       { step: 4, title: "The Twist", description: "If the subject completes the dare, they get to pick the next target. If they drink, the group decides." }
     ]
   },
-  "The Verdict": {
+  "Dimmed Lights": {
     description: "The courtroom is in session. Sandy is the judge, and your friends are the jury.",
     rules: [
       { step: 1, title: "The Case", description: "Reveal a card. It presents a hypothetical scenario or a 'Most Likely To' situation." },

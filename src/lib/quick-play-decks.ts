@@ -28,9 +28,9 @@ export const QUICK_PLAY_DECKS = [
     ]
   },
   {
-    id: 3, // Matches The Verdict ID
-    title: "The Verdict",
-    gameMode: { name: "The Verdict" },
+    id: 3, // Matches Dimmed Lights ID
+    title: "Dimmed Lights",
+    gameMode: { name: "Dimmed Lights" },
     gameCards: [
       { id: 1, ruleText: "{player}, send a risky text to the third person in your recent contacts.", orderIndex: 0 },
       { id: 2, ruleText: "Two Truths and a Lie: {player} goes first. Group votes. Losers drink.", orderIndex: 1 },

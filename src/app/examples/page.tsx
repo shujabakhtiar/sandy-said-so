@@ -20,7 +20,7 @@ export default function ExamplesPage() {
   const modesMap = [
     { title: "Sandy's Confession", color: "bg-brand-tan" },
     { title: "Pure Provocation", color: "bg-brand-blue" },
-    { title: "The Verdict", color: "bg-brand-red" }
+    { title: "Dimmed Lights", color: "bg-brand-red" }
   ];
 
   return (

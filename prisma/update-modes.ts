@@ -5,7 +5,7 @@ async function main() {
   const modes = [
     { id: 1, name: "Sandy's Confession" },
     { id: 2, name: "Pure Provocation" },
-    { id: 3, name: "The Verdict" },
+    { id: 3, name: "Dimmed Lights" },
   ];
 
   for (const mode of modes) {

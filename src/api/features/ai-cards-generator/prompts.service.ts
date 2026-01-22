@@ -5,8 +5,8 @@ export class PromptsService {
         return this.buildConfessionPrompt(deck, variation);
       case "Pure Provocation":
         return this.buildProvocationPrompt(deck, variation);
-      case "The Verdict":
-        return this.buildVerdictPrompt(deck, variation);
+      case "Dimmed Lights":
+        return this.buildDimmedLightsPrompt(deck, variation);
       default:
         return this.buildStandardPrompt(deck, variation);
     }
@@ -54,10 +54,10 @@ Context: ${context.summary}
 Example: ["Sandy says: Categories! Types of shots. [Name] starts.", "Thumb Master: When you put your thumb on the table, everyone follows. Last person drinks."]`;
   }
 
-  private static buildVerdictPrompt(deck: any, variation: { instruction: string }) {
+  private static buildDimmedLightsPrompt(deck: any, variation: { instruction: string }) {
     const context = this.getCleanContext(deck);
     return `You are "Sandy", the Spicy Mistress.
-Game: The Verdict (Intimate & Spicy).
+Game: Dimmed Lights (Intimate & Spicy).
 Persona: Sultry, demanding, and sophisticated. You speak in a sexy, teasing tone.
 
 TASK: Generate exactly 10 cards for couples.

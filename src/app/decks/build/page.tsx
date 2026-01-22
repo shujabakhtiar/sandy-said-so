@@ -14,7 +14,7 @@ import { ContextDetailsStep } from "@/ui/components/features/deck-build/ContextD
 const modes = [
   { id: 1, title: "Sandy's Confession", tag: "Truth or Dare", description: "Deep secrets, uncomfortable truths, and social sabotage.", color: "bg-brand-tan" },
   { id: 2, title: "Pure Provocation", tag: "Drinking Rituals", description: "The ultimate drinking game. Sandy makes the rules for the circle, Kings Cup style.", color: "bg-brand-blue" },
-  { id: 3, title: "The Verdict", tag: "Naughty & Spicy", description: "For the brave ones. High-stakes adult games and spicy sex dares.", color: "bg-brand-red" }
+  { id: 3, title: "Dimmed Lights", tag: "Naughty & Spicy", description: "For the brave ones. High-stakes adult games and spicy sex dares.", color: "bg-brand-red" }
 ];
 
 function BuildDeckContent() {

@@ -55,7 +55,7 @@ export const ContextDetailsStep = ({
   setChaosLevel,
   selectedModeId,
 }: ContextDetailsStepProps) => {
-  const isVerdict = selectedModeId === 3;
+  const isDimmedLights = selectedModeId === 3;
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -184,7 +184,7 @@ export const ContextDetailsStep = ({
         </div>
 
         {/* Chaos Level */}
-        {!isVerdict && (
+        {!isDimmedLights && (
           <div className="bg-white rounded-[40px] p-10 border border-brand-tan/10 shadow-espresso/5 mb-2">
             <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-brand-text-muted mb-8 ml-1">
               Chaos Level: How much trouble do you want?
@@ -230,7 +230,7 @@ export const ContextDetailsStep = ({
         )}
 
         {/* Goal */}
-        {!isVerdict && (
+        {!isDimmedLights && (
           <div>
             <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-brand-text-muted mb-3 ml-1">
               Tell Sandy how you want to have a good time? (Optional)
@@ -262,7 +262,7 @@ export const ContextDetailsStep = ({
         )}
 
         {/* Secrets */}
-        {!isVerdict && (
+        {!isDimmedLights && (
           <div>
             <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-brand-text-muted mb-3 ml-1">
               Any secrets or running jokes for Sandy? (Optional)
@@ -296,14 +296,14 @@ export const ContextDetailsStep = ({
         {/* Extra */}
         <div>
           <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-brand-text-muted mb-3 ml-1">
-            {isVerdict ? "Anything you'd like Sandy to know? (Optional)" : "Help Sandy make the game? (Optional)"}
+            {isDimmedLights ? "Anything you'd like Sandy to know? (Optional)" : "Help Sandy make the game? (Optional)"}
           </label>
           <textarea
             rows={3}
             value={extra}
             onChange={(e) => setExtra(e.target.value)}
             className="w-full px-8 py-6 rounded-[32px] bg-white border border-brand-tan/30 focus:border-brand-brown focus:ring-0 outline-none text-brand-brown font-medium shadow-sm transition-all resize-none mb-3"
-            placeholder={isVerdict ? "Occasion, specific items you have, or spicy vibes..." : "Occasion, specific rules, or vibes..."}
+            placeholder={isDimmedLights ? "Occasion, specific items you have, or spicy vibes..." : "Occasion, specific rules, or vibes..."}
           />
           <div className="flex flex-wrap gap-2">
             {[

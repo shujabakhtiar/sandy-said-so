@@ -9,7 +9,7 @@ import { cn } from "@/ui/lib/utils";
 const GAME_MODES = [
   { id: 1, title: "Sandy's Confession", color: "bg-brand-tan", description: "Deep secrets, uncomfortable truths." },
   { id: 2, title: "Pure Provocation", color: "bg-brand-blue", description: "The ultimate drinking game." },
-  { id: 3, title: "The Verdict", color: "bg-brand-red", description: "For the brave ones. High stakes." }
+  { id: 3, title: "Dimmed Lights", color: "bg-brand-red", description: "For the brave ones. High stakes." }
 ];
 
 export default function QuickPlayInitPage() {

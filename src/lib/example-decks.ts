@@ -26,7 +26,7 @@ export const EXAMPLE_DECKS = [
   {
     id: 103,
     title: "Spicy Night Out",
-    gameMode: { name: "The Verdict" },
+    gameMode: { name: "Dimmed Lights" },
     gameCards: [
       { id: 11, ruleText: "Taylor, point to the person you'd most want to be stranded on an island with.", orderIndex: 0 },
       { id: 12, ruleText: "Alex and Sam, exchange a piece of clothing or finish your drinks.", orderIndex: 1 },
