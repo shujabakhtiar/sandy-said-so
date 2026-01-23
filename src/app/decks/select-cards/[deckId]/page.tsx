@@ -180,13 +180,10 @@ export default function SelectCardsPage() {
             const allSelected = deckCards.every(card => selectedCards.has(card));
             const someSelected = deckCards.some(card => selectedCards.has(card));
             
-            // Better labels for the variations
-            const variationLabels = [
-              { name: "Bold & Daring", description: "Push boundaries and create memorable moments" },
-              { name: "Wild & Chaotic", description: "Maximum unpredictability and hilarious chaos" }
-            ];
-            
-            const variation = variationLabels[deckIndex] || { name: suggestion.theme, description: "" };
+            const variation = { 
+              name: suggestion.theme, 
+              description: (suggestion as any).description || "" 
+            };
             
             return (
               <div key={deckIndex} className="bg-white rounded-[48px] p-10 shadow-lg">

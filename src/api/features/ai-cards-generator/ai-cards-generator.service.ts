@@ -22,19 +22,38 @@ export class AICardsGeneratorService {
 
     const existingCount = deck.gameCards?.length || 0;
 
-    // 2. Check if we already have a complete set of cards (live or drafts)
-    if (existingCount >= 20) {
-      // Group them into the expected theme structure for the UI
+    // 2. Check if we already have suggestions (drafts)
+    const drafts = deck.gameCards.filter(c => c.isDraft);
+    if (drafts.length > 0) {
+      // Group cards by their card_type (phase) or into standard variations
+      if (deck.gameMode.name === "Dimmed Lights") {
+        const phases = ["PHASE_0", "PHASE_1", "PHASE_2", "PHASE_3", "PHASE_4", "PHASE_5"];
+        const phaseNames: Record<string, string> = {
+          PHASE_0: "Backstory",
+          PHASE_1: "Opening Moment",
+          PHASE_2: "Inside the Space",
+          PHASE_3: "Almost",
+          PHASE_4: "Tension",
+          PHASE_5: "Permission"
+        };
+
+        return phases.map(phase => ({
+          theme: phaseNames[phase],
+          cards: drafts.filter(c => c.cardType === phase).map(c => c.ruleText)
+        })).filter(p => p.cards.length > 0);
+      }
+
+      // Standard mode grouping
       return [
         { 
           theme: "Bold & Daring", 
-          cards: deck.gameCards.slice(0, 10).map(c => c.ruleText) 
+          cards: drafts.slice(0, 10).map(c => c.ruleText) 
         },
         { 
           theme: "Wild & Chaotic", 
-          cards: deck.gameCards.slice(10, 20).map(c => c.ruleText) 
+          cards: drafts.slice(10, 20).map(c => c.ruleText) 
         }
-      ];
+      ].filter(v => v.cards.length > 0);
     }
 
     // 3. Complete Cleanup: Remove ANY existing cards if we are re-generating
@@ -42,20 +61,34 @@ export class AICardsGeneratorService {
       where: { deckId }
     });
 
-    // 4. Generate 2 different variations
-    const variations = [
+    // 4. Generate variations based on game mode
+    let variations = [
       { 
         name: "Bold & Daring", 
-        instruction: "Create cards that are bold and push boundaries." 
+        instruction: "Create cards that are bold and push boundaries.",
+        type: null as any
       },
       { 
         name: "Wild & Chaotic", 
-        instruction: "Create cards that maximize chaos and unpredictability." 
+        instruction: "Create cards that maximize chaos and unpredictability.",
+        type: null as any
       }
     ];
 
+    if (deck.gameMode.name === "Dimmed Lights") {
+      variations = [
+        { type: "PHASE_0", name: "Backstory", instruction: "PHASE 0 — BACKSTORY (SHARED, READ TOGETHER). Short narrative paragraph establishing fictional context. No choices. No dialogue prompts." },
+        { type: "PHASE_1", name: "Opening Moment", instruction: "PHASE 1 — THE OPENING MOMENT. Romance-novel beginning. Gentle tension. Emotional stakes. No rush." },
+        { type: "PHASE_2", name: "Inside the Space", instruction: "PHASE 2 — INSIDE THE SPACE. Proximity, noticing details. No urgency." },
+        { type: "PHASE_3", name: "Almost", instruction: "PHASE 3 — ALMOST. Closeness without crossing the line. Anticipation focus." },
+        { type: "PHASE_4", name: "Tension", instruction: "PHASE 4 — TENSION. Waiting becomes intentional. Subtle control." },
+        { type: "PHASE_5", name: "Permission", instruction: "PHASE 5 — PERMISSION. Game steps back. Couple continues naturally." },
+      ] as any;
+    }
+
+    let globalCardIndex = 0;
     const deckSuggestions = await Promise.all(
-      variations.map(async (variation, index) => {
+      variations.map(async (variation) => {
         const prompt = PromptsService.getPromptForMode(deck.gameMode.name, deck, variation);
         
         const response = await this.genAI.models.generateContent({
@@ -68,16 +101,18 @@ export class AICardsGeneratorService {
         
         // Save suggested cards as drafts
         await Promise.all(
-          cards.map((cardText, cardIndex) =>
-            prisma.gameCard.create({
+          cards.map((cardText) => {
+            const currentIndex = globalCardIndex++;
+            return prisma.gameCard.create({
               data: {
                 deckId: deck.id,
                 ruleText: cardText,
-                orderIndex: cardIndex + (index * 10),
+                orderIndex: currentIndex,
+                cardType: variation.type,
                 isDraft: true
               }
-            })
-          )
+            });
+          })
         );
 
         return {
@@ -114,11 +149,10 @@ export class AICardsGeneratorService {
 
       const parsed = JSON.parse(cleanJson);
 
-      // 2. Handle nested arrays or weird objects
       if (Array.isArray(parsed)) {
         // Flatten if AI returned [[...]]
         const flat = parsed.flat(2);
-        return flat.filter(item => typeof item === 'string').slice(0, 10);
+        return flat.filter(item => typeof item === 'string');
       }
 
       // 3. Fallback to line splitting if it's not an array

@@ -56,33 +56,43 @@ Example: ["Sandy says: Categories! Types of shots. [Name] starts.", "Thumb Maste
 
   private static buildDimmedLightsPrompt(deck: any, variation: { instruction: string }) {
     const context = this.getCleanContext(deck);
-    return `You are "Sandy", the Spicy Mistress.
-Game: Dimmed Lights (Intimate & Spicy).
-Persona: Sultry, demanding, and sophisticated. You speak in a sexy, teasing tone.
+    return `You are "Sandy".
+You are not speaking directly to the players.
+You are designing intimate, cinematic game cards that guide a couple into a romantic, flirty, non-explicit sexual scene.
 
-TASK: Generate exactly 10 cards for couples.
-Variation: ${variation.instruction}
+GOAL:
+Create a scripted, easy-to-follow intimacy experience that feels like stepping into a romance novel.
+The cards should reduce awkwardness, increase chemistry, and gently escalate tension.
+
+PARTICIPANTS:
+Names: ${context.peopleList || "{{NAMES}}"}
+Kinks / Preferences (use subtly, implied, non-explicit): ${context.secrets || "None specified"}
 Chaos Level: ${deck.chaosLevel}/5
 
-Instructions: Each card should include:
-Title (2–3 words, bold/punchy, e.g., “Hands Behind,” “Dominatrix”)
-Description (1–2 sentences, clear, sexual intent, kinky or playful, but non-explicit about body acts)
-Themes to include: bondage, role-playing, power exchange, toys, sexual tension, anticipation, control, denial, and positions.
-The tone should be erotic, seductive, and consent-focused.
-Cards should be usable in a choose 3–5 style, where couples pick a few and incorporate them in their play.
-Avoid explicit pornographic detail. Focus on mood, power, and rules.
-Give the output as a numbered list of cards with title and description.
+CURRENT PHASE:
+${variation.instruction}
 
-Rules:
-1. Focus on intimate activities: neck kisses, strip-tease, teasing and sex positions.
-2. If context mentions items (ice, blindfolds), use them.
-3. Tone: Sultry Mistress. 
-4. ${context.peopleList ? "Focus on the chemistry between: " + context.peopleList : ""}
-5. Limits: Max 30 words and 160 chars per card.
-6. Format: Valid JSON array of 10 strings.
-${this.getTechnicalConstraints()}
-Context: ${context.summary}
-Example: ["**Whisper Secrets**: Whisper your dirtiest fantasy into [Name]'s ear.", "**Master's Command**: Remove one piece of clothing. Slowly."]`;
+IMPORTANT STRUCTURE:
+- ${variation.instruction.includes("PHASE 0") 
+    ? "Generate exactly ONE short narrative paragraph for this phase." 
+    : "Generate exactly TWO PRIVATE CARDS: His Card and Her Card."}
+- Players may choose to reveal or keep cards private.
+- DO NOT include "Say one of these".
+- DO NOT give multiple dialogue options.
+- Write the cards as SCENE DIRECTIONS, not instructions.
+- Dialogue may appear naturally inside the scene when appropriate.
+
+TONE:
+- Flirty, Romantic, Confident, Cinematic, Non-explicit, Consent-forward.
+- Think romance novel, not rulebook.
+
+CONTENT LIMITS:
+- No explicit sexual acts. No graphic body descriptions.
+- Focus on tension, closeness, anticipation, pacing, silence.
+
+${this.getTechnicalConstraints(variation.instruction.includes("PHASE 0") ? 1 : 2)}
+
+Context Summary: ${context.summary}`;
   }
 
   private static buildStandardPrompt(deck: any, variation: { instruction: string }) {
@@ -115,13 +125,13 @@ Context: ${context.summary}`;
     };
   }
 
-  private static getTechnicalConstraints() {
+  private static getTechnicalConstraints(cardCount: number = 10) {
     return `
 TECHNICAL CONSTRAINTS:
 1. OUTPUT: ONLY a valid JSON array of strings. 
 2. NO PREAMBLE: Do not include "Here is your JSON" or any text outside the array.
 3. STRUCTURE: Flat array. No nested arrays. No objects.
 4. VALIDATION: Keys and values must use double quotes.
-5. LIMITS: Exactly 10 strings. Max 30 words and 160 chars per card.`;
+5. LIMITS: Exactly ${cardCount} strings. ${cardCount === 1 ? "Maximum 80 words." : "Maximum 40 words per string."}`;
   }
 }
