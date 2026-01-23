@@ -10,6 +10,7 @@ interface GameCardProps {
     photo?: {
       url: string;
     };
+    cardType?: string;
   };
   gameType?: string;
   onEdit?: (card: any) => void;

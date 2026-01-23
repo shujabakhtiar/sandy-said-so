@@ -106,11 +106,12 @@ model GameCard {
   id         Int      @id @default(autoincrement())
   deckId     Int      @map("deck_id")
   photoId    Int?     @map("photo_id")
-  ruleText   String   @map("rule_text")
-  orderIndex Int      @map("order_index")
-  isDraft    Boolean  @default(true) @map("is_draft")
-  deck       GameDeck @relation(fields: [deckId], references: [id], onDelete: Cascade)
-  photo      Photo?   @relation(fields: [photoId], references: [id])
+  ruleText   String         @map("rule_text")
+  orderIndex Int            @map("order_index")
+  isDraft    Boolean        @default(true) @map("is_draft")
+  cardType   GameCardType?  @map("card_type")
+  deck       GameDeck       @relation(fields: [deckId], references: [id], onDelete: Cascade)
+  photo      Photo?         @relation(fields: [photoId], references: [id])
 
   @@index([deckId])
 }
@@ -272,4 +273,13 @@ enum SubscriptionStatus {
 enum AffiliatePayoutStatus {
   PENDING
   PAID
+}
+
+enum GameCardType {
+  PHASE_0
+  PHASE_1
+  PHASE_2
+  PHASE_3
+  PHASE_4
+  PHASE_5
 }

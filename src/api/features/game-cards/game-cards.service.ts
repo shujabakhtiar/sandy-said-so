@@ -1,13 +1,14 @@
 import { prisma } from "../../../lib/prisma";
 
 export class GameCardsService {
-  static async addCard(data: { deckId: number; ruleText: string; photoId?: number; orderIndex: number }) {
+  static async addCard(data: { deckId: number; ruleText: string; photoId?: number; orderIndex: number; cardType?: any }) {
     return await prisma.gameCard.create({
       data: {
         deckId: data.deckId,
         ruleText: data.ruleText,
         photoId: data.photoId,
         orderIndex: data.orderIndex,
+        cardType: data.cardType,
       },
     });
   }
@@ -25,7 +26,7 @@ export class GameCardsService {
     });
   }
 
-  static async bulkAddCards(deckId: number, cards: { ruleText: string; orderIndex: number; photoId?: number }[]) {
+  static async bulkAddCards(deckId: number, cards: { ruleText: string; orderIndex: number; photoId?: number; cardType?: any }[]) {
     const ruleTextsToSave = cards.map(c => c.ruleText);
 
     // 1. Mark selected cards as live (isDraft: false)
@@ -61,6 +62,7 @@ export class GameCardsService {
           ruleText: card.ruleText,
           orderIndex: card.orderIndex,
           photoId: card.photoId,
+          cardType: card.cardType,
           isDraft: false
         })),
       });
@@ -70,19 +72,20 @@ export class GameCardsService {
     for (const card of cards) {
       await prisma.gameCard.updateMany({
         where: { deckId, ruleText: card.ruleText },
-        data: { orderIndex: card.orderIndex }
+        data: { orderIndex: card.orderIndex, cardType: card.cardType }
       });
     }
 
     return { count: cards.length };
   }
 
-  static async updateCard(id: number, data: { ruleText?: string; isDraft?: boolean }) {
+  static async updateCard(id: number, data: { ruleText?: string; isDraft?: boolean; cardType?: any }) {
     return await prisma.gameCard.update({
       where: { id },
       data: { 
         ruleText: data.ruleText,
-        isDraft: data.isDraft
+        isDraft: data.isDraft,
+        cardType: data.cardType
       },
     });
   }
