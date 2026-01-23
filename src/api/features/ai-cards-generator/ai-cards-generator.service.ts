@@ -37,23 +37,29 @@ export class AICardsGeneratorService {
           PHASE_5: "Permission"
         };
 
-        return phases.map(phase => ({
-          theme: phaseNames[phase],
-          cards: drafts.filter(c => c.cardType === phase).map(c => c.ruleText)
-        })).filter(p => p.cards.length > 0);
+        return {
+          gameModeName: deck.gameMode.name,
+          suggestions: phases.map(phase => ({
+            theme: phaseNames[phase],
+            cards: drafts.filter(c => c.cardType === phase).map(c => c.ruleText)
+          })).filter(p => p.cards.length > 0)
+        };
       }
 
       // Standard mode grouping
-      return [
-        { 
-          theme: "Bold & Daring", 
-          cards: drafts.slice(0, 10).map(c => c.ruleText) 
-        },
-        { 
-          theme: "Wild & Chaotic", 
-          cards: drafts.slice(10, 20).map(c => c.ruleText) 
-        }
-      ].filter(v => v.cards.length > 0);
+      return {
+        gameModeName: deck.gameMode.name,
+        suggestions: [
+          { 
+            theme: "Bold & Daring", 
+            cards: drafts.slice(0, 10).map(c => c.ruleText) 
+          },
+          { 
+            theme: "Wild & Chaotic", 
+            cards: drafts.slice(10, 20).map(c => c.ruleText) 
+          }
+        ].filter(v => v.cards.length > 0)
+      };
     }
 
     // 3. Complete Cleanup: Remove ANY existing cards if we are re-generating
@@ -110,7 +116,7 @@ export class AICardsGeneratorService {
                 orderIndex: currentIndex,
                 cardType: variation.type,
                 targetPerson: typeof card === 'string' ? null : card.target,
-                isDraft: true
+                isDraft: deck.gameMode?.name === "Dimmed Lights" ? false : true
               }
             });
           })
@@ -123,8 +129,10 @@ export class AICardsGeneratorService {
       })
     );
 
-    const totalGenerated = deckSuggestions.reduce((acc, curr) => acc + curr.cards.length, 0);
-    return deckSuggestions;
+    return {
+      gameModeName: deck.gameMode?.name,
+      suggestions: deckSuggestions
+    };
   }
 
 

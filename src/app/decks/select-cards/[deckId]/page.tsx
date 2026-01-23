@@ -47,7 +47,15 @@ export default function SelectCardsPage() {
 
       if (response.ok) {
         const data = await response.json();
-        setSuggestions(data.suggestions);
+        const { gameModeName, suggestions: fetchedSuggestions } = data.suggestions;
+        
+        if (gameModeName === "Dimmed Lights") {
+          sandyToast.success("Deck ready.", "Sandy has finalized your cinematic experience.");
+          router.push(`/decks/${deckId}`);
+          return;
+        }
+
+        setSuggestions(fetchedSuggestions);
       } else {
         sandyToast.error("Failed to fetch suggestions from Sandy's kitchen.");
         hasFetched.current = false; // Allow retry if failed
