@@ -32,13 +32,17 @@ export const QUICK_PLAY_DECKS = [
     title: "Dimmed Lights",
     gameMode: { name: "Dimmed Lights" },
     gameCards: [
-      { id: 1, ruleText: "{player}, send a risky text to the third person in your recent contacts.", orderIndex: 0 },
-      { id: 2, ruleText: "Two Truths and a Lie: {player} goes first. Group votes. Losers drink.", orderIndex: 1 },
-      { id: 3, ruleText: "{player}, choose someone to give you a lap dance for 10 seconds.", orderIndex: 2 },
-      { id: 4, ruleText: "Everyone swap an item of clothing with the person to your right.", orderIndex: 3 },
-      { id: 5, ruleText: "{player}, kiss the cheek of the person to your left.", orderIndex: 4 },
-      { id: 6, ruleText: "{player}, let the group DM anyone from your Instagram.", orderIndex: 5 },
-      { id: 7, ruleText: "Spicy Question: {player}, have you ever hooked up with anyone in this room?", orderIndex: 6 },
+      { id: 1, cardType: "PHASE_0", ruleText: "Remember how it started. Before the world got loud, there was just this. A history written in glances.", orderIndex: 0 },
+      { id: 2, cardType: "PHASE_1", targetPerson: "Him", ruleText: "{player}, lean in and whisper what you first thought when you saw her.", orderIndex: 1 },
+      { id: 3, cardType: "PHASE_1", targetPerson: "Her", ruleText: "{player}, name one thing he's wearing today that you'd like to take off.", orderIndex: 2 },
+      { id: 4, cardType: "PHASE_2", targetPerson: "Him", ruleText: "{player}, trace a line from her shoulder to her wrist. Don't break eye contact.", orderIndex: 3 },
+      { id: 5, cardType: "PHASE_2", targetPerson: "Her", ruleText: "{player}, what is a part of his body you've been wanting to touch all night?", orderIndex: 4 },
+      { id: 6, cardType: "PHASE_3", targetPerson: "Him", ruleText: "{player}, if you could take her anywhere right now, no questions asked, where would it be?", orderIndex: 5 },
+      { id: 7, cardType: "PHASE_3", targetPerson: "Her", ruleText: "{player}, show him exactly how you want to be kissed later.", orderIndex: 6 },
+      { id: 8, cardType: "PHASE_4", targetPerson: "Him", ruleText: "{player}, let her lead you to a different spot in the room. Just you two.", orderIndex: 7 },
+      { id: 9, cardType: "PHASE_4", targetPerson: "Her", ruleText: "{player}, tell him a secret that makes your heart race just thinking about it.", orderIndex: 8 },
+      { id: 10, cardType: "PHASE_5", targetPerson: "Him", ruleText: "{player}, Sandy gives you permission. Take her hand and don't let go.", orderIndex: 9 },
+      { id: 11, cardType: "PHASE_5", targetPerson: "Her", ruleText: "{player}, it's time. Tell him what you want him to do to you next.", orderIndex: 10 },
     ]
   }
 ];

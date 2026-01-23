@@ -28,11 +28,12 @@ export const EXAMPLE_DECKS = [
     title: "Spicy Night Out",
     gameMode: { name: "Dimmed Lights" },
     gameCards: [
-      { id: 11, ruleText: "Taylor, point to the person you'd most want to be stranded on an island with.", orderIndex: 0 },
-      { id: 12, ruleText: "Alex and Sam, exchange a piece of clothing or finish your drinks.", orderIndex: 1 },
-      { id: 13, ruleText: "Jordan, rate everyone's kissing potential on a scale of 1-10.", orderIndex: 2 },
-      { id: 14, ruleText: "Whoever has the best 'moves' must demonstrate them now for 30 seconds.", orderIndex: 3 },
-      { id: 15, ruleText: "Sandy says: Sam and Taylor must hold hands until someone takes a drink.", orderIndex: 4 },
+      { id: 11, cardType: "PHASE_0", ruleText: "Sandy senses the electricity in the room. This isn't just another night out. It's a collision waiting to happen.", orderIndex: 0 },
+      { id: 12, cardType: "PHASE_1", targetPerson: "Him", ruleText: "Taylor, point to the person you'd most want to be stranded on an island with.", orderIndex: 1 },
+      { id: 13, cardType: "PHASE_1", targetPerson: "Her", ruleText: "Alex and Sam, exchange a piece of clothing or finish your drinks.", orderIndex: 2 },
+      { id: 14, cardType: "PHASE_2", targetPerson: "Him", ruleText: "Jordan, rate everyone's kissing potential on a scale of 1-10.", orderIndex: 3 },
+      { id: 15, cardType: "PHASE_2", targetPerson: "Her", ruleText: "Whoever has the best 'moves' must demonstrate them now for 30 seconds.", orderIndex: 4 },
+      { id: 16, cardType: "PHASE_3", targetPerson: "Him", ruleText: "Sandy says: Sam and Taylor must hold hands until someone takes a drink.", orderIndex: 5 },
     ]
   }
 ];

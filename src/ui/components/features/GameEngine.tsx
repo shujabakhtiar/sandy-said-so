@@ -42,11 +42,21 @@ export const GameEngine = ({ deck, isExample, onBack }: GameEngineProps) => {
 
   const isDimmedLights = modeName === "Dimmed Lights";
 
-  // Extract participants from deck.extra
+  // Extract participants from deck.extra or provide intelligent fallbacks
   const getParticipants = () => {
+    // 1. Try to extract from deck.extra (standard AI deck flow)
     const peopleMatch = deck.extra?.match(/People in the room: (.*)/);
-    if (!peopleMatch) return ["Him", "Her"]; // Fallback
-    return peopleMatch[1].split(",").map((p: string) => p.trim().split(" (")[0]);
+    if (peopleMatch) {
+      return peopleMatch[1].split(",").map((p: string) => p.trim().split(" (")[0]);
+    }
+
+    // 2. Try to find names in example cards if it's a known example deck (heuristic)
+    if (isExample && (deck as any).id === 103) {
+      return ["Taylor", "Jordan"]; // Specific names used in the spicy example
+    }
+
+    // 3. Absolute fallback
+    return ["Him", "Her"];
   };
 
   const participants = getParticipants();
