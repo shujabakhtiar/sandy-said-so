@@ -5,16 +5,21 @@ export class OrderService {
    * Places an order for a physical deck.
    */
   static async placeOrder(data: {
-    deckId: number;
-    customerEmail: string;
-    address: string;
+    deckId?: number;
+    customerEmail?: string;
+    address?: string;
+    productId?: number;
+    gameModeId?: number;
+    amount?: number;
+    currency?: string;
   }) {
-    // 1. Verify deck exists
-    const deck = await prisma.gameDeck.findUnique({
-      where: { id: data.deckId },
-    });
-
-    if (!deck) throw new Error("Deck not found");
+    // 1. Verify deck exists if provided
+    if (data.deckId) {
+      const deck = await prisma.gameDeck.findUnique({
+        where: { id: data.deckId },
+      });
+      if (!deck) throw new Error("Deck not found");
+    }
 
     // 2. Create Order
     const order = await prisma.order.create({
@@ -36,7 +41,11 @@ export class OrderService {
     return await prisma.order.findMany({
       where: { customerEmail: email },
       include: {
-        deck: true,
+        items: {
+          include: {
+            deck: true
+          }
+        },
       },
       orderBy: {
         createdAt: "desc",
