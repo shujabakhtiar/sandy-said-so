@@ -7,6 +7,7 @@ import { Button } from "@/ui/components/ui/Button";
 import { Modal } from "@/ui/components/ui/Modal";
 import { GameCard } from "@/ui/components/features/GameCard";
 import { DLGameCard } from "@/ui/components/features/DLGameCard";
+import { CardStack } from "@/ui/components/features/CardStack";
 import { getRulesForMode } from "@/lib/game-rules";
 import { formatCardText } from "@/ui/lib/text-utils";
 
@@ -34,6 +35,7 @@ export const GameEngine = ({ deck, isExample, onBack }: GameEngineProps) => {
   // Dimmed Lights specific state
   const [activeParticipantIndex, setActiveParticipantIndex] = useState<number>(0);
   const [showHandover, setShowHandover] = useState(false);
+  const [swipedIndices, setSwipedIndices] = useState<Set<number>>(new Set());
 
   const modeName = deck.gameMode?.name || "Standard Mode";
   const rules = getRulesForMode(modeName);
@@ -165,6 +167,7 @@ export const GameEngine = ({ deck, isExample, onBack }: GameEngineProps) => {
   const handleHandoverComplete = () => {
     setShowHandover(false);
     setActiveParticipantIndex(1);
+    setSwipedIndices(new Set());
     // In Dimmed Lights, we show the next set when they click again
   };
 
@@ -172,6 +175,7 @@ export const GameEngine = ({ deck, isExample, onBack }: GameEngineProps) => {
     if (isDimmedLights) {
       setCurrentCardIndex(null);
       setRevealedCards([]);
+      setSwipedIndices(new Set());
       setActiveParticipantIndex(0);
       setShowHandover(false);
       // Re-shuffle/pick new cards
@@ -203,6 +207,7 @@ export const GameEngine = ({ deck, isExample, onBack }: GameEngineProps) => {
       setShuffledCards(shuffled);
       setCurrentCardIndex(null);
       setRevealedCards([]);
+      setSwipedIndices(new Set());
     }
   };
 
@@ -210,9 +215,14 @@ export const GameEngine = ({ deck, isExample, onBack }: GameEngineProps) => {
   const cardsRemaining = shuffledCards.length - revealedCards.length;
   const gameComplete = revealedCards.length === shuffledCards.length && !showHandover;
 
-  // For Dimmed Lights, get all currently revealed cards for the active participant
+  // For Dimmed Lights and Standard, get all currently revealed cards that haven't been swiped
   const getActiveRevealedCards = () => {
-    if (!isDimmedLights) return currentCard ? [currentCard] : [];
+    if (!isDimmedLights) {
+      return revealedCards
+        .map(idx => ({ card: shuffledCards[idx], index: idx }))
+        .filter(item => !swipedIndices.has(item.index))
+        .reverse(); // Newest on top
+    }
     
     // Find index of handover
     const handoverIdx = shuffledCards.findIndex(c => c.isHandover);
@@ -221,19 +231,22 @@ export const GameEngine = ({ deck, isExample, onBack }: GameEngineProps) => {
       // Shared (Backstory) + P1 cards
       return shuffledCards
         .slice(0, handoverIdx)
-        .filter((_, idx) => revealedCards.includes(idx));
+        .map((card, idx) => ({ card, index: idx }))
+        .filter(item => revealedCards.includes(item.index) && !swipedIndices.has(item.index));
     } else {
       // Shared (Backstory) + P2 cards
       const p2Cards = shuffledCards
         .slice(handoverIdx + 1)
-        .filter((_, idx) => revealedCards.includes(idx + handoverIdx + 1));
+        .map((card, idx) => ({ card, index: idx + handoverIdx + 1 }))
+        .filter(item => revealedCards.includes(item.index) && !swipedIndices.has(item.index));
         
       // If none of her specific cards are revealed yet, show nothing (to keep "Reveal Cards" button active)
       if (p2Cards.length === 0) return [];
 
       const backstory = shuffledCards
         .slice(0, handoverIdx)
-        .filter(c => c.cardType === "PHASE_0" && revealedCards.includes(shuffledCards.indexOf(c)));
+        .map((card, idx) => ({ card, index: idx }))
+        .filter(item => item.card.cardType === "PHASE_0" && revealedCards.includes(item.index) && !swipedIndices.has(item.index));
         
       return [...backstory, ...p2Cards];
     }
@@ -310,26 +323,21 @@ export const GameEngine = ({ deck, isExample, onBack }: GameEngineProps) => {
         {/* Current Cards Display */}
         {activeCards.length > 0 && !showHandover && (
           <div className={cn(
-            "w-full animate-in zoom-in-95 fade-in duration-500 perspective-1000",
-            isDimmedLights ? "max-w-4xl overflow-x-auto pb-12 scrollbar-hide" : "max-w-[320px] md:max-w-sm"
+            "w-full flex justify-center items-center select-none mb-12",
+            isDimmedLights ? "max-w-4xl h-[400px]" : "max-w-[320px] md:max-w-sm h-[500px]"
           )}>
-            <div className={cn(
-              "flex gap-6",
-              isDimmedLights ? "flex-row px-4" : "justify-center"
-            )}>
-              {activeCards.map((card, idx) => (
-                <div key={idx} className={cn(
-                  "shrink-0 transition-all duration-700",
-                  isDimmedLights ? "w-[450px] md:w-[550px]" : "w-72 md:w-80"
-                )}>
-                  {isDimmedLights ? (
-                    <DLGameCard card={card} />
-                  ) : (
-                    <GameCard card={card} />
-                  )}
-                </div>
-              ))}
-            </div>
+            <CardStack
+              cards={activeCards}
+              isDimmedLights={isDimmedLights}
+              onSwipe={(item) => setSwipedIndices(prev => new Set([...prev, item.index]))}
+              renderCard={(item: any) => (
+                isDimmedLights ? (
+                  <DLGameCard card={item.card} />
+                ) : (
+                  <GameCard card={item.card} />
+                )
+              )}
+            />
           </div>
         )}
 
@@ -391,8 +399,10 @@ export const GameEngine = ({ deck, isExample, onBack }: GameEngineProps) => {
                   <div className="text-brand-tan font-bold text-xs uppercase tracking-[0.3em] relative z-10">
                     {isDimmedLights 
                       ? (activeCards.length > 0 
-                          ? (activeParticipantIndex === 0 ? "Handover" : "Finish") 
-                          : "Reveal Cards") 
+                          ? "Swipe to reveal" // Or just empty if you want it to be clean
+                          : (shuffledCards[revealedCards.length]?.isHandover 
+                              ? "Handover" 
+                              : (revealedCards.length > 0 ? "Finish" : "Reveal Cards"))) 
                       : `${cardsRemaining} cards remaining`}
                   </div>
                 </div>
