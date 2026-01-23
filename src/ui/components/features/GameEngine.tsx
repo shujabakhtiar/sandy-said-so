@@ -55,7 +55,7 @@ export const GameEngine = ({ deck, isExample, onBack }: GameEngineProps) => {
     if (deck?.gameCards) {
       // Collect both types of cards
       const regularCards = (deck.gameCards || []).map(card => ({ ...card, isChaos: false }));
-      const chaosCards = ((deck as any).sandyChaosCards || []).map((card: any) => ({ ...card, isChaos: true }));
+      const chaosCards = (deck.gameMode?.name !== "Dimmed Lights" ? ((deck as any).sandyChaosCards || []) : []).map((card: any) => ({ ...card, isChaos: true }));
       
       const allCards = [...regularCards, ...chaosCards];
       
@@ -181,7 +181,7 @@ export const GameEngine = ({ deck, isExample, onBack }: GameEngineProps) => {
       // Re-shuffle/pick new cards
       if (deck?.gameCards) {
         const regularCards = (deck.gameCards || []).map(card => ({ ...card, isChaos: false }));
-        const chaosCards = ((deck as any).sandyChaosCards || []).map((card: any) => ({ ...card, isChaos: true }));
+        const chaosCards = (deck.gameMode?.name !== "Dimmed Lights" ? ((deck as any).sandyChaosCards || []) : []).map((card: any) => ({ ...card, isChaos: true }));
         const allCards = [...regularCards, ...chaosCards];
         
         const phases = ["PHASE_0", "PHASE_1", "PHASE_2", "PHASE_3", "PHASE_4", "PHASE_5"];

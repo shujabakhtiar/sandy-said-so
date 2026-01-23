@@ -205,7 +205,7 @@ export default function DeckViewPage() {
             {[
               ...(deck.gameCards?.data || [])
                 .map((c: any) => ({ ...c, isChaos: false })),
-              ...(activeTab === "live" ? (deck.sandyChaosCards || []).map((c: any) => ({ ...c, isChaos: true })) : [])
+              ...(activeTab === "live" && deck.gameMode?.name !== "Dimmed Lights" ? (deck.sandyChaosCards || []).map((c: any) => ({ ...c, isChaos: true })) : [])
             ].map((card: any, idx: number) => (
               <DeckCard
                 key={card.isChaos ? `chaos-${card.id}` : `reg-${card.id}`}
