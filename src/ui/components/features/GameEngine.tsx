@@ -30,6 +30,7 @@ export const GameEngine = ({ deck, isExample, onBack }: GameEngineProps) => {
   const router = useRouter();
   const [shuffledCards, setShuffledCards] = useState<any[]>([]);
   const [swipedIndices, setSwipedIndices] = useState<Set<number>>(new Set());
+  const [swipeHistory, setSwipeHistory] = useState<number[]>([]);
   const [showTitleCard, setShowTitleCard] = useState(true);
 
   // Dimmed Lights specific state
@@ -96,11 +97,30 @@ export const GameEngine = ({ deck, isExample, onBack }: GameEngineProps) => {
     setActiveParticipantIndex(1);
     setShowTitleCard(true);
     setSwipedIndices(new Set());
+    setSwipeHistory([]);
+  };
+
+  const handleUndo = () => {
+    if (swipeHistory.length === 0) return;
+    
+    const lastIndex = swipeHistory[swipeHistory.length - 1];
+    setSwipeHistory(prev => prev.slice(0, -1));
+
+    if (lastIndex === -1) {
+      setShowTitleCard(true);
+    } else {
+      setSwipedIndices(prev => {
+        const next = new Set(prev);
+        next.delete(lastIndex);
+        return next;
+      });
+    }
   };
 
   const resetGame = () => {
     setShowTitleCard(true);
     setSwipedIndices(new Set());
+    setSwipeHistory([]);
     setActiveParticipantIndex(0);
     setShowHandover(false);
     
@@ -173,7 +193,7 @@ export const GameEngine = ({ deck, isExample, onBack }: GameEngineProps) => {
   const cardsRemaining = isDimmedLights ? activeCards.length : (shuffledCards.length - swipedIndices.size);
 
   return (
-    <main className="container mx-auto px-6 max-w-5xl grow flex flex-col">
+    <main className="container mx-auto px-6 max-w-5xl grow flex flex-col overflow-x-hidden">
       <header className="mb-12 text-center relative">
         <div className="inline-block px-3 py-1 rounded-full bg-brand-red/10 text-brand-red font-bold text-[10px] tracking-widest uppercase mb-6">
           {modeName}
@@ -235,6 +255,23 @@ export const GameEngine = ({ deck, isExample, onBack }: GameEngineProps) => {
             </div>
           </Modal>
         </div>
+
+        {/* Undo Row - Positioned below info row, right aligned */}
+        {swipeHistory.length > 0 && (
+          <div className="flex justify-end mt-6 -mb-6">
+            <button 
+              onClick={handleUndo}
+              className="flex items-center gap-2 text-[10px] font-black tracking-[0.2em] text-brand-red hover:text-brand-red/70 transition-all active:scale-95 uppercase group h-10 px-4 rounded-full bg-brand-red/5 border border-brand-red/10"
+              title="Undo last action"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="group-hover:-translate-x-0.5 transition-transform">
+                <path d="M9 14 4 9l5-5"/>
+                <path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5v.5"/>
+              </svg>
+              Undo
+            </button>
+          </div>
+        )}
       </header>
 
       <div className="flex-1 flex flex-col items-center justify-center gap-12 md:gap-16 lg:gap-24 relative px-4">
@@ -247,6 +284,7 @@ export const GameEngine = ({ deck, isExample, onBack }: GameEngineProps) => {
               cards={stack}
               isDimmedLights={isDimmedLights}
               onSwipe={(item) => {
+                setSwipeHistory(prev => [...prev, item.index]);
                 if (item.isTitle) {
                   setShowTitleCard(false);
                 } else {

@@ -79,21 +79,35 @@ const SwipeableCard = ({ index, onSwipe, children }: SwipeableCardProps) => {
   const handleDragEnd = async (_: any, info: any) => {
     const threshold = 100;
     if (info.offset.x > threshold) {
-      await controls.start({ x: 500, opacity: 0, transition: { duration: 0.2 } });
+      await controls.start({ x: 1000, opacity: 0, rotate: 20, transition: { duration: 0.45 } });
       onSwipe();
     } else if (info.offset.x < -threshold) {
-      await controls.start({ x: -500, opacity: 0, transition: { duration: 0.2 } });
+      await controls.start({ x: -1000, opacity: 0, rotate: -20, transition: { duration: 0.45 } });
       onSwipe();
     } else {
       controls.start({ x: 0, opacity: 1, transition: { type: "spring", stiffness: 300, damping: 20 } });
     }
   };
 
+  const handleTap = async () => {
+    if (!isTop) return;
+    // Animate to the right with a cinematic curve on tap
+    await controls.start({ 
+      x: 1000, 
+      opacity: 0, 
+      rotate: 15, 
+      transition: { duration: 0.5, ease: "easeOut" } 
+    });
+    onSwipe();
+  };
+
   return (
     <motion.div
       drag={isTop ? "x" : false}
       dragConstraints={{ left: 0, right: 0 }}
+      dragElastic={0.1}
       onDragEnd={handleDragEnd}
+      onTap={handleTap}
       animate={controls}
       style={{
         x,
@@ -103,10 +117,10 @@ const SwipeableCard = ({ index, onSwipe, children }: SwipeableCardProps) => {
       }}
       initial={{ scale: 0.8, opacity: 0, y: 20 }}
       exit={{ 
-        x: x.get() > 0 ? 500 : -500, 
+        x: x.get() >= 0 ? 1000 : -1000, 
         opacity: 0, 
-        scale: 0.5,
-        transition: { duration: 0.2 } 
+        scale: 0.8,
+        transition: { duration: 0.4 } 
       }}
       className={cn(
         "absolute inset-0 select-none",
