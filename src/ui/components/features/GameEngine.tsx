@@ -57,22 +57,34 @@ export const GameEngine = ({ deck, isExample, onBack }: GameEngineProps) => {
       const allCards = [...regularCards, ...chaosCards];
       
       if (isDimmedLights) {
-        // Special sorting for Dimmed Lights
+        // Special sorting for Dimmed Lights - pick EXACTLY one card per phase
         const phases = ["PHASE_0", "PHASE_1", "PHASE_2", "PHASE_3", "PHASE_4", "PHASE_5"];
-        const shared = allCards.filter(c => c.cardType === "PHASE_0");
+        
+        // Pick one shared card
+        const sharedCards = allCards.filter(c => c.cardType === "PHASE_0");
+        const shared = sharedCards.length > 0 
+          ? [sharedCards[Math.floor(Math.random() * sharedCards.length)]] 
+          : [];
         
         const participant1Cards = [];
         const participant2Cards = [];
 
+        // For each phase, pick one card for each participant
         for (const phase of phases.slice(1)) {
           const phaseCards = allCards.filter(c => c.cardType === phase);
-          const himCard = phaseCards.find(c => c.targetPerson === "Him");
-          const herCard = phaseCards.find(c => c.targetPerson === "Her");
           
-          if (himCard) participant1Cards.push(himCard);
-          if (herCard) participant2Cards.push(herCard);
+          const himCards = phaseCards.filter(c => c.targetPerson === "Him");
+          const herCards = phaseCards.filter(c => c.targetPerson === "Her");
+          
+          if (himCards.length > 0) {
+            participant1Cards.push(himCards[Math.floor(Math.random() * himCards.length)]);
+          }
+          if (herCards.length > 0) {
+            participant2Cards.push(herCards[Math.floor(Math.random() * herCards.length)]);
+          }
         }
 
+        // The flow: shared cards + first participant, then handover, then second participant
         const flow = [...shared, ...participant1Cards, { isHandover: true }, ...participant2Cards];
         setShuffledCards(flow);
       } else {
@@ -83,7 +95,51 @@ export const GameEngine = ({ deck, isExample, onBack }: GameEngineProps) => {
     }
   }, [deck, isDimmedLights]);
 
+  const handleRevealSet = () => {
+    if (isRevealing || revealedCards.length === shuffledCards.length) return;
+
+    setIsRevealing(true);
+    
+    // Find how many cards to reveal (until end or handover)
+    const newRevealed = [...revealedCards];
+    let nextIdx = revealedCards.length;
+    
+    let addedNonHandover = false;
+    while (nextIdx < shuffledCards.length) {
+      const card = shuffledCards[nextIdx];
+      if (card.isHandover) {
+        // If we revealed other cards in this click, stop before the handover
+        if (addedNonHandover) {
+          break;
+        }
+        // Otherwise (first card is handover), reveal it
+        newRevealed.push(nextIdx);
+        break;
+      }
+      newRevealed.push(nextIdx);
+      addedNonHandover = true;
+      nextIdx++;
+    }
+
+    // Animate the reveal
+    setTimeout(() => {
+      setRevealedCards(newRevealed);
+      setCurrentCardIndex(newRevealed[newRevealed.length - 1]);
+      setIsRevealing(false);
+      
+      // If the last revealed card is a handover, show it
+      if (shuffledCards[newRevealed[newRevealed.length - 1]]?.isHandover) {
+        setShowHandover(true);
+      }
+    }, 300);
+  };
+
   const handleDeckClick = () => {
+    if (isDimmedLights) {
+      handleRevealSet();
+      return;
+    }
+    
     if (isRevealing || revealedCards.length === shuffledCards.length) return;
     
     const nextIndex = revealedCards.length;
@@ -108,7 +164,7 @@ export const GameEngine = ({ deck, isExample, onBack }: GameEngineProps) => {
   const handleHandoverComplete = () => {
     setShowHandover(false);
     setActiveParticipantIndex(1);
-    handleDeckClick(); // Show the first card for the second participant
+    // In Dimmed Lights, we show the next set when they click again
   };
 
   const resetGame = () => {
@@ -117,6 +173,26 @@ export const GameEngine = ({ deck, isExample, onBack }: GameEngineProps) => {
       setRevealedCards([]);
       setActiveParticipantIndex(0);
       setShowHandover(false);
+      // Re-shuffle/pick new cards
+      if (deck?.gameCards) {
+        const regularCards = (deck.gameCards || []).map(card => ({ ...card, isChaos: false }));
+        const chaosCards = ((deck as any).sandyChaosCards || []).map((card: any) => ({ ...card, isChaos: true }));
+        const allCards = [...regularCards, ...chaosCards];
+        
+        const phases = ["PHASE_0", "PHASE_1", "PHASE_2", "PHASE_3", "PHASE_4", "PHASE_5"];
+        const sharedCards = allCards.filter(c => c.cardType === "PHASE_0");
+        const shared = sharedCards.length > 0 ? [sharedCards[Math.floor(Math.random() * sharedCards.length)]] : [];
+        const p1 = [];
+        const p2 = [];
+        for (const phase of phases.slice(1)) {
+          const pCards = allCards.filter(c => c.cardType === phase);
+          const h = pCards.filter(c => c.targetPerson === "Him");
+          const r = pCards.filter(c => c.targetPerson === "Her");
+          if (h.length > 0) p1.push(h[Math.floor(Math.random() * h.length)]);
+          if (r.length > 0) p2.push(r[Math.floor(Math.random() * r.length)]);
+        }
+        setShuffledCards([...shared, ...p1, { isHandover: true }, ...p2]);
+      }
     } else {
       const shuffled = [...shuffledCards].sort(() => Math.random() - 0.5);
       setShuffledCards(shuffled);
@@ -128,6 +204,28 @@ export const GameEngine = ({ deck, isExample, onBack }: GameEngineProps) => {
   const currentCard = currentCardIndex !== null ? shuffledCards[currentCardIndex] : null;
   const cardsRemaining = shuffledCards.length - revealedCards.length;
   const gameComplete = revealedCards.length === shuffledCards.length && !showHandover;
+
+  // For Dimmed Lights, get all currently revealed cards for the active participant
+  const getActiveRevealedCards = () => {
+    if (!isDimmedLights) return currentCard ? [currentCard] : [];
+    
+    // Find index of handover
+    const handoverIdx = shuffledCards.findIndex(c => c.isHandover);
+    
+    if (activeParticipantIndex === 0) {
+      // Shared + P1 cards that are revealed
+      return shuffledCards
+        .slice(0, handoverIdx)
+        .filter((_, idx) => revealedCards.includes(idx));
+    } else {
+      // P2 cards that are revealed
+      return shuffledCards
+        .slice(handoverIdx + 1)
+        .filter((_, idx) => revealedCards.includes(idx + handoverIdx + 1));
+    }
+  };
+
+  const activeCards = getActiveRevealedCards();
 
   return (
     <main className="container mx-auto px-6 max-w-5xl grow flex flex-col">
@@ -194,14 +292,22 @@ export const GameEngine = ({ deck, isExample, onBack }: GameEngineProps) => {
         </div>
       </header>
 
-      <div className="flex-1 flex flex-col md:flex-row-reverse items-center justify-center gap-12 md:gap-16 lg:gap-24 relative px-4">
-        {/* Current Card Display */}
-        {currentCard && !showHandover && (
-          <div className="w-full max-w-[320px] md:max-w-sm animate-in zoom-in-95 fade-in duration-500 perspective-1000">
-            <div className="relative transform transition-all duration-700 transform-3d">
-              <GameCard 
-                card={currentCard} 
-              />
+      <div className="flex-1 flex flex-col items-center justify-center gap-12 md:gap-16 lg:gap-24 relative px-4">
+        {/* Current Cards Display */}
+        {activeCards.length > 0 && !showHandover && (
+          <div className={cn(
+            "w-full animate-in zoom-in-95 fade-in duration-500 perspective-1000",
+            isDimmedLights ? "max-w-4xl overflow-x-auto pb-12 scrollbar-hide" : "max-w-[320px] md:max-w-sm"
+          )}>
+            <div className={cn(
+              "flex gap-6",
+              isDimmedLights ? "flex-row px-4" : "justify-center"
+            )}>
+              {activeCards.map((card, idx) => (
+                <div key={idx} className="shrink-0 w-72 md:w-80 transition-all duration-700">
+                  <GameCard card={card} />
+                </div>
+              ))}
             </div>
           </div>
         )}
@@ -230,7 +336,7 @@ export const GameEngine = ({ deck, isExample, onBack }: GameEngineProps) => {
               className={cn(
                 "relative group transition-all duration-700",
                 isRevealing 
-                  ? "-translate-y-20 md:translate-y-0 md:translate-x-32 opacity-0 scale-110" 
+                  ? (isDimmedLights ? "opacity-50 scale-95" : "-translate-y-20 md:translate-y-0 md:translate-x-32 opacity-0 scale-110") 
                   : "hover:scale-105 active:scale-95"
               )}
             >
@@ -259,7 +365,11 @@ export const GameEngine = ({ deck, isExample, onBack }: GameEngineProps) => {
                     {deck.title}
                   </h3>
                   <div className="text-brand-tan font-bold text-xs uppercase tracking-[0.3em] relative z-10">
-                    {cardsRemaining} cards remaining
+                    {isDimmedLights 
+                      ? (activeCards.length > 0 
+                          ? (activeParticipantIndex === 0 ? "Handover" : "Finish") 
+                          : "Reveal Cards") 
+                      : `${cardsRemaining} cards remaining`}
                   </div>
                 </div>
                 
@@ -279,13 +389,13 @@ export const GameEngine = ({ deck, isExample, onBack }: GameEngineProps) => {
               isRevealing ? "opacity-0" : "opacity-100"
             )}>
               <div className="w-px h-8 bg-linear-to-b from-brand-brown/40 to-transparent" />
-              Tap to reveal
+              {isDimmedLights ? "Tap to reveal cards" : "Tap to reveal"}
             </div>
           </div>
         )}
 
         {/* Game Complete State */}
-        {gameComplete && !currentCard && (
+        {gameComplete && activeCards.length === 0 && (
           <div className="text-center animate-in zoom-in-95 fade-in duration-500">
             <div className="w-32 h-32 bg-brand-red/10 rounded-full flex items-center justify-center mx-auto mb-8">
               <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-brand-red">
