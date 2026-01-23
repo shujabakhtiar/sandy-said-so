@@ -6,6 +6,7 @@ import { cn } from "@/ui/lib/utils";
 import { Button } from "@/ui/components/ui/Button";
 import { Modal } from "@/ui/components/ui/Modal";
 import { GameCard } from "@/ui/components/features/GameCard";
+import { DLGameCard } from "@/ui/components/features/DLGameCard";
 import { getRulesForMode } from "@/lib/game-rules";
 import { formatCardText } from "@/ui/lib/text-utils";
 
@@ -60,16 +61,16 @@ export const GameEngine = ({ deck, isExample, onBack }: GameEngineProps) => {
         // Special sorting for Dimmed Lights - pick EXACTLY one card per phase
         const phases = ["PHASE_0", "PHASE_1", "PHASE_2", "PHASE_3", "PHASE_4", "PHASE_5"];
         
-        // Pick one shared card
-        const sharedCards = allCards.filter(c => c.cardType === "PHASE_0");
-        const shared = sharedCards.length > 0 
-          ? [sharedCards[Math.floor(Math.random() * sharedCards.length)]] 
+        // Pick one shared backstory (Phase 0)
+        const backstoryCards = allCards.filter(c => c.cardType === "PHASE_0");
+        const shared = backstoryCards.length > 0 
+          ? [backstoryCards[Math.floor(Math.random() * backstoryCards.length)]] 
           : [];
         
         const participant1Cards = [];
         const participant2Cards = [];
 
-        // For each phase, pick one card for each participant
+        // For subsequent phases (1-5), pick one card for each participant
         for (const phase of phases.slice(1)) {
           const phaseCards = allCards.filter(c => c.cardType === phase);
           
@@ -84,7 +85,7 @@ export const GameEngine = ({ deck, isExample, onBack }: GameEngineProps) => {
           }
         }
 
-        // The flow: shared cards + first participant, then handover, then second participant
+        // The flow: shared backstory + first participant's turn (1-5), then handover, then second participant's turn (1-5)
         const flow = [...shared, ...participant1Cards, { isHandover: true }, ...participant2Cards];
         setShuffledCards(flow);
       } else {
@@ -180,10 +181,14 @@ export const GameEngine = ({ deck, isExample, onBack }: GameEngineProps) => {
         const allCards = [...regularCards, ...chaosCards];
         
         const phases = ["PHASE_0", "PHASE_1", "PHASE_2", "PHASE_3", "PHASE_4", "PHASE_5"];
-        const sharedCards = allCards.filter(c => c.cardType === "PHASE_0");
-        const shared = sharedCards.length > 0 ? [sharedCards[Math.floor(Math.random() * sharedCards.length)]] : [];
+        const backstoryCards = allCards.filter(c => c.cardType === "PHASE_0");
+        const shared = backstoryCards.length > 0 
+          ? [backstoryCards[Math.floor(Math.random() * backstoryCards.length)]] 
+          : [];
+        
         const p1 = [];
         const p2 = [];
+
         for (const phase of phases.slice(1)) {
           const pCards = allCards.filter(c => c.cardType === phase);
           const h = pCards.filter(c => c.targetPerson === "Him");
@@ -213,15 +218,24 @@ export const GameEngine = ({ deck, isExample, onBack }: GameEngineProps) => {
     const handoverIdx = shuffledCards.findIndex(c => c.isHandover);
     
     if (activeParticipantIndex === 0) {
-      // Shared + P1 cards that are revealed
+      // Shared (Backstory) + P1 cards
       return shuffledCards
         .slice(0, handoverIdx)
         .filter((_, idx) => revealedCards.includes(idx));
     } else {
-      // P2 cards that are revealed
-      return shuffledCards
+      // Shared (Backstory) + P2 cards
+      const p2Cards = shuffledCards
         .slice(handoverIdx + 1)
         .filter((_, idx) => revealedCards.includes(idx + handoverIdx + 1));
+        
+      // If none of her specific cards are revealed yet, show nothing (to keep "Reveal Cards" button active)
+      if (p2Cards.length === 0) return [];
+
+      const backstory = shuffledCards
+        .slice(0, handoverIdx)
+        .filter(c => c.cardType === "PHASE_0" && revealedCards.includes(shuffledCards.indexOf(c)));
+        
+      return [...backstory, ...p2Cards];
     }
   };
 
@@ -304,8 +318,15 @@ export const GameEngine = ({ deck, isExample, onBack }: GameEngineProps) => {
               isDimmedLights ? "flex-row px-4" : "justify-center"
             )}>
               {activeCards.map((card, idx) => (
-                <div key={idx} className="shrink-0 w-72 md:w-80 transition-all duration-700">
-                  <GameCard card={card} />
+                <div key={idx} className={cn(
+                  "shrink-0 transition-all duration-700",
+                  isDimmedLights ? "w-[450px] md:w-[550px]" : "w-72 md:w-80"
+                )}>
+                  {isDimmedLights ? (
+                    <DLGameCard card={card} />
+                  ) : (
+                    <GameCard card={card} />
+                  )}
                 </div>
               ))}
             </div>
@@ -346,7 +367,10 @@ export const GameEngine = ({ deck, isExample, onBack }: GameEngineProps) => {
               <div className="absolute inset-x-0 bottom-[-6px] h-10 bg-brand-brown/20 rounded-[32px] -z-10" />
               
               {/* Main deck card back */}
-              <div className="relative w-72 md:w-80 aspect-2/3 bg-brand-brown rounded-[32px] shadow-2xl border-4 border-brand-tan/20 flex flex-col items-center justify-center p-10 overflow-hidden">
+              <div className={cn(
+                "relative bg-brand-brown rounded-[32px] shadow-2xl border-4 border-brand-tan/20 flex flex-col items-center justify-center p-10 overflow-hidden transition-all duration-700",
+                isDimmedLights ? "w-[450px] md:w-[550px] aspect-3/2" : "w-72 md:w-80 aspect-2/3"
+              )}>
                 {/* Decorative corner indices */}
                 <div className="absolute top-6 left-6 flex flex-col items-center text-brand-cream/30">
                   <span className="text-[10px] font-bold tracking-tighter mb-1 select-none">SANDY</span>
