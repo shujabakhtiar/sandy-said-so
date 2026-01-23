@@ -4,7 +4,7 @@ import { GameCardsService } from "./game-cards.service";
 export class GameCardsController {
   static async create(req: NextRequest) {
     try {
-      const { deckId, ruleText, photoId, orderIndex, cardType } = await req.json();
+      const { deckId, ruleText, photoId, orderIndex, cardType, targetPerson } = await req.json();
       if (!deckId || !ruleText || orderIndex === undefined) {
         return NextResponse.json({ error: "deckId, ruleText, and orderIndex are required" }, { status: 400 });
       }
@@ -13,7 +13,8 @@ export class GameCardsController {
         ruleText, 
         photoId: photoId ? Number(photoId) : undefined, 
         orderIndex: Number(orderIndex),
-        cardType
+        cardType,
+        targetPerson
       });
       return NextResponse.json(card, { status: 201 });
     } catch (error: any) {
@@ -55,8 +56,8 @@ export class GameCardsController {
   static async update(req: NextRequest, { params }: { params: { id: string } }) {
     try {
       const { id } = await params;
-      const { ruleText, isDraft, cardType } = await req.json();
-      const card = await GameCardsService.updateCard(Number(id), { ruleText, isDraft, cardType });
+      const { ruleText, isDraft, cardType, targetPerson } = await req.json();
+      const card = await GameCardsService.updateCard(Number(id), { ruleText, isDraft, cardType, targetPerson });
       return NextResponse.json(card);
     } catch (error: any) {
       return NextResponse.json({ error: error.message }, { status: 500 });

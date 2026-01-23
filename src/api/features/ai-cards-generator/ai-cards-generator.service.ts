@@ -101,14 +101,15 @@ export class AICardsGeneratorService {
         
         // Save suggested cards as drafts
         await Promise.all(
-          cards.map((cardText) => {
+          cards.map((card) => {
             const currentIndex = globalCardIndex++;
             return prisma.gameCard.create({
               data: {
                 deckId: deck.id,
-                ruleText: cardText,
+                ruleText: typeof card === 'string' ? card : card.text,
                 orderIndex: currentIndex,
                 cardType: variation.type,
+                targetPerson: typeof card === 'string' ? null : card.target,
                 isDraft: true
               }
             });
@@ -127,7 +128,7 @@ export class AICardsGeneratorService {
   }
 
 
-  private static parseGeneratedCards(text: string): string[] {
+  private static parseGeneratedCards(text: string): (string | { text: string; target: string })[] {
     try {
       // 1. Extreme cleaning: find the first '[' and last ']'
       let cleanJson = text.trim();
@@ -152,7 +153,7 @@ export class AICardsGeneratorService {
       if (Array.isArray(parsed)) {
         // Flatten if AI returned [[...]]
         const flat = parsed.flat(2);
-        return flat.filter(item => typeof item === 'string');
+        return flat.filter(item => typeof item === 'string' || (typeof item === 'object' && item !== null && 'text' in item));
       }
 
       // 3. Fallback to line splitting if it's not an array
@@ -164,6 +165,7 @@ export class AICardsGeneratorService {
         .split("\n")
         .map(line => line.replace(/^\d+\.\s*|^-\s*|^\[\d+\]\s*/, "").replace(/^"|"$/g, "").trim())
         .filter(line => line.length > 5 && !line.includes("JSON") && !line.includes("["))
+        .map(text => ({ text, target: "Both" }))
         .slice(0, 10);
     }
   }

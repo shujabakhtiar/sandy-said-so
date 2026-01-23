@@ -1,7 +1,7 @@
 import { prisma } from "../../../lib/prisma";
 
 export class GameCardsService {
-  static async addCard(data: { deckId: number; ruleText: string; photoId?: number; orderIndex: number; cardType?: any }) {
+  static async addCard(data: { deckId: number; ruleText: string; photoId?: number; orderIndex: number; cardType?: any; targetPerson?: string }) {
     return await prisma.gameCard.create({
       data: {
         deckId: data.deckId,
@@ -9,6 +9,7 @@ export class GameCardsService {
         photoId: data.photoId,
         orderIndex: data.orderIndex,
         cardType: data.cardType,
+        targetPerson: data.targetPerson,
       },
     });
   }
@@ -26,7 +27,7 @@ export class GameCardsService {
     });
   }
 
-  static async bulkAddCards(deckId: number, cards: { ruleText: string; orderIndex: number; photoId?: number; cardType?: any }[]) {
+  static async bulkAddCards(deckId: number, cards: { ruleText: string; orderIndex: number; photoId?: number; cardType?: any; targetPerson?: string }[]) {
     const ruleTextsToSave = cards.map(c => c.ruleText);
 
     // 1. Mark selected cards as live (isDraft: false)
@@ -63,6 +64,7 @@ export class GameCardsService {
           orderIndex: card.orderIndex,
           photoId: card.photoId,
           cardType: card.cardType,
+          targetPerson: card.targetPerson,
           isDraft: false
         })),
       });
@@ -72,20 +74,21 @@ export class GameCardsService {
     for (const card of cards) {
       await prisma.gameCard.updateMany({
         where: { deckId, ruleText: card.ruleText },
-        data: { orderIndex: card.orderIndex, cardType: card.cardType }
+        data: { orderIndex: card.orderIndex, cardType: card.cardType, targetPerson: card.targetPerson }
       });
     }
 
     return { count: cards.length };
   }
 
-  static async updateCard(id: number, data: { ruleText?: string; isDraft?: boolean; cardType?: any }) {
+  static async updateCard(id: number, data: { ruleText?: string; isDraft?: boolean; cardType?: any; targetPerson?: string }) {
     return await prisma.gameCard.update({
       where: { id },
       data: { 
         ruleText: data.ruleText,
         isDraft: data.isDraft,
-        cardType: data.cardType
+        cardType: data.cardType,
+        targetPerson: data.targetPerson
       },
     });
   }

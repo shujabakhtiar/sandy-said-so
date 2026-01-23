@@ -109,8 +109,9 @@ model GameCard {
   ruleText   String         @map("rule_text")
   orderIndex Int            @map("order_index")
   isDraft    Boolean        @default(true) @map("is_draft")
-  cardType   GameCardType?  @map("card_type")
-  deck       GameDeck       @relation(fields: [deckId], references: [id], onDelete: Cascade)
+  cardType     GameCardType?  @map("card_type")
+  targetPerson String?        @map("target_person")
+  deck         GameDeck       @relation(fields: [deckId], references: [id], onDelete: Cascade)
   photo      Photo?         @relation(fields: [photoId], references: [id])
 
   @@index([deckId])

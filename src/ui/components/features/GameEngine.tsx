@@ -17,6 +17,7 @@ interface GameEngineProps {
       name: string;
     };
     gameCards: any[];
+    extra?: string;
   };
   isExample?: boolean;
   onBack?: () => void;
@@ -29,8 +30,23 @@ export const GameEngine = ({ deck, isExample, onBack }: GameEngineProps) => {
   const [revealedCards, setRevealedCards] = useState<number[]>([]);
   const [isRevealing, setIsRevealing] = useState(false);
 
+  // Dimmed Lights specific state
+  const [activeParticipantIndex, setActiveParticipantIndex] = useState<number>(0);
+  const [showHandover, setShowHandover] = useState(false);
+
   const modeName = deck.gameMode?.name || "Standard Mode";
   const rules = getRulesForMode(modeName);
+
+  const isDimmedLights = modeName === "Dimmed Lights";
+
+  // Extract participants from deck.extra
+  const getParticipants = () => {
+    const peopleMatch = deck.extra?.match(/People in the room: (.*)/);
+    if (!peopleMatch) return ["Him", "Her"]; // Fallback
+    return peopleMatch[1].split(",").map((p: string) => p.trim().split(" (")[0]);
+  };
+
+  const participants = getParticipants();
 
   useEffect(() => {
     if (deck?.gameCards) {
@@ -40,17 +56,46 @@ export const GameEngine = ({ deck, isExample, onBack }: GameEngineProps) => {
       
       const allCards = [...regularCards, ...chaosCards];
       
-      // Shuffle the cards on mount
-      const shuffled = allCards.sort(() => Math.random() - 0.5);
-      setShuffledCards(shuffled);
+      if (isDimmedLights) {
+        // Special sorting for Dimmed Lights
+        const phases = ["PHASE_0", "PHASE_1", "PHASE_2", "PHASE_3", "PHASE_4", "PHASE_5"];
+        const shared = allCards.filter(c => c.cardType === "PHASE_0");
+        
+        const participant1Cards = [];
+        const participant2Cards = [];
+
+        for (const phase of phases.slice(1)) {
+          const phaseCards = allCards.filter(c => c.cardType === phase);
+          const himCard = phaseCards.find(c => c.targetPerson === "Him");
+          const herCard = phaseCards.find(c => c.targetPerson === "Her");
+          
+          if (himCard) participant1Cards.push(himCard);
+          if (herCard) participant2Cards.push(herCard);
+        }
+
+        const flow = [...shared, ...participant1Cards, { isHandover: true }, ...participant2Cards];
+        setShuffledCards(flow);
+      } else {
+        // Shuffle the cards on mount
+        const shuffled = allCards.sort(() => Math.random() - 0.5);
+        setShuffledCards(shuffled);
+      }
     }
-  }, [deck]);
+  }, [deck, isDimmedLights]);
 
   const handleDeckClick = () => {
     if (isRevealing || revealedCards.length === shuffledCards.length) return;
     
-    setIsRevealing(true);
     const nextIndex = revealedCards.length;
+    const nextCard = shuffledCards[nextIndex];
+
+    if (nextCard?.isHandover) {
+      setShowHandover(true);
+      setRevealedCards([...revealedCards, nextIndex]);
+      return;
+    }
+
+    setIsRevealing(true);
     
     // Animate the reveal
     setTimeout(() => {
@@ -60,16 +105,29 @@ export const GameEngine = ({ deck, isExample, onBack }: GameEngineProps) => {
     }, 300);
   };
 
+  const handleHandoverComplete = () => {
+    setShowHandover(false);
+    setActiveParticipantIndex(1);
+    handleDeckClick(); // Show the first card for the second participant
+  };
+
   const resetGame = () => {
-    const shuffled = [...shuffledCards].sort(() => Math.random() - 0.5);
-    setShuffledCards(shuffled);
-    setCurrentCardIndex(null);
-    setRevealedCards([]);
+    if (isDimmedLights) {
+      setCurrentCardIndex(null);
+      setRevealedCards([]);
+      setActiveParticipantIndex(0);
+      setShowHandover(false);
+    } else {
+      const shuffled = [...shuffledCards].sort(() => Math.random() - 0.5);
+      setShuffledCards(shuffled);
+      setCurrentCardIndex(null);
+      setRevealedCards([]);
+    }
   };
 
   const currentCard = currentCardIndex !== null ? shuffledCards[currentCardIndex] : null;
   const cardsRemaining = shuffledCards.length - revealedCards.length;
-  const gameComplete = revealedCards.length === shuffledCards.length;
+  const gameComplete = revealedCards.length === shuffledCards.length && !showHandover;
 
   return (
     <main className="container mx-auto px-6 max-w-5xl grow flex flex-col">
@@ -88,6 +146,13 @@ export const GameEngine = ({ deck, isExample, onBack }: GameEngineProps) => {
           </p>
 
           <div className="w-px h-4 bg-brand-tan/30" />
+
+          {isDimmedLights && participants.length > 0 && (
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-black uppercase tracking-widest text-brand-brown/40">Active:</span>
+              <span className="text-[10px] font-black uppercase tracking-widest text-brand-red">{participants[activeParticipantIndex]}</span>
+            </div>
+          )}
 
           <Modal
             variant="letter"
@@ -131,7 +196,7 @@ export const GameEngine = ({ deck, isExample, onBack }: GameEngineProps) => {
 
       <div className="flex-1 flex flex-col md:flex-row-reverse items-center justify-center gap-12 md:gap-16 lg:gap-24 relative px-4">
         {/* Current Card Display */}
-        {currentCard && (
+        {currentCard && !showHandover && (
           <div className="w-full max-w-[320px] md:max-w-sm animate-in zoom-in-95 fade-in duration-500 perspective-1000">
             <div className="relative transform transition-all duration-700 transform-3d">
               <GameCard 
@@ -141,8 +206,23 @@ export const GameEngine = ({ deck, isExample, onBack }: GameEngineProps) => {
           </div>
         )}
 
+        {/* Handover Modal/Screen */}
+        {showHandover && (
+          <div className="text-center animate-in zoom-in-95 fade-in duration-500">
+            <h2 className="text-4xl font-serif font-bold text-brand-brown mb-8 leading-tight">
+              Hand the phone to <span className="text-brand-red">{participants[1] || "the other person"}</span>.
+            </h2>
+            <p className="text-xl text-brand-text-muted italic mb-12 max-w-sm mx-auto">
+              It&apos;s their turn to receive Sandy&apos;s directions.
+            </p>
+            <Button size="xl" onClick={handleHandoverComplete}>
+              I have the phone
+            </Button>
+          </div>
+        )}
+
         {/* Deck Stack */}
-        {!gameComplete && (
+        {!gameComplete && !showHandover && (
           <div className="relative flex flex-col items-center">
             <button
               onClick={handleDeckClick}

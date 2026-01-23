@@ -2,7 +2,7 @@ import React from "react";
 import { cn } from "./utils";
 
 export const formatCardText = (text: string, isDark: boolean = false) => {
-  if (!text) return null;
+  if (typeof text !== 'string' || !text.trim()) return null;
   
   // 1. Handle double newlines for paragraph breaks
   const paragraphs = text.split(/\n\n/);
