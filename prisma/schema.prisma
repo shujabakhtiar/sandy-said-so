@@ -284,3 +284,12 @@ enum GameCardType {
   PHASE_4
   PHASE_5
 }
+
+model Enlistment {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("enlistments")
+}
