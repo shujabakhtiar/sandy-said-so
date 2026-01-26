@@ -28,7 +28,11 @@ export class EnlistmentsController {
 
   static async list(req: NextRequest) {
     try {
-      const enlistments = await EnlistmentsService.list();
+      const { searchParams } = new URL(req.url);
+      const page = Number(searchParams.get("page")) || 1;
+      const limit = Number(searchParams.get("limit")) || 10;
+
+      const enlistments = await EnlistmentsService.list(page, limit);
       return NextResponse.json(enlistments);
     } catch (error: any) {
       return NextResponse.json({ error: error.message }, { status: 500 });
