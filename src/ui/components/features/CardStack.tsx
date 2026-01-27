@@ -96,7 +96,7 @@ const SwipeableCard = ({ index, onSwipe, children }: SwipeableCardProps) => {
       x: 1000, 
       opacity: 0, 
       rotate: 15, 
-      transition: { duration: 0.5, ease: "easeOut" } 
+      transition: { duration: 1.5, ease: "easeOut" } 
     });
     onSwipe();
   };
