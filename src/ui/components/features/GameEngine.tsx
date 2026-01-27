@@ -32,6 +32,9 @@ export const GameEngine = ({ deck, isExample, onBack }: GameEngineProps) => {
   const [swipedIndices, setSwipedIndices] = useState<Set<number>>(new Set());
   const [swipeHistory, setSwipeHistory] = useState<number[]>([]);
   const [showTitleCard, setShowTitleCard] = useState(true);
+  const [isSwipeMode, setIsSwipeMode] = useState(true);
+  const [isRevealing, setIsRevealing] = useState(false);
+  const scrollContainerRef = useState<{ current: HTMLDivElement | null }>({ current: null })[0]; // Simple way since I can't easily add useRef and use it in the same chunk without imports being at the top
 
   // Dimmed Lights specific state
   const [activeParticipantIndex, setActiveParticipantIndex] = useState<number>(0);
@@ -102,6 +105,17 @@ export const GameEngine = ({ deck, isExample, onBack }: GameEngineProps) => {
     }
   }, [deck, isDimmedLights]);
 
+  // Auto-scroll Classic mode revealed cards to the end
+  useEffect(() => {
+    if (!isSwipeMode && scrollContainerRef.current) {
+      const container = scrollContainerRef.current;
+      container.scrollTo({
+        left: container.scrollWidth,
+        behavior: "smooth"
+      });
+    }
+  }, [swipedIndices.size, isSwipeMode, scrollContainerRef]);
+
   const handleHandoverComplete = () => {
     setShowHandover(false);
     setActiveParticipantIndex(1);
@@ -161,6 +175,41 @@ export const GameEngine = ({ deck, isExample, onBack }: GameEngineProps) => {
     }
   };
 
+  const handleDeckClick = () => {
+    if (isRevealing || gameComplete) return;
+
+    if (showTitleCard) {
+      setSwipeHistory(prev => [...prev, -1]);
+      setShowTitleCard(false);
+      return;
+    }
+
+    const nextCardToReveal = activeCards[0];
+    if (!nextCardToReveal) return;
+
+    if (nextCardToReveal.card.isHandover) {
+      setShowHandover(true);
+      setSwipeHistory(prev => [...prev, nextCardToReveal.index]);
+      setSwipedIndices(prev => {
+        const next = new Set(prev);
+        next.add(nextCardToReveal.index);
+        return next;
+      });
+      return;
+    }
+
+    setIsRevealing(true);
+    setTimeout(() => {
+      setSwipeHistory(prev => [...prev, nextCardToReveal.index]);
+      setSwipedIndices(prev => {
+        const next = new Set(prev);
+        next.add(nextCardToReveal.index);
+        return next;
+      });
+      setIsRevealing(false);
+    }, 300);
+  };
+
   const getActiveCards = () => {
     if (!isDimmedLights) {
       return shuffledCards
@@ -215,7 +264,7 @@ export const GameEngine = ({ deck, isExample, onBack }: GameEngineProps) => {
 
         <div className="flex items-center justify-center gap-6">
           <p className="text-xl text-brand-text-muted italic font-medium">
-            {gameComplete ? "Game Complete!" : `${cardsRemaining} cards remaining`}
+            {gameComplete ? "Game Complete!" : (isSwipeMode ? `${cardsRemaining} cards remaining` : (swipedIndices.size > 0 ? "Revealed Cards" : "Tap deck to start"))}
           </p>
 
           <div className="w-px h-4 bg-brand-tan/30" />
@@ -266,12 +315,31 @@ export const GameEngine = ({ deck, isExample, onBack }: GameEngineProps) => {
           </Modal>
         </div>
 
-        {/* Undo Row - Positioned below info row, right aligned */}
-        {swipeHistory.length > 0 && (
-          <div className="flex justify-end mt-6 -mb-6">
+        {/* Undo & Mode Toggle Row - Positioned below info row, right aligned */}
+        <div className="flex justify-end items-center gap-4 mt-6 -mb-6">
+          <button
+            onClick={() => setIsSwipeMode(!isSwipeMode)}
+            className={cn(
+              "flex items-center gap-2 text-[10px] font-black tracking-[0.2em] transition-all active:scale-95 uppercase h-10 px-4 rounded-full border",
+              isSwipeMode 
+                ? "bg-brand-brown/5 border-brand-brown/10 text-brand-brown/40 hover:text-brand-brown" 
+                : "bg-brand-red/5 border-brand-red/10 text-brand-red hover:text-brand-red/70"
+            )}
+            title={isSwipeMode ? "Switch to Classic Mode" : "Switch to Swipe Mode"}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+              <rect width="18" height="18" x="3" y="3" rx="2"/>
+              <path d="M7 8h10"/>
+              <path d="M7 12h10"/>
+              <path d="M7 16h10"/>
+            </svg>
+            {isSwipeMode ? "Swipe ON" : "Swipe OFF"}
+          </button>
+
+          {swipeHistory.length > 0 && (
             <button 
               onClick={handleUndo}
-              className="flex items-center gap-2 text-[10px] font-black tracking-[0.2em] text-brand-red hover:text-brand-red/70 transition-all active:scale-95 uppercase group h-10 px-4 rounded-full bg-brand-red/5 border border-brand-red/10"
+              className="flex items-center gap-2 text-[10px] font-black tracking-[0.2em] text-brand-red hover:text-brand-red/70 transition-all active:scale-95 uppercase h-10 px-4 rounded-full bg-brand-red/5 border border-brand-red/10"
               title="Undo last action"
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="group-hover:-translate-x-0.5 transition-transform">
@@ -280,12 +348,12 @@ export const GameEngine = ({ deck, isExample, onBack }: GameEngineProps) => {
               </svg>
               Undo
             </button>
-          </div>
-        )}
+          )}
+        </div>
       </header>
 
       <div className="flex-1 flex flex-col items-center justify-center gap-12 md:gap-16 lg:gap-24 relative px-4">
-        {stack.length > 0 && !showHandover && (
+        {stack.length > 0 && !showHandover && isSwipeMode && (
           <div className={cn(
             "w-full flex justify-center items-center select-none mb-12 animate-in fade-in zoom-in duration-700",
             isDimmedLights ? "max-w-4xl h-[400px]" : "max-w-[320px] md:max-w-sm h-[500px]"
@@ -322,6 +390,91 @@ export const GameEngine = ({ deck, isExample, onBack }: GameEngineProps) => {
                 );
               }}
             />
+          </div>
+        )}
+
+        {/* Classic Mode View */}
+        {!isSwipeMode && !showHandover && !gameComplete && (
+          <div className="w-full flex flex-col items-center gap-12">
+            <div 
+              ref={(el) => { scrollContainerRef.current = el; }}
+              className={cn(
+                "w-full flex justify-center items-center gap-6 overflow-x-auto pb-8 scrollbar-hide px-4 min-h-[400px]",
+                isDimmedLights ? "max-w-5xl" : "max-w-xl"
+              )}
+            >
+              {shuffledCards
+                .map((card, idx) => ({ card, index: idx }))
+                .filter(item => {
+                  const isRevealed = swipedIndices.has(item.index);
+                  if (!isRevealed || item.card.isHandover) return false;
+                  
+                  if (!isDimmedLights) return true;
+                  
+                  const handoverIdx = shuffledCards.findIndex(c => c.isHandover);
+                  if (activeParticipantIndex === 0) {
+                    return item.index < handoverIdx;
+                  } else {
+                    return item.index > handoverIdx || item.card.cardType === "PHASE_0";
+                  }
+                })
+                .map((item, idx) => (
+                  <div 
+                    key={item.index} 
+                    className={cn(
+                      "shrink-0 transition-all duration-500 animate-in slide-in-from-right-8 fade-in",
+                      isDimmedLights ? "w-[450px] md:w-[550px]" : "w-72 md:w-80"
+                    )}
+                  >
+                    {isDimmedLights ? (
+                      <DLGameCard card={item.card} />
+                    ) : (
+                      <GameCard card={item.card} />
+                    )}
+                  </div>
+                ))}
+              
+              {/* If no cards revealed yet, show placeholder or encouragement */}
+              {swipedIndices.size === 0 && !showTitleCard && (
+                <div className="text-brand-brown/20 italic font-serif text-2xl">
+                  Ready to begin...
+                </div>
+              )}
+            </div>
+
+            {/* Deck to click */}
+            <div className="relative flex flex-col items-center">
+              <button
+                onClick={handleDeckClick}
+                disabled={isRevealing}
+                className={cn(
+                  "relative group transition-all duration-700",
+                  isRevealing 
+                    ? "opacity-50 scale-95" 
+                    : "hover:scale-105 active:scale-95"
+                )}
+              >
+                {/* Physical Stack Shadow effect */}
+                <div className="absolute inset-0 bg-brand-brown/20 rounded-[32px] translate-x-3 translate-y-3 blur-md" />
+                
+                {/* Main deck card back */}
+                <div className={cn(
+                  "relative bg-brand-brown rounded-[32px] shadow-2xl border-4 border-brand-tan/20 flex flex-col items-center justify-center p-10 overflow-hidden transition-all duration-700",
+                  isDimmedLights ? "w-[450px] md:w-[550px] aspect-3/2" : "w-64 md:w-72 aspect-2/3"
+                )}>
+                  {/* Center Content: Deck Title */}
+                  <div className="relative z-10 text-center px-4">
+                    <div className="font-script text-8xl text-brand-cream/20 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 select-none italic">S</div>
+                    <h3 className="text-2xl md:text-3xl font-serif font-black text-brand-cream leading-tight mb-4 relative z-10">
+                      {showTitleCard ? deck.title : "Next Card"}
+                    </h3>
+                    <div className="text-brand-tan font-bold text-[10px] uppercase tracking-[0.3em] relative z-10">
+                      {showTitleCard ? "Tap to Start" : `${cardsRemaining} remaining`}
+                    </div>
+                  </div>
+                </div>
+              </button>
+            </div>
           </div>
         )}
 
