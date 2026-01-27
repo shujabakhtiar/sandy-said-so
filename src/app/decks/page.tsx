@@ -75,7 +75,7 @@ export default function DecksPage() {
       <Navbar />
       
       <main className="container mx-auto px-6 grow">
-        <header className="mb-14 flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <header className="mb-6 md:mb-14 flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div>
             <h1 className="text-5xl md:text-6xl font-serif font-bold text-brand-brown">Your Decks.</h1>
             <p className="mt-4 text-brand-text-muted font-medium italic text-xl">The secrets you&apos;ve collected so far.</p>
@@ -92,33 +92,60 @@ export default function DecksPage() {
         </header>
 
         {/* Mode Filter */}
-        <div className="mb-12 overflow-x-auto pb-4 scrollbar-hide">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setSelectedModeId(null)}
-              className={cn(
-                "px-6 py-2.5 rounded-full font-bold text-xs uppercase tracking-widest transition-all duration-300 whitespace-nowrap",
-                selectedModeId === null 
-                  ? "bg-brand-brown text-white shadow-lg scale-105" 
-                  : "bg-white text-brand-brown/60 hover:bg-brand-tan/10"
-              )}
-            >
-              All Modes
-            </button>
-            {modes.map((mode) => (
+        <div className="mb-12">
+          {/* Mobile Dropdown */}
+          <div className="md:hidden">
+            <div className="relative">
+              <select
+                value={selectedModeId?.toString() || ""}
+                onChange={(e) => setSelectedModeId(e.target.value ? Number(e.target.value) : null)}
+                className="w-full appearance-none bg-white border-2 border-brand-tan/20 text-brand-brown font-bold text-sm rounded-xl px-4 py-3 pr-10 focus:outline-none focus:border-brand-brown/50 transition-colors"
+                aria-label="Filter by Game Mode"
+              >
+                <option value="">ALL MODES</option>
+                {modes.map((mode) => (
+                  <option key={mode.id} value={mode.id}>
+                    {mode.name.toUpperCase()}
+                  </option>
+                ))}
+              </select>
+              <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-brand-brown">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M6 9l6 6 6-6"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          {/* Desktop Chips */}
+          <div className="hidden md:block overflow-x-auto p-4 -mx-4 scrollbar-hide">
+            <div className="flex items-center gap-3">
               <button
-                key={mode.id}
-                onClick={() => setSelectedModeId(mode.id)}
+                onClick={() => setSelectedModeId(null)}
                 className={cn(
                   "px-6 py-2.5 rounded-full font-bold text-xs uppercase tracking-widest transition-all duration-300 whitespace-nowrap",
-                  selectedModeId === mode.id 
-                    ? "bg-brand-red text-white shadow-lg scale-105" 
+                  selectedModeId === null 
+                    ? "bg-brand-brown text-white shadow-lg scale-105" 
                     : "bg-white text-brand-brown/60 hover:bg-brand-tan/10"
                 )}
               >
-                {mode.name}
+                All Modes
               </button>
-            ))}
+              {modes.map((mode) => (
+                <button
+                  key={mode.id}
+                  onClick={() => setSelectedModeId(mode.id)}
+                  className={cn(
+                    "px-6 py-2.5 rounded-full font-bold text-xs uppercase tracking-widest transition-all duration-300 whitespace-nowrap",
+                    selectedModeId === mode.id 
+                      ? "bg-brand-red text-white shadow-lg scale-105" 
+                      : "bg-white text-brand-brown/60 hover:bg-brand-tan/10"
+                  )}
+                >
+                  {mode.name}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
