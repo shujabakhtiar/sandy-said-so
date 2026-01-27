@@ -315,12 +315,11 @@ export const GameEngine = ({ deck, isExample, onBack }: GameEngineProps) => {
           </Modal>
         </div>
 
-        {/* Undo & Mode Toggle Row - Positioned below info row, right aligned */}
         <div className="flex justify-end items-center gap-4 mt-6 -mb-6">
           <button
             onClick={() => setIsSwipeMode(!isSwipeMode)}
             className={cn(
-              "flex items-center gap-2 text-[10px] font-black tracking-[0.2em] transition-all active:scale-95 uppercase h-10 px-4 rounded-full border",
+              "hidden items-center gap-2 text-[10px] font-black tracking-[0.2em] transition-all active:scale-95 uppercase h-10 px-4 rounded-full border",
               isSwipeMode 
                 ? "bg-brand-brown/5 border-brand-brown/10 text-brand-brown/40 hover:text-brand-brown" 
                 : "bg-brand-red/5 border-brand-red/10 text-brand-red hover:text-brand-red/70"
