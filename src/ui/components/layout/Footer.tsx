@@ -9,11 +9,7 @@ export const Footer = () => {
           </p>
         </div>
         
-        <div className="max-w-md">
-          <p className="text-brand-brown font-serif italic leading-relaxed text-base md:text-lg">
-            "Created by Shuja B, who couldn’t find the right social card game, so made one."
-          </p>
-        </div>
+        
 
         <div className="text-brand-brown/30 font-bold uppercase text-[10px] tracking-[0.4em]">
           © 2025 SANDY SAID SO.

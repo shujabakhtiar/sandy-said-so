@@ -58,15 +58,17 @@ export const Navbar = () => {
     <>
       <nav 
         className={cn(
-          "fixed top-0 left-0 right-0 z-50 transition-all duration-500 px-8 w-full",
-          isScrolled 
-            ? "bg-brand-cream/90 backdrop-blur-lg shadow-espresso py-3 lg:px-16" 
-            : "bg-transparent py-8 lg:px-16"
+          "fixed top-0 left-0 right-0 z-50 px-8 w-full transition-all duration-500",
+          // Mobile: Always solid background, no transparency transition
+          "bg-brand-cream/90 backdrop-blur-lg py-4",
+          // Desktop: Transparent at top, solid when scrolled
+          "md:py-8 md:bg-transparent md:shadow-none",
+          isScrolled && "md:bg-brand-cream/90 md:backdrop-blur-lg md:py-3 lg:px-16"
         )}
       >
         <div className={cn(
           "container mx-auto flex items-center justify-between transition-all duration-500",
-          isScrolled ? "scale-[0.98] opacity-100" : "scale-100"
+          isScrolled ? "md:scale-[0.98] md:opacity-100" : "md:scale-100"
         )}>
           <Link href="/" className="font-serif text-2xl tracking-tight font-bold text-brand-brown">
             Sandy <span className="font-script text-3xl font-normal ml-1">said so.</span>

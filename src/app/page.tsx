@@ -12,8 +12,9 @@ export default function Home() {
       <div className="sunkissed" />
       
       {/* Background Decor */}
-      <div className="absolute top-0 right-[-10%] w-[60%] h-[80%] bg-brand-blue/10 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[70%] bg-brand-tan/20 rounded-full blur-[100px] pointer-events-none" />
+      {/* Background Decor */}
+      <div className="fixed top-0 right-[-10%] w-[60%] h-[80%] bg-brand-blue/10 rounded-full blur-[120px] pointer-events-none translate-z-0 will-change-transform" />
+      <div className="fixed bottom-[-10%] left-[-10%] w-[50%] h-[70%] bg-brand-tan/20 rounded-full blur-[100px] pointer-events-none translate-z-0 will-change-transform" />
 
       <Navbar />
       

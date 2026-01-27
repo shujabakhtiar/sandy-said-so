@@ -262,7 +262,7 @@ export default function DeckViewPage() {
       </main>
       {/* Decorative Branding */}
       <div className="fixed bottom-10 left-10 pointer-events-none opacity-10 select-none -rotate-12">
-        <div className="font-script text-8xl text-brand-brown">No secrets safe.</div>
+        <div className="hidden md:block font-script text-8xl text-brand-brown">No secrets safe.</div>
       </div>
     </div>
   );

@@ -222,7 +222,7 @@ function LoginContent() {
 
       {/* Decorative Elements */}
       <div className="fixed bottom-10 right-10 pointer-events-none opacity-20">
-        <div className="font-script text-6xl text-brand-red rotate-12">Sandy knows.</div>
+        <div className="hidden md:block font-script text-6xl text-brand-red rotate-12">Sandy knows.</div>
       </div>
     </div>
   );
